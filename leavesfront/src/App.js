@@ -1,11 +1,11 @@
-import Tree from "./Tree.js"
+import React from "react";
+import { AppProvider } from "./AppContext"; // AppContext 가져오기
+import Tree from "./Tree";
 
-function App() {
+export default function App() {
   return (
-    <div>
-      <Tree/>
-    </div>
+    <AppProvider>
+      <Tree />
+    </AppProvider>
   );
 }
-
-export default App;

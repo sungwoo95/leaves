@@ -1,7 +1,14 @@
-import React from "react";
+import React, { useRef, useEffect, useCallback } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
+import { useAppContext } from "./AppContext";
 
 export default function Tree() {
+  const { searchDirectory, setSearchDirectory,
+    setCurrentNodeDirectory,
+    currentNodeTreeId, setCurrentNodeTreeId,
+    currentNodeId, setCurrentNodeId } = useAppContext();
+  const cyRef = useRef(null);
+
   // 노드 데이터
   const nodes = [
     { data: { id: "root", label: "Root Node" }, position: { x: 300, y: 50 } },
@@ -15,24 +22,76 @@ export default function Tree() {
     { data: { source: "root", target: "child2", label: "Edge to Child 2" } },
   ];
 
+  const focusCurrentNode = useCallback(() => {
+    if (cyRef.current && currentNodeId) {
+      const cy = cyRef.current;
+      const node = cy.getElementById(currentNodeId);
+
+      if (node && node.isNode()) {
+        cy.center(node);
+
+        // 강조 스타일 적용
+        cy.style()
+          .selector(`node[id = "${currentNodeId}"]`)
+          .style({
+            width: "50px",
+            height: "50px",
+            "background-color": "blue",
+          })
+          .update();
+      }
+    }
+  }, [currentNodeId]);
+
+  const handleNodeClick = useCallback(
+    (event) => {
+      const nodeId = event.target.id();
+      setCurrentNodeId(nodeId);
+    },
+    [setCurrentNodeId]
+  );
+
+  // Cytoscape 이벤트 리스너 설정
+  useEffect(() => {
+    if (cyRef.current) {
+      const cy = cyRef.current;
+      cy.on("tap", "node", handleNodeClick);
+
+      // 컴포넌트 언마운트 시 이벤트 리스너 정리
+      return () => {
+        cy.off("tap", "node", handleNodeClick);
+      };
+    }
+  }, [handleNodeClick]);
+
+  // 마운트, currentNodeId 변경 시 노드 정렬.
+  useEffect(() => {
+    focusCurrentNode();
+  }, [currentNodeId, focusCurrentNode]);
+
   return (
     <CytoscapeComponent
-      elements={CytoscapeComponent.normalizeElements({ nodes, edges })} // 노드와 엣지를 분리해 병합
-      style={{ width: "600px", height: "600px" }} // Cytoscape 캔버스 크기
-      layout={{ name: "preset" }} // 노드 위치 고정
+      cy={(cy) => {
+        cyRef.current = cy; // Cytoscape 인스턴스 참조 저장
+      }}
+      elements={CytoscapeComponent.normalizeElements({ nodes, edges })}
+      style={{ width: "600px", height: "600px" }}
+      layout={{ name: "preset" }}
       stylesheet={[
         {
-          selector: "node", // 모든 노드에 적용
+          selector: "node",
           style: {
-            "background-color": "green", // 노드 배경색
-            "label": "data(label)", // 노드에 라벨 표시
+            "background-color": "green",
+            "label": "data(label)",
+            width: "30px",
+            height: "30px",
           },
         },
         {
-          selector: "edge", // 모든 엣지에 적용
+          selector: "edge",
           style: {
-            "width": 2, // 엣지 두께
-            "line-color": "#ccc", // 엣지 선 색상
+            width: 2,
+            "line-color": "#ccc",
           },
         },
       ]}
