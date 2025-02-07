@@ -11,7 +11,7 @@ const client = new MongoClient(uri, {
   }
 });
 
-async function connectToDB() {
+const connectToDB = async () => {
   try {
     await client.connect();
     // 연결 테스트: admin 데이터베이스에 ping 명령 실행
