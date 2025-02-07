@@ -1,14 +1,19 @@
 {
   "name": "leavesback",
   "version": "1.0.0",
+  "type": "module",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "express": "^4.21.2"
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "googleapis": "^144.0.0",
+    "mongodb": "^6.13.0"
   }
 }
