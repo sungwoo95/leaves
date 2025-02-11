@@ -1,54 +1,64 @@
-import React, { useRef, useEffect, useCallback } from "react";
+import React, { useRef, useEffect, useCallback, useState } from "react";
+import axios from "axios"
 import CytoscapeComponent from "react-cytoscapejs";
-import { useAppContext } from "./Space";
+import { useSpaceContext } from "./Space";
 
 export default function Tree() {
-  const { searchDirectory, setSearchDirectory,
-    setCurrentNodeDirectory,
-    currentNodeTreeId, setCurrentNodeTreeId,
-    currentNodeId, setCurrentNodeId } = useAppContext();
+  const { treeId,leafId,setLeafId } = useSpaceContext();
   const cyRef = useRef(null);
+  const [nodes, setNodes] = useState([]);
+  const [edges, setEdges] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const path = window.location.hostname === "localhost"
+    ? "http://localhost:3001"  
+    : "https://api.mywebsite.com"; 
 
-  // 노드 데이터
-  const nodes = [
-    { data: { id: "root", label: "Root Node" }, position: { x: 300, y: 50 } },
-    { data: { id: "child1", label: "Child Node 1" }, position: { x: 200, y: 200 } },
-    { data: { id: "child2", label: "Child Node 2" }, position: { x: 400, y: 200 } },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${path}/api/trees/${treeId}`);
 
-  // 엣지 데이터
-  const edges = [
-    { data: { source: "root", target: "child1", label: "Edge to Child 1" } },
-    { data: { source: "root", target: "child2", label: "Edge to Child 2" } },
-  ];
+        setNodes(response.data.nodes);
+        setEdges(response.data.edges);
+      } catch (error) {
+        console.error("Error fetching tree data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (treeId) {
+      fetchData();
+    }
+  }, [treeId]); 
 
   const focusCurrentNode = useCallback(() => {
-    if (cyRef.current && currentNodeId) {
+    if (cyRef.current && leafId) {
       const cy = cyRef.current;
-      const node = cy.getElementById(currentNodeId);
+      const node = cy.getElementById(leafId);
 
       if (node && node.isNode()) {
         cy.center(node);
 
         // 강조 스타일 적용
         cy.style()
-          .selector(`node[id = "${currentNodeId}"]`)
+          .selector(`node[id = "${leafId}"]`)
           .style({
-            width: "50px",
-            height: "50px",
-            "background-color": "blue",
+            width: "40px",
+            height: "40px",
           })
           .update();
       }
     }
-  }, [currentNodeId]);
+  }, [leafId]);
 
   const handleNodeClick = useCallback(
     (event) => {
       const nodeId = event.target.id();
-      setCurrentNodeId(nodeId);
+      setLeafId(nodeId);
     },
-    [setCurrentNodeId]
+    [setLeafId]
   );
 
   // Cytoscape 이벤트 리스너 설정
@@ -64,11 +74,15 @@ export default function Tree() {
     }
   }, [handleNodeClick]);
 
-  // 마운트, currentNodeId 변경 시 노드 정렬.
+  // 마운트, leafId 변경 시 노드 정렬.
   useEffect(() => {
     focusCurrentNode();
-  }, [currentNodeId, focusCurrentNode]);
+  }, [leafId, focusCurrentNode]);
 
+  if (loading) {
+    return <p>Loading tree data...</p>;
+  }
+  
   return (
     <CytoscapeComponent
       cy={(cy) => {

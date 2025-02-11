@@ -1,8 +1,13 @@
 import express from 'express';
-import  connectToDB  from './config/db.js';
+import cors from "cors";
+import connectToDB  from './config/db.js';
+import treesRouter from './routes/trees.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+app.use(cors());
+
+app.use("/api", treesRouter);
 
 const startServer = async () => {
   try {

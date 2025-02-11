@@ -4,25 +4,16 @@ import React, { createContext, useState, useContext } from "react";
 const SpaceContext = createContext();
 
 export function Space({ children }) {
-  const [searchDirectory, setSearchDirectory] = useState(null); 
-  const [searchTreeId, setSearchTreeId] = useState(null); 
-  const [currentNodeDirectory, setCurrentNodeDirectory] = useState(null); 
-  const [currentNodeTreeId, setCurrentNodeTreeId] = useState(null); 
-  const [currentNodeId, setCurrentNodeId] = useState(null); 
+  const [treeId, setTreeId] = useState(1);
+  const [leafId, setLeafId] = useState(null); 
 
   return (
     <SpaceContext.Provider
       value={{
-        searchDirectory,
-        setSearchDirectory,
-        searchTreeId,
-        setSearchTreeId,
-        currentNodeDirectory,
-        setCurrentNodeDirectory,
-        currentNodeTreeId,
-        setCurrentNodeTreeId,
-        currentNodeId,
-        setCurrentNodeId,
+        treeId,
+        setTreeId,
+        leafId,
+        setLeafId,
       }}
     >
       {children}
@@ -30,4 +21,4 @@ export function Space({ children }) {
   );
 }
 
-export const useAppContext = () => useContext(SpaceContext);
+export const useSpaceContext = () => useContext(SpaceContext);
