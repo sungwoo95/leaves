@@ -2,7 +2,7 @@ import express from 'express';
 import  connectToDB  from './config/db.js';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 const startServer = async () => {
   try {

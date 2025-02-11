@@ -1,9 +1,9 @@
 import React, { createContext, useState, useContext } from "react";
 
 // Context 생성
-const AppContext = createContext();
+const SpaceContext = createContext();
 
-export function AppProvider({ children }) {
+export function Space({ children }) {
   const [searchDirectory, setSearchDirectory] = useState(null); 
   const [searchTreeId, setSearchTreeId] = useState(null); 
   const [currentNodeDirectory, setCurrentNodeDirectory] = useState(null); 
@@ -11,7 +11,7 @@ export function AppProvider({ children }) {
   const [currentNodeId, setCurrentNodeId] = useState(null); 
 
   return (
-    <AppContext.Provider
+    <SpaceContext.Provider
       value={{
         searchDirectory,
         setSearchDirectory,
@@ -26,8 +26,8 @@ export function AppProvider({ children }) {
       }}
     >
       {children}
-    </AppContext.Provider>
+    </SpaceContext.Provider>
   );
 }
 
-export const useAppContext = () => useContext(AppContext);
+export const useAppContext = () => useContext(SpaceContext);

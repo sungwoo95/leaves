@@ -1,11 +1,11 @@
 import React from "react";
-import { AppProvider } from "./AppContext"; // AppContext 가져오기
+import { Space } from "./Space"; 
 import Tree from "./Tree";
 
 export default function App() {
   return (
-    <AppProvider>
+    <Space>
       <Tree />
-    </AppProvider>
+    </Space>
   );
 }

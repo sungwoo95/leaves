@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useCallback } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
-import { useAppContext } from "./AppContext";
+import { useAppContext } from "./Space";
 
 export default function Tree() {
   const { searchDirectory, setSearchDirectory,
