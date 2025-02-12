@@ -13,6 +13,7 @@ export default function Tree() {
     ? "http://localhost:3001"  
     : "https://api.mywebsite.com"; 
 
+  //tree데이터 가져오기.
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -53,26 +54,31 @@ export default function Tree() {
     }
   }, [leafId]);
 
-  const handleNodeClick = useCallback(
+  const handleLeafClick = useCallback(
     (event) => {
-      const nodeId = event.target.id();
-      setLeafId(nodeId);
+      console.log("handleLeafClick 호출");
+      const leafId = event.target.id();
+      setLeafId(leafId);
     },
     [setLeafId]
   );
 
-  // Cytoscape 이벤트 리스너 설정
+  // handleLeafClick 등록.
   useEffect(() => {
-    if (cyRef.current) {
-      const cy = cyRef.current;
-      cy.on("tap", "node", handleNodeClick);
+    if (!cyRef.current) return;
 
-      // 컴포넌트 언마운트 시 이벤트 리스너 정리
-      return () => {
-        cy.off("tap", "node", handleNodeClick);
-      };
-    }
-  }, [handleNodeClick]);
+    const cy = cyRef.current;
+    console.log("handleLeafClick 등록");
+
+    // 기존 이벤트 리스너 제거 후 다시 등록
+    cy.off("tap", "node", handleLeafClick);
+    cy.on("tap", "node", handleLeafClick);
+
+    return () => {
+      cy.off("tap", "node", handleLeafClick);
+    };
+  }, [nodes, edges, handleLeafClick]); // ✅ 노드 & 엣지가 변경될 때 리스너 재설정
+
 
   // 마운트, leafId 변경 시 노드 정렬.
   useEffect(() => {
