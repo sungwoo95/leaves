@@ -77,7 +77,7 @@ export default function Tree() {
     return () => {
       cy.off("tap", "node", handleLeafClick);
     };
-  }, [nodes, edges, handleLeafClick]); // ✅ 노드 & 엣지가 변경될 때 리스너 재설정
+  }, [nodes, edges, handleLeafClick]);
 
 
   // 마운트, leafId 변경 시 노드 정렬.
@@ -95,7 +95,7 @@ export default function Tree() {
         cyRef.current = cy; // Cytoscape 인스턴스 참조 저장
       }}
       elements={CytoscapeComponent.normalizeElements({ nodes, edges })}
-      style={{ width: "600px", height: "600px" }}
+      style={{ width: "100%", height: "100%" }}
       layout={{ name: "preset" }}
       stylesheet={[
         {

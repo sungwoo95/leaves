@@ -2,12 +2,12 @@ import React from "react";
 import { Paper, Box } from "@mui/material";
 import Tree from "./Tree";
 
-export default function SidebarRight() {
+export default function SecondSidebar() {
   return (
     <Paper
-      sx={{ height: "100vh"}}
+      sx={{ height: "100vh" }}
     >
-      <Box sx={{ overflow: "hidden" }}>
+      <Box sx={{ overflow: "hidden", height: "100vh" }}>
         <Tree />
       </Box>
     </Paper>
