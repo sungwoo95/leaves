@@ -1,11 +1,11 @@
 import React from "react";
-import { Space } from "./Space"; 
-import Tree from "./Tree";
+import AppLayout from "./AppLayout";
+import { Space } from "./Space";
 
 export default function App() {
   return (
     <Space>
-      <Tree />
+      <AppLayout />
     </Space>
   );
 }

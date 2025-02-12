@@ -31,7 +31,7 @@ export default function Tree() {
     if (treeId) {
       fetchData();
     }
-  }, [treeId]); 
+  }, [path, treeId]); 
 
   const focusCurrentNode = useCallback(() => {
     if (cyRef.current && leafId) {
