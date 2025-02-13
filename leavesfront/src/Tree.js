@@ -13,7 +13,33 @@ export default function Tree() {
     ? "http://localhost:3001"
     : "https://api.mywebsite.com";
 
-  //tree데이터 가져오기.(마운트,treeId 변경 시)
+  const focusCurrentNode = useCallback(() => {
+    if (cyRef.current && leafId) {
+      const cy = cyRef.current;
+      const node = cy.getElementById(leafId);
+
+      if (node && node.isNode()) {
+        cy.center(node);
+
+        // 강조 스타일 적용
+        cy.style()
+          .selector(`node[id = "${leafId}"]`)
+          .style({
+            width: "40px",
+            height: "40px",
+          })
+          .update();
+      }
+    }
+  }, [leafId]);
+
+  const handleLeafClick = (event) => {
+    console.log("handleLeafClick 호출");
+    const leafId = event.target.id();
+    setLeafId(leafId);
+  }
+
+  //tree데이터 가져오기.
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -35,36 +61,7 @@ export default function Tree() {
     }
   }, [path, treeId]);
 
-  const focusCurrentNode = useCallback(() => {
-    if (cyRef.current && leafId) {
-      const cy = cyRef.current;
-      const node = cy.getElementById(leafId);
-
-      if (node && node.isNode()) {
-        cy.center(node);
-
-        // 강조 스타일 적용
-        cy.style()
-          .selector(`node[id = "${leafId}"]`)
-          .style({
-            width: "40px",
-            height: "40px",
-          })
-          .update();
-      }
-    }
-  }, [leafId]);
-
-  const handleLeafClick = useCallback(
-    (event) => {
-      console.log("handleLeafClick 호출");
-      const leafId = event.target.id();
-      setLeafId(leafId);
-    },
-    [setLeafId]
-  );
-
-  // 마운트, leafId 변경 시 노드 정렬.
+  //노드 정렬.
   useEffect(() => {
     focusCurrentNode();
   }, [leafId, focusCurrentNode]);
