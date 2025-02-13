@@ -4,19 +4,20 @@ import CytoscapeComponent from "react-cytoscapejs";
 import { useSpaceContext } from "./Space";
 
 export default function Tree() {
-  const { treeId,leafId,setLeafId } = useSpaceContext();
+  const { treeId, leafId, setLeafId } = useSpaceContext();
   const cyRef = useRef(null);
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const [loading, setLoading] = useState(true);
   const path = window.location.hostname === "localhost"
-    ? "http://localhost:3001"  
-    : "https://api.mywebsite.com"; 
+    ? "http://localhost:3001"
+    : "https://api.mywebsite.com";
 
-  //tree데이터 가져오기.
+  //tree데이터 가져오기.(마운트,treeId 변경 시)
   useEffect(() => {
     const fetchData = async () => {
       try {
+        console.log(`fetchData called, treeID:${treeId}`);
         setLoading(true);
         const response = await axios.get(`${path}/api/trees/${treeId}`);
 
@@ -32,7 +33,7 @@ export default function Tree() {
     if (treeId) {
       fetchData();
     }
-  }, [path, treeId]); 
+  }, [path, treeId]);
 
   const focusCurrentNode = useCallback(() => {
     if (cyRef.current && leafId) {
@@ -63,23 +64,6 @@ export default function Tree() {
     [setLeafId]
   );
 
-  // handleLeafClick 등록.
-  useEffect(() => {
-    if (!cyRef.current) return;
-
-    const cy = cyRef.current;
-    console.log("handleLeafClick 등록");
-
-    // 기존 이벤트 리스너 제거 후 다시 등록
-    cy.off("tap", "node", handleLeafClick);
-    cy.on("tap", "node", handleLeafClick);
-
-    return () => {
-      cy.off("tap", "node", handleLeafClick);
-    };
-  }, [nodes, edges, handleLeafClick]);
-
-
   // 마운트, leafId 변경 시 노드 정렬.
   useEffect(() => {
     focusCurrentNode();
@@ -88,11 +72,12 @@ export default function Tree() {
   if (loading) {
     return <p>Loading tree data...</p>;
   }
-  
+
   return (
     <CytoscapeComponent
       cy={(cy) => {
-        cyRef.current = cy; // Cytoscape 인스턴스 참조 저장
+        cyRef.current = cy;
+        cy.on("tap", "node", handleLeafClick);
       }}
       elements={CytoscapeComponent.normalizeElements({ nodes, edges })}
       style={{ width: "100%", height: "100%" }}
