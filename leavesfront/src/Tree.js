@@ -13,13 +13,28 @@ export default function Tree() {
     ? "http://localhost:3001"
     : "https://api.mywebsite.com";
 
+  //leafId로 중앙 정렬.
   const focusCurrentNode = useCallback(() => {
     if (cyRef.current && leafId) {
       const cy = cyRef.current;
-      const node = cy.getElementById(leafId);
+      const leaf = cy.getElementById(leafId);
 
-      if (node && node.isNode()) {
-        cy.center(node);
+      if (leaf && leaf.isNode()) {
+        const leafPosition = leaf.position();
+        const zoom = cy.zoom();
+
+        cy.animate(
+          {
+            pan: {
+              x: (cy.width() / 2 - leafPosition.x * zoom),
+              y: (cy.width() / 2 - leafPosition.y * zoom),
+            }
+          },
+          {
+            duration: 600,
+            easing: "ease-in-out"
+          }
+        )
 
         // 강조 스타일 적용
         cy.style()
