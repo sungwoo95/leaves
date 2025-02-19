@@ -1,10 +1,10 @@
-import React, { useRef, useEffect, useCallback, useState } from "react";
+import { useRef, useEffect, useCallback, useState } from "react";
 import axios from "axios";
 import CytoscapeComponent from "react-cytoscapejs";
 import { useSpaceContext } from "./Space";
 import cytoscape from "cytoscape";
 
-export default function Tree() {
+const Tree: React.FC = () => {
   const spaceContext = useSpaceContext();
   try {
     if (!spaceContext) {
@@ -123,4 +123,6 @@ export default function Tree() {
       ]}
     />
   );
-}
+};
+
+export default Tree;

@@ -1,15 +1,14 @@
-import React from "react";
 import { Paper, Box } from "@mui/material";
-import Tree from "./Tree.tsx";
+import Tree from "./Tree"; 
 
-export default function SecondSidebar() {
+const SecondSidebar: React.FC = () => {
   return (
-    <Paper
-      sx={{ height: "100vh" }}
-    >
+    <Paper sx={{ height: "100vh" }}>
       <Box sx={{ overflow: "hidden", height: "100vh" }}>
         <Tree />
       </Box>
     </Paper>
   );
-}
+};
+
+export default SecondSidebar;

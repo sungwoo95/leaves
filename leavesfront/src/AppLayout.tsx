@@ -1,10 +1,9 @@
-import React from "react";
 import { Box } from "@mui/material";
 import FirstSidebar from "./FirstSidebar";
 import SecondSidebar from "./SecondSidebar";
 import MainContent from "./MainContent";
 
-export default function AppLayout() {
+const AppLayout: React.FC = () => {
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>  
       <Box sx={{ flex: 1.5, display: "flex", flexDirection: "column" }}>  
@@ -18,4 +17,6 @@ export default function AppLayout() {
       </Box>
     </Box>
   );
-}
+};
+
+export default AppLayout;
