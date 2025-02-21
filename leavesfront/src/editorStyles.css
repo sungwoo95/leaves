@@ -1,7 +1,7 @@
 /* Base theme */
 .bn-container[data-theming-css-variables-demo][data-color-scheme] {
   --bn-colors-editor-text: #222222;
-  --bn-colors-editor-background: #ffeeee;
+  --bn-colors-editor-background: #ffffff;
   --bn-colors-menu-text: #ffffff;
   --bn-colors-menu-background: #9b0000;
   --bn-colors-tooltip-text: #ffffff;
@@ -23,7 +23,7 @@
 /* Changes for dark mode */
 .bn-container[data-theming-css-variables-demo][data-color-scheme="dark"] {
   --bn-colors-editor-text: #ffffff;
-  --bn-colors-editor-background: #000000;
+  --bn-colors-editor-background: #121212;
   --bn-colors-side-menu: #ffffff;
 }
  
