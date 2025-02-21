@@ -1,11 +1,20 @@
-import { Box } from "@mui/material";
+import { Box, Paper } from "@mui/material";
 import Editor from "./Editor";
+import { useTheme } from "@mui/material/styles";
 
 const MainContent: React.FC = () => {
+  const theme = useTheme();
+
   return (
-    <Box sx={{ height: "100vh", p: 2, boxSizing: "border-box" }}>
-      Main Content
-      <Editor />
+    <Box sx={{ height: "100vh", boxSizing: "border-box", display: "flex", flexDirection: "column" }}>
+      <Box sx={{ mb: 2 }}>Title</Box>
+      <Paper
+        sx={{
+          flex: 1,
+          bgcolor: theme.palette.mode === "dark" ? "black" : "white",
+        }}>
+        <Editor />
+      </Paper>
     </Box>
   );
 };

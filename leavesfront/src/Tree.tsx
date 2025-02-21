@@ -3,6 +3,7 @@ import axios from "axios";
 import CytoscapeComponent from "react-cytoscapejs";
 import { useSpaceContext } from "./Space";
 import cytoscape from "cytoscape";
+import { useTheme } from "@mui/material/styles";
 
 const Tree: React.FC = () => {
   const spaceContext = useSpaceContext();
@@ -21,6 +22,7 @@ const Tree: React.FC = () => {
   const [edges, setEdges] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const path = window.location.hostname === "localhost" ? "http://localhost:3001" : "https://api.mywebsite.com";
+  const theme = useTheme();
 
   //leafId로 중앙 정렬.
   const focusCurrentNode = useCallback(() => {
@@ -111,6 +113,7 @@ const Tree: React.FC = () => {
             label: "data(label)",
             width: "30px",
             height: "30px",
+            color: theme.palette.mode === "dark" ? "white" : "black",
           },
         },
         {
