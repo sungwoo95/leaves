@@ -14,13 +14,13 @@ const MainContent: React.FC = () => {
         flexDirection: "column",
       }}>
       <Box sx={{ mb: 2 }}>Title</Box>
-      <Paper
+      <Box         
         sx={{
-          flex: 1,
+          flex: 1,          
           bgcolor: theme.palette.mode === "dark" ? "#121212" : "white",
         }}>
         <Editor />
-      </Paper>
+      </Box>
     </Box>
   );
 };
