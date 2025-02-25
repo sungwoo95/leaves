@@ -1,4 +1,4 @@
-import { Box, Paper } from "@mui/material";
+import { Box } from "@mui/material";
 import Editor from "./Editor";
 import { useTheme } from "@mui/material/styles";
 
