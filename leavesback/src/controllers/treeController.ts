@@ -1,4 +1,27 @@
-const treeData = {
+import { Request, Response } from "express";
+
+type NodeData = {
+  id: string;
+  label: string;
+};
+
+type Position = {
+  x: number;
+  y: number;
+};
+
+type EdgeData = {
+  source: string;
+  target: string;
+  label: string;
+};
+
+type Tree = {
+  nodes: { data: NodeData; position: Position }[];
+  edges: { data: EdgeData }[];
+};
+
+const treeData: Record<string, Tree> = {
   "1": {
     nodes: [
       { data: { id: "root", label: "Root Node" }, position: { x: 300, y: 50 } },
@@ -12,7 +35,8 @@ const treeData = {
   },
 };
 
-export const getTreeData = (req, res) => {
+// 특정 트리 데이터 조회 (GET /api/tree/:treeId)
+export const getTreeData = (req: Request, res: Response): void => {
   const { treeId } = req.params;
 
   if (treeData[treeId]) {
@@ -22,11 +46,11 @@ export const getTreeData = (req, res) => {
   }
 };
 
-export const deleteTree = (req, res) => {
+export const deleteTree = (req: Request, res: Response): void => {
   const { treeId } = req.params;
 
   if (treeData[treeId]) {
-    delete treeData[treeId]; 
+    delete treeData[treeId];
     res.json({ message: `Tree ${treeId} has been deleted.` });
   } else {
     res.status(404).json({ error: "Tree not found" });
