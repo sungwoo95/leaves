@@ -8,6 +8,7 @@ const FirstSidebar: React.FC = () => {
   return (
     <Paper
       sx={{
+        width:"100%",
         padding: 1,
         height: "100vh",
         display: "flex",

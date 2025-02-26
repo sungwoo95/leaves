@@ -14,7 +14,7 @@ const PrivateForest = () => {
   const fileTree: Directory[] = [
     {
       _id: "1",
-      name: "Documents",
+      name: "Private Forest Documents",
       type: "folder",
       children: [
         { _id: "2", name: "resume.pdf", type: "file" },
@@ -39,7 +39,7 @@ const PrivateForest = () => {
 
 
   return (
-    <Box sx={{ borderRadius: 2 }}>
+    <Box sx={{width:"100%"}}>
       <Button
         variant="text"
         sx={{ width: "100%", justifyContent: "flex-start" }}
