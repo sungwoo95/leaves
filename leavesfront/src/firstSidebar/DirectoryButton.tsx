@@ -6,11 +6,13 @@ import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 const DirectoryButton = ({
   item,
   level,
+  isVisible,
   toggleVisibility,
   addDirectory,
 }: {
   item: Directory;
   level: number;
+  isVisible: boolean;
   toggleVisibility: (id: string) => void;
   addDirectory: AddDirectory;
 }) => {
@@ -37,12 +39,14 @@ const DirectoryButton = ({
           <CreateNewFolderIcon
             onClick={(e) => {
               e.stopPropagation();
+              if(!isVisible) toggleVisibility(item.id);
               addDirectory(item.id, DirectoryType.FOLDER);
             }}
           />
           <AddIcon
             onClick={(e) => {
               e.stopPropagation();
+              if (!isVisible) toggleVisibility(item.id);
               addDirectory(item.id, DirectoryType.FILE);
             }}
           />

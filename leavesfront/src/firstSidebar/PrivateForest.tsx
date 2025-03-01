@@ -84,12 +84,14 @@ const PrivateForest = () => {
         <CreateNewFolderIcon
           onClick={(e) => {
             e.stopPropagation();
+            if (!isVisible) toggleVisibility();
             addDirectory(null, DirectoryType.FOLDER);
           }}
         />
         <AddIcon
           onClick={(e) => {
             e.stopPropagation();
+            if (!isVisible) toggleVisibility();
             addDirectory(null, DirectoryType.FILE);
           }}
         />

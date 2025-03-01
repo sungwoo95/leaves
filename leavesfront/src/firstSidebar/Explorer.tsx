@@ -15,7 +15,7 @@ const Explorer = ({ directories, level = 2, addDirectory }: { directories: Direc
     <Box sx={{ width: "100%" }}>
       {directories.map((item) => (
         <Box sx={{ width: "100%" }} key={item.id}>
-          <DirectoryButton item={item} level={level} toggleVisibility={toggleVisibility} addDirectory={addDirectory} />
+          <DirectoryButton item={item} level={level} isVisible={openState[item.id]} toggleVisibility={toggleVisibility} addDirectory={addDirectory} />
           {openState[item.id] && item.type === "folder" && item.children && <Explorer directories={item.children} level={level + 1} addDirectory={addDirectory} />}
         </Box>
       ))}
