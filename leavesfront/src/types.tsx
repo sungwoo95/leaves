@@ -1,6 +1,13 @@
+export type AddDirectory = (parentId: null | string, type: DirectoryType) => void;
+
+export enum DirectoryType {
+  FOLDER = "folder",
+  FILE = "file",
+}
+
 export type Directory = {
-  _id: string;
+  id: string;
+  type: DirectoryType; // ✅ enum 사용
   name: string;
-  type: "folder" | "file";
-  children?: Directory[];
+  children: Directory[];
 };
