@@ -12,23 +12,52 @@ const fileTree: Directory[] = [
     name: "Private Forest Documents",
     type: DirectoryType.FOLDER,
     children: [
-      { id: "2", name: "resume.pdf", type: DirectoryType.FILE,children:[] },
-      { id: "3", name: "notes.txt", type: DirectoryType.FILE,children:[] }
+      {
+        id: "2",
+        name: "resume.pdf",
+        type: DirectoryType.FILE,
+        children: [],
+        isNew: false,
+      },
+      {
+        id: "3",
+        name: "notes.txt",
+        type: DirectoryType.FILE,
+        children: [],
+        isNew: false,
+      },
     ],
+    isNew: false,
   },
   {
     id: "4",
     name: "Photos",
     type: DirectoryType.FOLDER,
     children: [
-      { id: "5", name: "vacation.jpg", type: DirectoryType.FILE,children:[] },
+      {
+        id: "5",
+        name: "vacation.jpg",
+        type: DirectoryType.FILE,
+        children: [],
+        isNew: false,
+      },
       {
         id: "6",
         name: "Events",
         type: DirectoryType.FOLDER,
-        children: [{ id: "7", name: "birthday.jpg", type: DirectoryType.FILE,children:[]}],
+        children: [
+          {
+            id: "7",
+            name: "birthday.jpg",
+            type: DirectoryType.FILE,
+            children: [],
+            isNew: false,
+          },
+        ],
+        isNew: false,
       },
     ],
+    isNew: false,
   },
 ];
 const PrivateForest = () => {
@@ -39,10 +68,11 @@ const PrivateForest = () => {
     setIsVisible((prev) => !prev);
   };
 
-  const addDirectory = (parentId: null | string = null, type: DirectoryType): void => {
+  const addDirectory = (targetId: null | string = null, type: DirectoryType): void => {
     const directory: Directory = {
       id: crypto.randomUUID(),
       type: type,
+      isNew: true,
       name: "Untitled",
       children: [],
     };
@@ -50,27 +80,49 @@ const PrivateForest = () => {
       for (let i = 0; i < directories.length; i++) {
         const id = directories[i].id;
         const children = directories[i].children;
-        if (id === parentId) {
-          //새로운 배열 반환.
+        //여기서 찾았음, "새로운 배열"을 return하자.(나를 소환한 본체에게 전달)
+        if (id === targetId) {
           return [...directories.slice(0, i), { ...directories[i], children: [...children, directory] }, ...directories.slice(i + 1)];
         }
-        //children이 있을 경우
         if (children.length > 0) {
+          //분신술 사용
           const updatedChildren = updateChildren(children);
+          //나의 분신이 찾았을 경우, 나도 새로운 배열을 본체에게 전달.
           if (updatedChildren !== children) {
-            //children에서 찾았을 경우
             return [...directories.slice(0, i), { ...directories[i], children: updatedChildren }, ...directories.slice(i + 1)];
           }
         }
       }
-      return directories; //못 찾으면 그대로 반환.
+      return directories; //분신도 못 찾고, 나도 못 찾으면 그대로 반환.
     };
     setDirectories((prevDirectories) => {
-      if (parentId) {
+      if (targetId) {
         return updateChildren(prevDirectories);
       } else {
         return [...prevDirectories, directory];
       }
+    });
+  };
+
+  const updateIsNew = (targetId: string): void => {
+    const updateDirectoryIsNew = (directories: Directory[]): Directory[] => {
+      for (let i = 0; i < directories.length; i++) {
+        const id = directories[i].id;
+        const children = directories[i].children;
+        if (id === targetId) {
+          return [...directories.slice(0, i), { ...directories[i], isNew: false }, ...directories.slice(i + 1)];
+        }
+        if (children.length > 0) {
+          const updatedChildren = updateDirectoryIsNew(children);
+          if (updatedChildren !== children) {
+            return [...directories.slice(0, i), { ...directories[i], children: updatedChildren }, ...directories.slice(i + 1)];
+          }
+        }
+      }
+      return directories;
+    };
+    setDirectories((prevDirectories) => {
+      return updateDirectoryIsNew(prevDirectories);
     });
   };
   useEffect(() => {
@@ -98,7 +150,7 @@ const PrivateForest = () => {
       </Button>
 
       {isVisible && ( // isVisible이 true일 때만 Box 렌더링
-        <Explorer directories={directories} addDirectory={addDirectory} />
+        <Explorer directories={directories} addDirectory={addDirectory} updateIsNew={updateIsNew} />
       )}
     </Box>
   );
