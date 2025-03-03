@@ -1,8 +1,9 @@
 import { Button, Box, TextField } from "@mui/material";
-import { AddDirectory, Directory, DirectoryType, UpdateIsNew, UpdateName } from "../types";
+import { AddDirectory, Directory, DirectoryType, Position, UpdateIsNew, UpdateName } from "../types";
 import AddIcon from "@mui/icons-material/Add";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import { useEffect, useRef, useState } from "react";
+import DirectoryContextMenu from "./DirectoryContextMenu";
 
 const DirectoryButton = ({
   item,
@@ -22,24 +23,43 @@ const DirectoryButton = ({
   updateName: UpdateName;
 }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [menuPosition, setMenuPosition] = useState<Position | undefined>(undefined);
   const inputRef = useRef<HTMLInputElement | undefined>(undefined);
-  
-  const handleEditingEnd = ():void => {
+
+  const exitEditMode = (): void => {
+    console.log("[DirectoryButton]exitEditMode called");
     //편집 내용 업데이트.
     if (inputRef.current) {
       const newName = inputRef.current.value;
-      if (item.name !== newName) updateName(item.id, newName); 
+      if (item.name !== newName) updateName(item.id, newName);
     }
     //편집 상태 종료.
     if (item.isNew) updateIsNew(item.id);
     setIsEditing(false);
   };
+
+  const onClickHandler = () => {
+    console.log("[DirectoryButton][Button]onClick called");
+    if (item.type === DirectoryType.FOLDER) toggleVisibility(item.id);
+  };
+
+  const onContextMenuHandler = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setMenuPosition({ top: e.clientY, left: e.clientX });
+  };
+
+  const onCloseHandler = () => {
+    console.log("[DirectoryButton]handleContextMenuClose called");
+    setMenuPosition(undefined);
+  };
+
   useEffect(() => {
     if ((item.isNew || isEditing) && inputRef.current) {
       inputRef.current.focus();
       inputRef.current.select();
     }
   }, [isEditing]);
+
   return (
     <Button
       variant="text"
@@ -48,7 +68,9 @@ const DirectoryButton = ({
         pl: level,
         border: item.isNew || isEditing ? "2px solid green" : "none",
       }}
-      onClick={() => toggleVisibility(item.id)}>
+      onClick={onClickHandler}
+      onContextMenu={onContextMenuHandler}>
+      <DirectoryContextMenu open={!!menuPosition} menuPosition={menuPosition} onCloseHandler={onCloseHandler} />
       <Box
         sx={{
           width: "100%",
@@ -62,12 +84,10 @@ const DirectoryButton = ({
             inputRef={inputRef} //focus,select를 위함.
             defaultValue={item.name}
             variant="standard"
-            onBlur={() => {
-              handleEditingEnd();
-            }}
+            onBlur={exitEditMode}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                handleEditingEnd();
+                exitEditMode();
               }
             }}
           />

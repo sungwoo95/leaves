@@ -17,3 +17,8 @@ export type Directory = {
   name: string;
   children: Directory[];
 };
+
+export type Position = {
+  top: number;
+  left: number;
+};
