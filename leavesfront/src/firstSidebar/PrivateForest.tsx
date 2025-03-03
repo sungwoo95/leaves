@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import { Box } from "@mui/material";
 import Explorer from "./Explorer";
-import { Directory, DirectoryType } from "../types";
+import { Directory, DirectoryType, UpdateName } from "../types";
 import AddIcon from "@mui/icons-material/Add";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 const fileTree: Directory[] = [
@@ -78,18 +78,18 @@ const PrivateForest = () => {
     };
     const updateChildren = (directories: Directory[]): Directory[] => {
       for (let i = 0; i < directories.length; i++) {
-        const id = directories[i].id;
-        const children = directories[i].children;
+        const elem = directories[i];
+        const children = elem.children;
         //여기서 찾았음, "새로운 배열"을 return하자.(나를 소환한 본체에게 전달)
-        if (id === targetId) {
-          return [...directories.slice(0, i), { ...directories[i], children: [...children, directory] }, ...directories.slice(i + 1)];
+        if (elem.id === targetId) {
+          return [...directories.slice(0, i), { ...elem, children: [...children, directory] }, ...directories.slice(i + 1)];
         }
         if (children.length > 0) {
           //분신술 사용
           const updatedChildren = updateChildren(children);
           //나의 분신이 찾았을 경우, 나도 새로운 배열을 본체에게 전달.
           if (updatedChildren !== children) {
-            return [...directories.slice(0, i), { ...directories[i], children: updatedChildren }, ...directories.slice(i + 1)];
+            return [...directories.slice(0, i), { ...elem, children: updatedChildren }, ...directories.slice(i + 1)];
           }
         }
       }
@@ -107,15 +107,15 @@ const PrivateForest = () => {
   const updateIsNew = (targetId: string): void => {
     const updateDirectoryIsNew = (directories: Directory[]): Directory[] => {
       for (let i = 0; i < directories.length; i++) {
-        const id = directories[i].id;
-        const children = directories[i].children;
-        if (id === targetId) {
-          return [...directories.slice(0, i), { ...directories[i], isNew: false }, ...directories.slice(i + 1)];
+        const elem = directories[i];
+        const children = elem.children;
+        if (elem.id === targetId) {
+          return [...directories.slice(0, i), { ...elem, isNew: false }, ...directories.slice(i + 1)];
         }
         if (children.length > 0) {
           const updatedChildren = updateDirectoryIsNew(children);
           if (updatedChildren !== children) {
-            return [...directories.slice(0, i), { ...directories[i], children: updatedChildren }, ...directories.slice(i + 1)];
+            return [...directories.slice(0, i), { ...elem, children: updatedChildren }, ...directories.slice(i + 1)];
           }
         }
       }
@@ -125,6 +125,29 @@ const PrivateForest = () => {
       return updateDirectoryIsNew(prevDirectories);
     });
   };
+
+  const updateName: UpdateName = (targetId: string, newName: string) => {
+    const updateDirectoryName = (directories: Directory[]): Directory[] => {
+      for (let i = 0; i < directories.length; i++) {
+        const elem: Directory = directories[i];
+        const children: Directory[] = elem.children;
+        if (elem.id === targetId) {
+          return [...directories.slice(0, i), { ...elem, name: newName }, ...directories.slice(i + 1)];
+        }
+        if (children.length > 0) {
+          const updatedChildren = updateDirectoryName(children);
+          if (updatedChildren !== children) {
+            return [...directories.slice(0, i), { ...elem, children: updatedChildren }, ...directories.slice(i + 1)];
+          }
+        }
+      }
+      return directories;
+    };
+    setDirectories((prevDirectories) => {
+      return updateDirectoryName(prevDirectories);
+    });
+  };
+  
   useEffect(() => {
     setDirectories(fileTree); //서버에서 받아오는 것으로 변경 예정.
   }, []);
@@ -150,7 +173,7 @@ const PrivateForest = () => {
       </Button>
 
       {isVisible && ( // isVisible이 true일 때만 Box 렌더링
-        <Explorer directories={directories} addDirectory={addDirectory} updateIsNew={updateIsNew} />
+        <Explorer directories={directories} addDirectory={addDirectory} updateIsNew={updateIsNew} updateName={updateName} />
       )}
     </Box>
   );

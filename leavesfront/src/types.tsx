@@ -1,6 +1,10 @@
-export type AddDirectory = (parentId: null | string, type: DirectoryType) => void;
+export type AddDirectory = (tartgetId: null | string, type: DirectoryType) => void;
 
-export type UpdateIsNew = (id: string) => void;
+export type UpdateIsNew = (targetId: string) => void;
+
+export type UpdateName = (targetId: string, newName: string) => void;
+
+// export type UpdateName = (id: string) => void;
 export enum DirectoryType {
   FOLDER = "folder",
   FILE = "file",

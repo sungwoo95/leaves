@@ -1,5 +1,5 @@
 import { Button, Box, TextField } from "@mui/material";
-import { AddDirectory, Directory, DirectoryType, UpdateIsNew } from "../types";
+import { AddDirectory, Directory, DirectoryType, UpdateIsNew, UpdateName } from "../types";
 import AddIcon from "@mui/icons-material/Add";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import { useEffect, useRef, useState } from "react";
@@ -11,6 +11,7 @@ const DirectoryButton = ({
   toggleVisibility,
   addDirectory,
   updateIsNew,
+  updateName,
 }: {
   item: Directory;
   level: number;
@@ -18,9 +19,21 @@ const DirectoryButton = ({
   toggleVisibility: (id: string) => void;
   addDirectory: AddDirectory;
   updateIsNew: UpdateIsNew;
+  updateName: UpdateName;
 }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | undefined>(undefined);
+  
+  const handleEditingEnd = ():void => {
+    //편집 내용 업데이트.
+    if (inputRef.current) {
+      const newName = inputRef.current.value;
+      if (item.name !== newName) updateName(item.id, newName); 
+    }
+    //편집 상태 종료.
+    if (item.isNew) updateIsNew(item.id);
+    setIsEditing(false);
+  };
   useEffect(() => {
     if ((item.isNew || isEditing) && inputRef.current) {
       inputRef.current.focus();
@@ -46,17 +59,15 @@ const DirectoryButton = ({
         }}>
         {item.isNew || isEditing ? (
           <TextField
-            inputRef={inputRef}
+            inputRef={inputRef} //focus,select를 위함.
             defaultValue={item.name}
             variant="standard"
             onBlur={() => {
-              if (item.isNew) updateIsNew(item.id);
-              setIsEditing(false);
+              handleEditingEnd();
             }}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                if (item.isNew) updateIsNew(item.id);
-                setIsEditing(false);
+                handleEditingEnd();
               }
             }}
           />

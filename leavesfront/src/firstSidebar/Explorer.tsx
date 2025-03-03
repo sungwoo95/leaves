@@ -1,4 +1,4 @@
-import { AddDirectory, Directory, UpdateIsNew } from "../types";
+import { AddDirectory, Directory, UpdateIsNew, UpdateName } from "../types";
 import { useState } from "react";
 import { Box } from "@mui/material";
 import DirectoryButton from "./DirectoryButton";
@@ -7,12 +7,14 @@ const Explorer = ({
   directories,
   level = 2,
   addDirectory,
-  updateIsNew
+  updateIsNew,
+  updateName,
 }: {
   directories: Directory[];
   level?: number;
   addDirectory: AddDirectory;
   updateIsNew: UpdateIsNew;
+  updateName: UpdateName;
 }) => {
   const [openState, setOpenState] = useState<Record<string, boolean>>({});
 
@@ -25,9 +27,17 @@ const Explorer = ({
     <Box sx={{ width: "100%" }}>
       {directories.map((item) => (
         <Box sx={{ width: "100%" }} key={item.id}>
-          <DirectoryButton item={item} level={level} isVisible={openState[item.id]} toggleVisibility={toggleVisibility} addDirectory={addDirectory} updateIsNew={updateIsNew}/>
+          <DirectoryButton
+            item={item}
+            level={level}
+            isVisible={openState[item.id]}
+            toggleVisibility={toggleVisibility}
+            addDirectory={addDirectory}
+            updateIsNew={updateIsNew}
+            updateName={updateName}
+          />
           {openState[item.id] && item.type === "folder" && item.children && (
-            <Explorer directories={item.children} level={level + 1} addDirectory={addDirectory} updateIsNew={updateIsNew} />
+            <Explorer directories={item.children} level={level + 1} addDirectory={addDirectory} updateIsNew={updateIsNew} updateName={updateName} />
           )}
         </Box>
       ))}
