@@ -1,8 +1,8 @@
 import express, { Application } from "express";
 import cors from "cors";
 import connectToDB from "./config/db";
-import treeRouter from "./routes/tree";
-import userRouter from "./routes/user";
+import treeRouter from "./routes/treeRouter";
+import userRouter from "./routes/userRouter";
 
 const app: Application = express();
 const PORT = process.env.PORT || 3001;
