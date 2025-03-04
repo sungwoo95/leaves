@@ -68,9 +68,8 @@ const Tree: React.FC = () => {
 
   //tree데이터 가져오기.
   useEffect(() => {
-    const fetchData = async () => {
+    const getData = async () => {
       try {
-        console.log(`fetchData called, treeID:${treeId}`);
         setLoading(true);
         const response = await axios.get(`${path}/tree/${treeId}`);
 
@@ -84,7 +83,7 @@ const Tree: React.FC = () => {
     };
 
     if (treeId) {
-      fetchData();
+      getData();
     }
   }, [path, treeId]);
 

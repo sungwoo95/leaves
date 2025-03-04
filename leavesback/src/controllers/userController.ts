@@ -1,7 +1,7 @@
 import { Directory, DirectoryType } from "../types";
 import { Request, Response } from "express";
 
-const fileTree: Directory[] = [
+let fileTree: Directory[] = [
   //임시 데이터.
   {
     id: "1",
@@ -58,6 +58,12 @@ const fileTree: Directory[] = [
 ];
 
 export const getDirectories = (req: Request, res: Response): void => {
-  console.log("[userController]getDirectories called")
-  res.json(fileTree);
+  console.log("[userController]getDirectories called");
+  res.json(fileTree);//json메서드는 내부에서 객체를 json으로 변환,Content-Type: application/json설정함
 }
+
+export const postDirectories = (req: Request, res: Response): void => {
+  console.log("[userController] postDirectories called");
+  const newDirectories: Directory[] = req.body;
+  fileTree = newDirectories; 
+};

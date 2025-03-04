@@ -24,7 +24,7 @@ const PrivateForest = () => {
       name: "Untitled",
       children: [],
     };
-    const updateChildren = (directories: Directory[]): Directory[] => {
+    const newDirectories = (directories: Directory[]): Directory[] => {
       for (let i = 0; i < directories.length; i++) {
         const elem = directories[i];
         const children = elem.children;
@@ -34,7 +34,7 @@ const PrivateForest = () => {
         }
         if (children.length > 0) {
           //분신술 사용
-          const updatedChildren = updateChildren(children);
+          const updatedChildren = newDirectories(children);
           //나의 분신이 찾았을 경우, 나도 새로운 배열을 본체에게 전달.
           if (updatedChildren !== children) {
             return [...directories.slice(0, i), { ...elem, children: updatedChildren }, ...directories.slice(i + 1)];
@@ -45,15 +45,19 @@ const PrivateForest = () => {
     };
     setDirectories((prevDirectories) => {
       if (targetId) {
-        return updateChildren(prevDirectories);
+        const result = newDirectories(prevDirectories);
+        postDirectories(result);
+        return result;
       } else {
-        return [...prevDirectories, directory];
+        const result = [...prevDirectories, directory];
+        postDirectories(result);
+        return result;
       }
     });
   };
 
   const updateIsNew = (targetId: string): void => {
-    const updateDirectoryIsNew = (directories: Directory[]): Directory[] => {
+    const newDirectories = (directories: Directory[]): Directory[] => {
       for (let i = 0; i < directories.length; i++) {
         const elem = directories[i];
         const children = elem.children;
@@ -61,7 +65,7 @@ const PrivateForest = () => {
           return [...directories.slice(0, i), { ...elem, isNew: false }, ...directories.slice(i + 1)];
         }
         if (children.length > 0) {
-          const updatedChildren = updateDirectoryIsNew(children);
+          const updatedChildren = newDirectories(children);
           if (updatedChildren !== children) {
             return [...directories.slice(0, i), { ...elem, children: updatedChildren }, ...directories.slice(i + 1)];
           }
@@ -70,12 +74,14 @@ const PrivateForest = () => {
       return directories;
     };
     setDirectories((prevDirectories) => {
-      return updateDirectoryIsNew(prevDirectories);
+        const result = newDirectories(prevDirectories);
+        postDirectories(result);
+        return result;
     });
   };
 
   const updateName: UpdateName = (targetId: string, newName: string) => {
-    const updateDirectoryName = (directories: Directory[]): Directory[] => {
+    const newDirectories = (directories: Directory[]): Directory[] => {
       for (let i = 0; i < directories.length; i++) {
         const elem: Directory = directories[i];
         const children: Directory[] = elem.children;
@@ -83,7 +89,7 @@ const PrivateForest = () => {
           return [...directories.slice(0, i), { ...elem, name: newName }, ...directories.slice(i + 1)];
         }
         if (children.length > 0) {
-          const updatedChildren = updateDirectoryName(children);
+          const updatedChildren = newDirectories(children);
           if (updatedChildren !== children) {
             return [...directories.slice(0, i), { ...elem, children: updatedChildren }, ...directories.slice(i + 1)];
           }
@@ -92,13 +98,23 @@ const PrivateForest = () => {
       return directories;
     };
     setDirectories((prevDirectories) => {
-      return updateDirectoryName(prevDirectories);
+        const result = newDirectories(prevDirectories);
+        postDirectories(result);
+        return result;
     });
+  };
+
+  const postDirectories = async (directories: Directory[]) => {
+    try {
+      await axios.post(`${path}/user/directories`, directories);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
     console.log("[PrivateForest]useEffect called");
-    const fetchData = async () => {
+    const getData = async () => {
       try {
         const response = await axios.get(`${path}/user/directories`);
         const newDirectories: Directory[] = response.data;
@@ -107,7 +123,7 @@ const PrivateForest = () => {
         console.log(error);
       }
     };
-    fetchData();
+    getData();
   }, []);
 
   return (

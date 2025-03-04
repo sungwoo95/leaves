@@ -6,7 +6,7 @@ import userRouter from "./routes/userRouter";
 
 const app: Application = express();
 const PORT = process.env.PORT || 3001;
-
+app.use(express.json());//req.body를 자동으로 JSON 객체로 변환
 app.use(cors());
 app.use(treeRouter);
 app.use(userRouter);
