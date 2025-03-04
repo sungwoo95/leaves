@@ -21,8 +21,6 @@ const Explorer = ({
   const toggleVisibility = (id: string) => {
     setOpenState((prev) => ({ ...prev, [id]: !prev[id] }));
   };
-  //directories가 []일 경우?
-  //map은 순회를 하지 않는다.
   return (
     <Box sx={{ width: "100%" }}>
       {directories.map((item) => (

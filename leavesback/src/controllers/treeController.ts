@@ -35,8 +35,9 @@ const treeData: Record<string, Tree> = {
   },
 };
 
-// 특정 트리 데이터 조회 (GET /api/tree/:treeId)
+// 특정 트리 데이터 조회 (GET /tree/:treeId)
 export const getTreeData = (req: Request, res: Response): void => {
+  console.log("[treeController]getTreeData called");
   const { treeId } = req.params;
 
   if (treeData[treeId]) {

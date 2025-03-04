@@ -1,0 +1,1 @@
+export const path = window.location.hostname === "localhost" ? "http://localhost:3001" : "https://api.mywebsite.com";

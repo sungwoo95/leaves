@@ -4,6 +4,7 @@ import CytoscapeComponent from "react-cytoscapejs";
 import { useSpaceContext } from "./Space";
 import cytoscape from "cytoscape";
 import { useTheme } from "@mui/material/styles";
+import { path } from "../config/env";
 
 const Tree: React.FC = () => {
   const spaceContext = useSpaceContext();
@@ -21,7 +22,7 @@ const Tree: React.FC = () => {
   const [nodes, setNodes] = useState<any[]>([]);
   const [edges, setEdges] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const path = window.location.hostname === "localhost" ? "http://localhost:3001" : "https://api.mywebsite.com";
+  
   const theme = useTheme();
 
   //leafId로 중앙 정렬.
@@ -71,7 +72,7 @@ const Tree: React.FC = () => {
       try {
         console.log(`fetchData called, treeID:${treeId}`);
         setLoading(true);
-        const response = await axios.get(`${path}/api/trees/${treeId}`);
+        const response = await axios.get(`${path}/tree/${treeId}`);
 
         setNodes(response.data.nodes);
         setEdges(response.data.edges);

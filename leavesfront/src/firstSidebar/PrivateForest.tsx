@@ -5,64 +5,12 @@ import Explorer from "./Explorer";
 import { Directory, DirectoryType, UpdateName } from "../types";
 import AddIcon from "@mui/icons-material/Add";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
-const fileTree: Directory[] = [
-  //임시 데이터.
-  {
-    id: "1",
-    name: "Private Forest Documents",
-    type: DirectoryType.FOLDER,
-    children: [
-      {
-        id: "2",
-        name: "resume.pdf",
-        type: DirectoryType.FILE,
-        children: [],
-        isNew: false,
-      },
-      {
-        id: "3",
-        name: "notes.txt",
-        type: DirectoryType.FILE,
-        children: [],
-        isNew: false,
-      },
-    ],
-    isNew: false,
-  },
-  {
-    id: "4",
-    name: "Photos",
-    type: DirectoryType.FOLDER,
-    children: [
-      {
-        id: "5",
-        name: "vacation.jpg",
-        type: DirectoryType.FILE,
-        children: [],
-        isNew: false,
-      },
-      {
-        id: "6",
-        name: "Events",
-        type: DirectoryType.FOLDER,
-        children: [
-          {
-            id: "7",
-            name: "birthday.jpg",
-            type: DirectoryType.FILE,
-            children: [],
-            isNew: false,
-          },
-        ],
-        isNew: false,
-      },
-    ],
-    isNew: false,
-  },
-];
+import axios from "axios";
+import { path } from "../../config/env";
+
 const PrivateForest = () => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
-  const [directories, setDirectories] = useState<Directory[]>(fileTree);
+  const [directories, setDirectories] = useState<Directory[]>([]);
 
   const toggleVisibility = () => {
     setIsVisible((prev) => !prev);
@@ -149,7 +97,17 @@ const PrivateForest = () => {
   };
 
   useEffect(() => {
-    setDirectories(fileTree); //서버에서 받아오는 것으로 변경 예정.
+    console.log("[PrivateForest]useEffect called");
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${path}/user/directories`);
+        const newDirectories: Directory[] = response.data;
+        setDirectories(newDirectories);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
   }, []);
 
   return (
