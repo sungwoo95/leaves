@@ -1,9 +1,19 @@
 import { Menu, MenuItem } from "@mui/material";
-import { Position } from "../types";
+import { OnClickMenuHandler, Position } from "../types";
 
-const DirectoryContextMenu = ({ open, menuPosition, onCloseHandler }: { open: boolean; menuPosition: Position | undefined; onCloseHandler: () => void }) => {
+const DirectoryContextMenu = ({
+  open,
+  menuPosition,
+  onCloseHandler,
+  onClickMenuHandler,
+}: {
+  open: boolean;
+  menuPosition: Position | undefined;
+  onCloseHandler: () => void;
+  onClickMenuHandler: OnClickMenuHandler;
+}) => {
   return (
-    <Menu open={open} onClose={onCloseHandler} anchorReference="anchorPosition" anchorPosition={menuPosition}>
+    <Menu open={open} onClose={onCloseHandler} anchorReference="anchorPosition" anchorPosition={menuPosition} onClick={onClickMenuHandler}>
       <MenuItem>Rename</MenuItem>
       <MenuItem>Delete</MenuItem>
       <MenuItem>Properties</MenuItem>

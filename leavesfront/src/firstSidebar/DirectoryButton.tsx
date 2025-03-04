@@ -43,6 +43,10 @@ const DirectoryButton = ({
     if (item.type === DirectoryType.FOLDER) toggleVisibility(item.id);
   };
 
+  const onClickMenuHandler = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   const onContextMenuHandler = (e: React.MouseEvent) => {
     e.preventDefault();
     setMenuPosition({ top: e.clientY, left: e.clientX });
@@ -70,7 +74,7 @@ const DirectoryButton = ({
       }}
       onClick={onClickHandler}
       onContextMenu={onContextMenuHandler}>
-      <DirectoryContextMenu open={!!menuPosition} menuPosition={menuPosition} onCloseHandler={onCloseHandler} />
+      <DirectoryContextMenu open={!!menuPosition} menuPosition={menuPosition} onCloseHandler={onCloseHandler} onClickMenuHandler={onClickMenuHandler} />
       <Box
         sx={{
           width: "100%",

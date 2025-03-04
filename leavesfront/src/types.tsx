@@ -4,6 +4,7 @@ export type UpdateIsNew = (targetId: string) => void;
 
 export type UpdateName = (targetId: string, newName: string) => void;
 
+export type OnClickMenuHandler = (e: React.MouseEvent) => void;
 // export type UpdateName = (id: string) => void;
 export enum DirectoryType {
   FOLDER = "folder",

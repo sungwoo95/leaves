@@ -147,7 +147,7 @@ const PrivateForest = () => {
       return updateDirectoryName(prevDirectories);
     });
   };
-  
+
   useEffect(() => {
     setDirectories(fileTree); //서버에서 받아오는 것으로 변경 예정.
   }, []);
