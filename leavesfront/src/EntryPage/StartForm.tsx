@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import { TextField, Button, Box, Typography, Container } from "@mui/material";
+import { TextField, Button, Box, Typography } from "@mui/material";
 
 const StartForm = () => {
   const [email, setEmail] = useState("");
@@ -29,35 +29,25 @@ const StartForm = () => {
   };
 
   return (
-    <Container maxWidth="xs">
-      <Box sx={{ mt: 5, p: 3, border: "1px solid #ddd", borderRadius: 2, boxShadow: 2 }}>
-        <Typography variant="h5" align="center" gutterBottom>
-          로그인
+    <Box sx={{ mt: 5, p: 3, border: "1px solid #ddd", borderRadius: 2, boxShadow: 2 }}>
+      <Typography variant="h5" align="center" gutterBottom>
+        로그인
+      </Typography>
+
+      <TextField fullWidth label="이메일" variant="outlined" margin="normal" value={email} onChange={(e) => setEmail(e.target.value)} />
+
+      <TextField fullWidth label="비밀번호" type="password" variant="outlined" margin="normal" value={password} onChange={(e) => setPassword(e.target.value)} />
+
+      {error && (
+        <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+          {error}
         </Typography>
+      )}
 
-        <TextField fullWidth label="이메일" variant="outlined" margin="normal" value={email} onChange={(e) => setEmail(e.target.value)} />
-
-        <TextField
-          fullWidth
-          label="비밀번호"
-          type="password"
-          variant="outlined"
-          margin="normal"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        {error && (
-          <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-            {error}
-          </Typography>
-        )}
-
-        <Button fullWidth variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleSubmit}>
-          계속
-        </Button>
-      </Box>
-    </Container>
+      <Button fullWidth variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleSubmit}>
+        계속
+      </Button>
+    </Box>
   );
 };
 
