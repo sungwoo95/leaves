@@ -3,8 +3,8 @@ import { getTreeData, deleteTree } from "../controllers/treeController";
 
 const treeRouter: Router = Router(); 
 
-treeRouter.get("/tree/:treeId", getTreeData);
+treeRouter.get("/:treeId", getTreeData);
 
-treeRouter.delete("/tree/:treeId", deleteTree);
+treeRouter.delete("/:treeId", deleteTree);
 
 export default treeRouter;

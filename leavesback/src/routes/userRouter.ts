@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { readDirectories, updateDirectories } from "../controllers/userController";
+import { readDirectories, updateDirectories, userStart } from "../controllers/userController";
 
 
 const userRouter: Router = Router(); 
 
-userRouter.get("/user/directories",readDirectories);
-userRouter.post("/user/directories",updateDirectories);
+userRouter.get("/directories",readDirectories);
+userRouter.post("/directories",updateDirectories);
+userRouter.post("/start", userStart);
 
 export default userRouter;
