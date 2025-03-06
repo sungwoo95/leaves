@@ -1,4 +1,3 @@
-import "dotenv/config";
 import { MongoClient, ServerApiVersion } from "mongodb";
 
 const uri: string | undefined = process.env.MONGO_URI;
@@ -8,15 +7,26 @@ if (!uri) {
 }
 
 //MongoDB 클라이언트 인스턴스 생성
-const client = new MongoClient(uri, {
+export const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
   },
 });
+enum Database {
+  NAMUNIBS = "namunibs",
+}
 
-const connectToDB = async (): Promise<MongoClient> => {
+enum Collection {
+  USERS = "users",
+}
+
+const db = client.db(Database.NAMUNIBS);
+
+export const usersCollection = db.collection(Collection.USERS);
+
+export const connectToDB = async (): Promise<MongoClient> => {
   try {
     await client.connect();
     // 연결 테스트: admin 데이터베이스에 ping 명령 실행
@@ -29,4 +39,3 @@ const connectToDB = async (): Promise<MongoClient> => {
   }
 };
 
-export default connectToDB;

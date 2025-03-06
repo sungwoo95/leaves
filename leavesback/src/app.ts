@@ -1,8 +1,9 @@
+import "dotenv/config";
 import express, { Application } from "express";
 import cors from "cors";
-import connectToDB from "./config/db";
 import treeRouter from "./routes/treeRouter";
 import userRouter from "./routes/userRouter";
+import { connectToDB } from "./config/db";
 
 const app: Application = express();
 const PORT = process.env.PORT || 3001;
