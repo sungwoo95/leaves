@@ -113,7 +113,6 @@ const PrivateForest = () => {
   };
 
   useEffect(() => {
-    console.log("[PrivateForest]useEffect called");
     const getData = async () => {
       try {
         const response = await axios.get(`${path}/user/directories`);
