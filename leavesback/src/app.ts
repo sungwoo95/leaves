@@ -4,13 +4,19 @@ import cors from "cors";
 import treeRouter from "./routes/treeRouter";
 import userRouter from "./routes/userRouter";
 import { connectToDB } from "./config/db";
+import cookieParser from "cookie-parser";
 
 const app: Application = express();
 const PORT = process.env.PORT || 3001;
 app.use(express.json());//req.body를 자동으로 JSON 객체로 변환
+app.use(cookieParser());
 app.use(
-  cors()
+  cors({
+    origin: "http://localhost:5173", 
+    credentials: true,
+  })
 );
+
 app.use("/api/tree",treeRouter);
 app.use("/api/user",userRouter);
 

@@ -31,48 +31,43 @@ const sendAccessToken = (res: Response, objectId: ObjectId): void => {
   res.json({ message: "Signed in" });
 };
 
-//토큰 만료 예외 처리 해야 함.
-const parseAccessToken = (token: string): ObjectId | void => {
+const parseAccessToken = (token: string, res: Response): ObjectId | void => {
   try {
     //verify메서드: 1.토큰 변조,만료 확인, 2.Payload | string 반환 (payload의 값이 string일 경우 string 반환)
     const decoded = jwt.verify(token, JWT_SECRET) as { userObjectIdString: string };
     return new ObjectId(decoded.userObjectIdString);
   } catch (error: any) {
+    //todo: 상황별 예외 처리 
     if (error.name === "JsonWebTokenError") {
-      console.error("🚨 변조된 토큰:", error.message);
+      res.status(401).json({ message: "Unauthorized: No token provided" });
     } else if (error.name === "TokenExpiredError") {
-      console.error("⌛ 토큰 만료됨:", error.message);
+      res.status(401).json({ message: "Unauthorized: No token provided" });
     } else {
-      console.error("❌ 기타 오류:", error.message);
+      res.status(401).json({ message: "Unauthorized: No token provided" });
     }
-    return;
   }
 };
 
 
 export const readDirectories = async (req: Request, res: Response): Promise<void> => {
-  console.log("[userController] getDirectories called");
-
-  const token = req.cookies.access_token;
-  if (!token) {
+  const cookies = req.cookies;
+  if(!cookies){
     res.status(401).json({ message: "Unauthorized: No token provided" });
     return;
   }
-
-  const userId = parseAccessToken(token);
-  //토큰 만료등 예외 처리 해야 함.
-  if (!userId) {
-    res.status(401).json({ message: "Access Token error" });
+  const accessToken = cookies.access_token;
+  const objectId = parseAccessToken(accessToken, res);
+  //todo: 상황별 예외처리 
+  if (!objectId) {
     return;
   }
-
   try {
-    const user = await usersCollection.findOne({ _id: userId });
+    const user = await usersCollection.findOne({ _id: objectId });
     if (!user) {
       res.status(404).json({ message: "User not found" });
       return;
     }
-    res.json({ directories: user.directories });
+    res.json(user.directories);
     return;
   } catch (error) {
     console.error("[userController][readDirectories] Error read directories:", error);
@@ -80,11 +75,34 @@ export const readDirectories = async (req: Request, res: Response): Promise<void
   }
 };
 
-
-export const updateDirectories = (req: Request, res: Response): void => {
-  console.log("[userController] postDirectories called");
+export const updateDirectories = async (req: Request, res: Response): Promise<void> => {
+  console.log("[userController] updateDirectories called");
   const newDirectories: Directory[] = req.body;
-  res.json({ message: "directories update success" });
+  const cookies = req.cookies;
+  if (!cookies) {
+    res.status(401).json({ message: "Unauthorized: No token provided" });
+    return;
+  }
+  const accessToken = cookies.access_token;
+  const objectId = parseAccessToken(accessToken, res);
+  //todo: 상황별 예외처리 
+  if (!objectId) {
+    return;
+  }
+  try {
+    const result = await usersCollection.updateOne(
+      { _id: objectId },
+      { $set: { directories: newDirectories } }
+    );
+    if (result.matchedCount === 0) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+    res.json({ message: "Directories updated successfully" });
+  } catch (error) {
+    console.error("[userController][updateDirectories] Error updating directories:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 export const userStart = async (req: Request, res: Response) => {
