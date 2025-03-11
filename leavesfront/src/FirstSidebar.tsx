@@ -1,7 +1,7 @@
 import { Paper } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import PrivateForest from "./firstSidebar/PrivateForest";
-import PublicForest from "./firstSidebar/PublicForest";
+import PrivateForestRegion from "./firstSidebar/PrivateForestRegion";
+import PublicForestRegion from "./firstSidebar/PublicForestRegion";
 
 const FirstSidebar: React.FC = () => {
   const theme = useTheme();
@@ -19,8 +19,8 @@ const FirstSidebar: React.FC = () => {
         color: theme.palette.mode === "dark" ? "white" : "black",
       }}>
       Sidebar Left
-      <PrivateForest/>
-      <PublicForest/>
+      <PrivateForestRegion/>
+      <PublicForestRegion/>
     </Paper>
   );
 };

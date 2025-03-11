@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Button from "@mui/material/Button";
 import { Box } from "@mui/material";
 import Explorer from "./Explorer";
@@ -74,9 +74,9 @@ const PrivateForest = () => {
       return directories;
     };
     setDirectories((prevDirectories) => {
-        const result = newDirectories(prevDirectories);
-        postDirectories(result);
-        return result;
+      const result = newDirectories(prevDirectories);
+      postDirectories(result);
+      return result;
     });
   };
 
@@ -98,9 +98,9 @@ const PrivateForest = () => {
       return directories;
     };
     setDirectories((prevDirectories) => {
-        const result = newDirectories(prevDirectories);
-        postDirectories(result);
-        return result;
+      const result = newDirectories(prevDirectories);
+      postDirectories(result);
+      return result;
     });
   };
 
