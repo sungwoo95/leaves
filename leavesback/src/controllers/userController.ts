@@ -48,10 +48,9 @@ const parseAccessToken = (token: string, res: Response): ObjectId | void => {
   }
 };
 
-
 export const readDirectories = async (req: Request, res: Response): Promise<void> => {
   const cookies = req.cookies;
-  if(!cookies){
+  if (!cookies) {
     res.status(401).json({ message: "Unauthorized: No token provided" });
     return;
   }
@@ -108,7 +107,7 @@ export const updateDirectories = async (req: Request, res: Response): Promise<vo
 export const userStart = async (req: Request, res: Response) => {
   console.log("[userController]userStart called");
   const { email, password } = req.body;
-  let user = await usersCollection.findOne({ email }, { projection: { _id: 1, password: 1 } })
+  let user = await usersCollection.findOne({ email }, { projection: { password: 1 } })
   if (!user) {//신규 회원.
     console.log("신규 회원 시작");
     const hashedPassword = await bcrypt.hash(password, 8);
@@ -131,5 +130,39 @@ export const userStart = async (req: Request, res: Response) => {
     }
     sendAccessToken(res, user._id);
     return;
+  }
+};
+
+export const readForests = async (req: Request, res: Response): Promise<void> => {
+  console.log("readForests called");
+  //쿠키 받고, ObjectId로 조회한 문서의 forests응답하기.
+  const cookies = req.cookies;
+  if (!cookies) {
+    res.status(401).json({ message: "Unauthorized: No token provided" });
+    return;
+  }
+  const accessToken = cookies.access_token;
+  const objectId = parseAccessToken(accessToken, res);
+  //todo: 상황별 예외처리 
+  if (!objectId) {
+    return;
+  }
+  //objectId로 조회한 문서의 forests응답하기.
+  try {
+    // 특정 필드(forests)만 가져오기
+    const forests = await usersCollection.findOne(
+      { _id: objectId },
+      { projection: { forests: 1, _id: 0 } }
+    );
+    if (!forests) {
+      console.log("cannot find user");
+      res.status(500).json({ message: "Internal server error" });
+      return;
+    }
+    // forests 속성 응답
+    res.json(forests);
+  } catch (error) {
+    console.error("[userController][readForests] Error reading forests:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

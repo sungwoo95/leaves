@@ -1,14 +1,16 @@
+import { ObjectId } from "mongodb";
+
 export type User = {
   password: string,
   email: string,
   directories: Directory[],
-  forests: ForestInfo[],
+  forests: ForestMetaData[],
   treeId: string | null,
   leafId: string | null,
 }
 
-export type ForestInfo = {
-  forestId: string, //값은 Forest의 _id
+export type ForestMetaData = {
+  forestId: ObjectId, //Forest의 _id
   forestName: string,
   isOwner: boolean
 }
