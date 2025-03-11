@@ -10,13 +10,14 @@ export type User = {
 }
 
 export type ForestMetaData = {
+  isNew: boolean,
   forestId: ObjectId, //Forest의 _id
   forestName: string,
-  isOwner: boolean
+  isOwner: boolean,
 }
 
 export type Forest = {
-  directories: Directory[]
+  directories: Directory[],
 }
 
 export enum DirectoryType {
@@ -25,9 +26,9 @@ export enum DirectoryType {
 }
 
 export type Directory = {
-  id: string;
-  type: DirectoryType;
-  isNew: boolean;
-  name: string;
-  children: Directory[];
+  id: string,
+  type: DirectoryType,
+  isNew: boolean,
+  name: string,
+  children: Directory[],
 };

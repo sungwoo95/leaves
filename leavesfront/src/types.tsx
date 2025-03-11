@@ -27,6 +27,7 @@ export type Position = {
 };
 
 export type ForestMetaData = {
+  isNew: boolean;
   forestId: ObjectId; //Forest의 _id
   forestName: string;
   isOwner: boolean;

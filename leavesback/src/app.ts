@@ -5,6 +5,7 @@ import treeRouter from "./routes/treeRouter";
 import userRouter from "./routes/userRouter";
 import { connectToDB } from "./config/db";
 import cookieParser from "cookie-parser";
+import forestRouter from "./routes/forestRouter";
 
 const app: Application = express();
 const PORT = process.env.PORT || 3001;
@@ -19,6 +20,7 @@ app.use(
 
 app.use("/api/tree",treeRouter);
 app.use("/api/user",userRouter);
+app.use("/api/forest",forestRouter);
 
 const startServer = async () => {
   console.log("startServer");

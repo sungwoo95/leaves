@@ -1,4 +1,5 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
+import { Forest, User } from "../types";
 
 const uri: string | undefined = process.env.MONGO_URI;
 
@@ -20,11 +21,13 @@ enum Database {
 
 enum Collection {
   USERS = "users",
+  FORESTS = "forests",
 }
 
 const db = client.db(Database.NAMUNIBS);
 
-export const usersCollection = db.collection(Collection.USERS);
+export const usersCollection = db.collection<User>(Collection.USERS);
+export const forestsCollection = db.collection<Forest>(Collection.FORESTS);
 
 export const connectToDB = async (): Promise<MongoClient> => {
   try {

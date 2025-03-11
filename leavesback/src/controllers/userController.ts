@@ -1,4 +1,4 @@
-import { Directory, DirectoryType, User } from "../types";
+import { Directory, User } from "../types";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { usersCollection } from "../config/db";
@@ -31,7 +31,7 @@ const sendAccessToken = (res: Response, objectId: ObjectId): void => {
   res.json({ message: "Signed in" });
 };
 
-const parseAccessToken = (token: string, res: Response): ObjectId | void => {
+export const parseAccessToken = (token: string, res: Response): ObjectId | void => {
   try {
     //verify메서드: 1.토큰 변조,만료 확인, 2.Payload | string 반환 (payload의 값이 string일 경우 string 반환)
     const decoded = jwt.verify(token, JWT_SECRET) as { userObjectIdString: string };

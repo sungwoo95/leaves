@@ -11,8 +11,8 @@ import { path } from "../../config/env";
 const PublicForest = ({ forestMetaData }: { forestMetaData: ForestMetaData }) => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [directories, setDirectories] = useState<Directory[]>([]);
-  const {forestId,forestName,isOwner} = forestMetaData
-  console.log(forestId,forestName,isOwner);
+  const { forestId, forestName, isOwner, isNew } = forestMetaData;
+
   const toggleVisibility = () => {
     setIsVisible((prev) => !prev);
   };
@@ -116,7 +116,7 @@ const PublicForest = ({ forestMetaData }: { forestMetaData: ForestMetaData }) =>
   useEffect(() => {
     const getData = async () => {
       try {
-        const response = await axios.get(`${path}/user/directories`);
+        const response = await axios.get(`${path}/forest/${forestId.toString()}`);
         const newDirectories: Directory[] = response.data;
         setDirectories(newDirectories);
       } catch (error) {
@@ -129,7 +129,7 @@ const PublicForest = ({ forestMetaData }: { forestMetaData: ForestMetaData }) =>
   return (
     <Box sx={{ width: "100%" }}>
       <Button variant="text" sx={{ width: "100%", justifyContent: "flex-start" }} onClick={toggleVisibility}>
-        Private Forest
+        Public Forest
         <CreateNewFolderIcon
           onClick={(e) => {
             e.stopPropagation();
