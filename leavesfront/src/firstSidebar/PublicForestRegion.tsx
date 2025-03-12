@@ -1,15 +1,38 @@
 import { useEffect, useState } from "react";
 import Button from "@mui/material/Button";
-import { Box } from "@mui/material";
+import { Box, Modal, TextField, Typography } from "@mui/material";
 import axios from "axios";
 import { path } from "../../config/env";
 import PublicForest from "./PublicForest";
 import AddIcon from "@mui/icons-material/Add";
 import { MyForestInfo } from "../types";
+import { useTheme } from "@mui/material/styles";
+
+const modalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 4,
+};
 
 const PublicForestRegion = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [myForests, setMyForests] = useState<MyForestInfo[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const theme = useTheme();
+  const [inputValue, setInputValue] = useState("");
+  const handleModalOpen = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
   const toggleVisibility = () => {
     setIsVisible((prev) => !prev);
   };
@@ -38,10 +61,33 @@ const PublicForestRegion = () => {
           onClick={(e) => {
             e.stopPropagation();
             if (!isVisible) toggleVisibility();
-            //클릭 시 모달 생성.
+            handleModalOpen();
           }}
         />
       </Button>
+      <Modal open={isModalOpen} onClose={handleModalClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+        <Box sx={modalStyle}>
+          <Typography color={theme.palette.mode === "dark" ? "white" : "black"} id="modal-modal-title" variant="h6" component="h2">
+            Create Public Forest
+          </Typography>
+          <Typography color={theme.palette.mode === "dark" ? "white" : "black"} id="modal-modal-description" sx={{ mt: 2 }}>
+            You can invite users to a public forest.
+          </Typography>
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="Enter the name of the new public forest."
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            sx={{ mt: 2 }}
+          />
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+            <Button onClick={() => alert(`입력값: ${inputValue}`)} variant="contained">
+              Create
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
       {isVisible && (
         <Box>
           {myForests.map((item) => (
