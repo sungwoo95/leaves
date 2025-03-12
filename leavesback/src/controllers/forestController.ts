@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import { parseAccessToken } from "./userController";
 import { forestsCollection, usersCollection } from "../config/db";
-import { Forest, ForestMetaData } from "../types";
+import { Forest, MyForestInfo } from "../types";
 import { ObjectId } from "mongodb";
 
+//forest이름 받아야 함.
 export const createForest = async (req: Request, res: Response): Promise<void> => {
   const cookies = req.cookies;
   if (!cookies) {
@@ -16,25 +17,24 @@ export const createForest = async (req: Request, res: Response): Promise<void> =
     return;
   }
   try {
-    //Forest추가, _id받기.
     const newForest: Forest = {
-      directories: []
+      name: "example",
+      directories: [],
+      participants: [],
     }
     const newForestObjectId: ObjectId = (await forestsCollection.insertOne(newForest)).insertedId;
-    const newForestMetaData: ForestMetaData = {
-      isNew: true,
+    const newMyForestInfo: MyForestInfo = {
       forestId: newForestObjectId,
-      forestName: "Untitled",
       isOwner: true,
     }
     //forests업데이트.
     const updateResult = await usersCollection.updateOne(
       { _id: userObjectId },
-      { $push: { forests: newForestMetaData } }
+      { $push: { myForests: newMyForestInfo } }
     );
     res.status(201).json({
       message: "Forest created successfully",
-      forestMetaData: newForestMetaData
+      forestMetaData: newMyForestInfo
     });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });

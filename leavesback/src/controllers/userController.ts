@@ -11,7 +11,7 @@ const createUser = (email: string, password: string): User => {
     email,
     password,
     directories: [],
-    forests: [],
+    myForests: [],
     treeId: null,
     leafId: null,
   };
@@ -133,9 +133,9 @@ export const userStart = async (req: Request, res: Response) => {
   }
 };
 
-export const readForests = async (req: Request, res: Response): Promise<void> => {
-  console.log("readForests called");
-  //쿠키 받고, ObjectId로 조회한 문서의 forests응답하기.
+export const readMyForests = async (req: Request, res: Response): Promise<void> => {
+  console.log("readMyForests called");
+  //쿠키 받고, ObjectId로 조회한 문서의 myForests응답하기.
   const cookies = req.cookies;
   if (!cookies) {
     res.status(401).json({ message: "Unauthorized: No token provided" });
@@ -147,20 +147,20 @@ export const readForests = async (req: Request, res: Response): Promise<void> =>
   if (!objectId) {
     return;
   }
-  //objectId로 조회한 문서의 forests응답하기.
+  //objectId로 조회한 문서의 myForests응답하기.
   try {
-    // 특정 필드(forests)만 가져오기
-    const forests = await usersCollection.findOne(
+    // 특정 필드(myForests)만 가져오기
+    const myForests = await usersCollection.findOne(
       { _id: objectId },
-      { projection: { forests: 1, _id: 0 } }
+      { projection: { myForests: 1, _id: 0 } }
     );
-    if (!forests) {
+    if (!myForests) {
       console.log("cannot find user");
       res.status(500).json({ message: "Internal server error" });
       return;
     }
-    // forests 속성 응답
-    res.json(forests);
+    // myForests 속성 응답
+    res.json(myForests);
   } catch (error) {
     console.error("[userController][readForests] Error reading forests:", error);
     res.status(500).json({ message: "Internal server error" });

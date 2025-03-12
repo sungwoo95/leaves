@@ -4,20 +4,20 @@ export type User = {
   password: string,
   email: string,
   directories: Directory[],
-  forests: ForestMetaData[],
+  myForests: MyForestInfo[],
   treeId: string | null,
   leafId: string | null,
 }
 
-export type ForestMetaData = {
-  isNew: boolean,
-  forestId: ObjectId, //Forest의 _id
-  forestName: string,
-  isOwner: boolean,
-}
+export type MyForestInfo = {
+  forestId: ObjectId; 
+  isOwner: boolean;
+};
 
 export type Forest = {
+  name: string,
   directories: Directory[],
+  participants: ObjectId[],
 }
 
 export enum DirectoryType {

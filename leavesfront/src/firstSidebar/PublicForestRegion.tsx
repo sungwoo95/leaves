@@ -2,41 +2,32 @@ import { useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import { Box } from "@mui/material";
 import axios from "axios";
-import { ForestMetaData } from "../types";
 import { path } from "../../config/env";
 import PublicForest from "./PublicForest";
 import AddIcon from "@mui/icons-material/Add";
+import { MyForestInfo } from "../types";
 
 const PublicForestRegion = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const [forests, setForests] = useState<ForestMetaData[]>([]);
+  const [myForests, setMyForests] = useState<MyForestInfo[]>([]);
   const toggleVisibility = () => {
     setIsVisible((prev) => !prev);
-  };
-  const postForest = async () => {
-    try {
-      const response = await axios.post(`${path}/forest/createForest`);
-      const forestMetaData = response.data.forestMetaData;
-      setForests((prev)=>{
-        return [...prev,forestMetaData];
-      })
-    } catch (error) {}
   };
 
   useEffect(() => {
     console.log("[PublicForestRegion]useEffect called");
-    const setForestsData = async () => {
+    const setMyForestsData = async () => {
       try {
-        const response = await axios.get(`${path}/user/forests`);
+        const response = await axios.get(`${path}/user/myForests`);
         if (Array.isArray(response.data)) {
-          const newForests: ForestMetaData[] = response.data;
-          setForests(newForests);
+          const newMyForests: MyForestInfo[] = response.data;
+          setMyForests(newMyForests);
         }
       } catch (error) {
         console.log(error);
       }
     };
-    setForestsData();
+    setMyForestsData();
   }, []);
 
   return (
@@ -47,13 +38,13 @@ const PublicForestRegion = () => {
           onClick={(e) => {
             e.stopPropagation();
             if (!isVisible) toggleVisibility();
-            postForest();
+            //클릭 시 모달 생성.
           }}
         />
       </Button>
       {isVisible && (
         <Box>
-          {forests.map((item) => (
+          {myForests.map((item) => (
             <Box sx={{ width: "100%" }} key={item.forestId.toString()}>
               <PublicForest forestMetaData={item} />
             </Box>
