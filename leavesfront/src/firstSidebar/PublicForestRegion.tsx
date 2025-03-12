@@ -28,15 +28,26 @@ const PublicForestRegion = () => {
   const handleModalOpen = () => {
     setIsModalOpen(true);
   };
-
   const handleModalClose = () => {
     setIsModalOpen(false);
   };
-
   const toggleVisibility = () => {
     setIsVisible((prev) => !prev);
   };
-
+  const postPublicForest = async () => {
+    try {
+      const response = await axios.post(`${path}/forest/createForest`, { forestName: inputValue });
+      const newMyForestInfo = response.data.newMyForestInfo;
+      console.log(newMyForestInfo);
+      setMyForests((prev) => [...prev, newMyForestInfo]);
+    } catch (error) {
+      console.log("[PublicForestRegion]postPublicForest error");
+    }
+  };
+  const handleModalCreate = () => {
+    postPublicForest();
+    handleModalClose();
+  };
   useEffect(() => {
     console.log("[PublicForestRegion]useEffect called");
     const setMyForestsData = async () => {
@@ -82,7 +93,7 @@ const PublicForestRegion = () => {
             sx={{ mt: 2 }}
           />
           <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
-            <Button onClick={() => alert(`입력값: ${inputValue}`)} variant="contained">
+            <Button onClick={handleModalCreate} variant="contained">
               Create
             </Button>
           </Box>
@@ -92,7 +103,7 @@ const PublicForestRegion = () => {
         <Box>
           {myForests.map((item) => (
             <Box sx={{ width: "100%" }} key={item.forestId.toString()}>
-              <PublicForest forestMetaData={item} />
+              <PublicForest myForests={item} />
             </Box>
           ))}
         </Box>

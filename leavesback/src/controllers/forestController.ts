@@ -4,8 +4,9 @@ import { forestsCollection, usersCollection } from "../config/db";
 import { Forest, MyForestInfo } from "../types";
 import { ObjectId } from "mongodb";
 
-//forest이름 받아야 함.
 export const createForest = async (req: Request, res: Response): Promise<void> => {
+  const forestName = req.body.forestName;
+  console.log(forestName);
   const cookies = req.cookies;
   if (!cookies) {
     res.status(401).json({ message: "Unauthorized: No token provided" });
@@ -18,7 +19,7 @@ export const createForest = async (req: Request, res: Response): Promise<void> =
   }
   try {
     const newForest: Forest = {
-      name: "example",
+      name: forestName,
       directories: [],
       participants: [],
     }
@@ -27,14 +28,13 @@ export const createForest = async (req: Request, res: Response): Promise<void> =
       forestId: newForestObjectId,
       isOwner: true,
     }
-    //forests업데이트.
-    const updateResult = await usersCollection.updateOne(
+    await usersCollection.updateOne(
       { _id: userObjectId },
       { $push: { myForests: newMyForestInfo } }
     );
     res.status(201).json({
       message: "Forest created successfully",
-      forestMetaData: newMyForestInfo
+      newMyForestInfo,
     });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
@@ -55,6 +55,6 @@ export const readForest = async (req: Request, res: Response): Promise<void> => 
     res.json(directories);
   } catch (error) {
     console.log("[forestController]readForest Error");
-    res.status(500).json({message:"internal error"});
+    res.status(500).json({ message: "internal error" });
   }
 }

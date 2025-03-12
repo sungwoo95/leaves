@@ -10,14 +10,14 @@ export type User = {
 }
 
 export type MyForestInfo = {
-  forestId: ObjectId; 
-  isOwner: boolean;
+  forestId: ObjectId,
+  isOwner: boolean,
 };
 
 export type Forest = {
   name: string,
   directories: Directory[],
-  participants: ObjectId[],
+  participants: ObjectId[], 
 }
 
 export enum DirectoryType {

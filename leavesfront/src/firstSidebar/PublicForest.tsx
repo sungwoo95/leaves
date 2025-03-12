@@ -2,16 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import Button from "@mui/material/Button";
 import { Box } from "@mui/material";
 import Explorer from "./Explorer";
-import { Directory, DirectoryType, ForestMetaData, UpdateName } from "../types";
+import { Directory, DirectoryType ,MyForestInfo,UpdateName } from "../types";
 import AddIcon from "@mui/icons-material/Add";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import axios from "axios";
 import { path } from "../../config/env";
 
-const PublicForest = ({ forestMetaData }: { forestMetaData: ForestMetaData }) => {
+const PublicForest = ({ myForests }: { myForests: MyForestInfo }) => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [directories, setDirectories] = useState<Directory[]>([]);
-  const { forestId, forestName, isOwner, isNew } = forestMetaData;
+  const { forestId, isOwner } = myForests;
 
   const toggleVisibility = () => {
     setIsVisible((prev) => !prev);
@@ -116,7 +116,7 @@ const PublicForest = ({ forestMetaData }: { forestMetaData: ForestMetaData }) =>
   useEffect(() => {
     const getData = async () => {
       try {
-        const response = await axios.get(`${path}/forest/${forestId.toString()}`);
+        const response = await axios.get(`${path}/forest/readForest/${forestId.toString()}`);
         const newDirectories: Directory[] = response.data;
         setDirectories(newDirectories);
       } catch (error) {

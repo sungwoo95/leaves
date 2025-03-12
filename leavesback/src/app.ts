@@ -13,14 +13,14 @@ app.use(express.json());//req.body를 자동으로 JSON 객체로 변환
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:5173", 
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
 
-app.use("/api/tree",treeRouter);
-app.use("/api/user",userRouter);
-app.use("/api/forest",forestRouter);
+app.use("/api/tree", treeRouter);
+app.use("/api/user", userRouter);
+app.use("/api/forest", forestRouter);
 
 const startServer = async () => {
   console.log("startServer");
