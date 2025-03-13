@@ -113,11 +113,15 @@ const PrivateForest = () => {
   };
 
   useEffect(() => {
+    console.log("[PrivateForest]useEffect called");
     const getData = async () => {
+      console.log("getData called");
       try {
         const response = await axios.get(`${path}/user/directories`);
         const newDirectories: Directory[] = response.data;
-        setDirectories(newDirectories);
+        if (Array.isArray(newDirectories)) {
+          setDirectories(newDirectories);
+        }
       } catch (error) {
         console.log(error);
       }
