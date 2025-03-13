@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { parseAccessToken } from "./userController";
 import { forestsCollection, usersCollection } from "../config/db";
-import { Forest, MyForestInfo } from "../types";
+import { Directory, Forest, MyForestInfo } from "../types";
 import { ObjectId } from "mongodb";
 
 export const createForest = async (req: Request, res: Response): Promise<void> => {
@@ -51,11 +51,30 @@ export const readForest = async (req: Request, res: Response): Promise<void> => 
       res.status(404).json({ message: "Forest not found" });
       return;
     }
-    const directories = forest.directories;
-    const name = forest.name;
-    res.json({directories,name});
+    res.json(forest);
   } catch (error) {
     console.log("[forestController]readForest Error");
     res.status(500).json({ message: "internal error" });
   }
 }
+
+export const updateForestDirectories = async (req: Request, res: Response): Promise<void> => {
+  console.log("[forestController]req.body: ",req.body);
+
+  const { forestId, directories }: { forestId: string; directories: Directory[] } = req.body;
+  const objectId = new ObjectId(forestId);
+  try {
+    const result = await forestsCollection.updateOne(
+      { _id: objectId },
+      { $set: { directories: directories } }
+    );
+    if (result.matchedCount === 0) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+    res.json({ message: "Directories updated successfully" });
+  } catch (error) {
+    console.error("[userController][updateDirectories] Error updating directories:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

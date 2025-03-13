@@ -1,5 +1,3 @@
-import { ObjectId } from "mongodb";
-
 export type AddDirectory = (tartgetId: null | string, type: DirectoryType) => void;
 
 export type UpdateIsNew = (targetId: string) => void;
@@ -14,11 +12,11 @@ export enum DirectoryType {
 }
 
 export type Directory = {
-  id: string;
-  type: DirectoryType;
-  isNew: boolean;
-  name: string;
-  children: Directory[];
+  id: string,
+  type: DirectoryType,
+  isNew: boolean,
+  name: string,
+  children: Directory[],
 };
 
 export type Position = {
@@ -27,6 +25,6 @@ export type Position = {
 };
 
 export type MyForestInfo = {
-  forestId: ObjectId; //Forest의 _id
+  forestId: string,
   isOwner: boolean;
 };

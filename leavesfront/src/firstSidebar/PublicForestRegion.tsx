@@ -54,6 +54,7 @@ const PublicForestRegion = () => {
       try {
         const response = await axios.get(`${path}/user/myForests`);
         const newMyForests: MyForestInfo[] = response.data;
+        console.log("[PublicForestRegion]response.data: ",newMyForests);
         setMyForests(newMyForests);
       } catch (error) {
         console.log(error);

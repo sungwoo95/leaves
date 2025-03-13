@@ -74,7 +74,7 @@ export const readDirectories = async (req: Request, res: Response): Promise<void
   }
 };
 
-export const updateDirectories = async (req: Request, res: Response): Promise<void> => {
+export const updateUserDirectories = async (req: Request, res: Response): Promise<void> => {
   console.log("[userController] updateDirectories called");
   const newDirectories: Directory[] = req.body;
   const cookies = req.cookies;
@@ -155,13 +155,13 @@ export const readMyForests = async (req: Request, res: Response): Promise<void> 
       { projection: { myForests: 1, _id: 0 } }
     );
     const myForests = document?.myForests
-    console.log(myForests);
     if (!myForests) {
       console.log("cannot find user");
       res.status(500).json({ message: "Internal server error" });
       return;
     }
     // myForests 속성 응답
+    console.log("[userController]res.json(", myForests, ")");
     res.json(myForests);
   } catch (error) {
     console.error("[userController][readForests] Error reading forests:", error);

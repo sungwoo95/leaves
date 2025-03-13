@@ -107,8 +107,9 @@ const PublicForest = ({ myForests }: { myForests: MyForestInfo }) => {
   };
 
   const postDirectories = async (directories: Directory[]) => {
+    console.log("[PublicForest]postDirectories called");
     try {
-      await axios.post(`${path}/user/directories`, directories);
+      await axios.post(`${path}/forest/updateDirectories`, { forestId, directories });
     } catch (error) {
       console.log(error);
     }
