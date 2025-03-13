@@ -127,22 +127,24 @@ const PrivateForest = () => {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Button variant="text" sx={{ width: "100%", justifyContent: "flex-start" }} onClick={toggleVisibility}>
-        Private Forest
-        <CreateNewFolderIcon
-          onClick={(e) => {
-            e.stopPropagation();
-            if (!isVisible) toggleVisibility();
-            addDirectory(null, DirectoryType.FOLDER);
-          }}
-        />
-        <AddIcon
-          onClick={(e) => {
-            e.stopPropagation();
-            if (!isVisible) toggleVisibility();
-            addDirectory(null, DirectoryType.FILE);
-          }}
-        />
+      <Button variant="text" sx={{ width: "100%", justifyContent: "space-between" }} onClick={toggleVisibility}>
+        <Box>Private Forest</Box>
+        <Box sx={{ display: "flex" }}>
+          <CreateNewFolderIcon
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!isVisible) toggleVisibility();
+              addDirectory(null, DirectoryType.FOLDER);
+            }}
+          />
+          <AddIcon
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!isVisible) toggleVisibility();
+              addDirectory(null, DirectoryType.FILE);
+            }}
+          />
+        </Box>
       </Button>
 
       {isVisible && ( // isVisible이 true일 때만 Box 렌더링

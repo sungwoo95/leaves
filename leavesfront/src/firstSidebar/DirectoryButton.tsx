@@ -71,6 +71,7 @@ const DirectoryButton = ({
         width: "100%",
         pl: level,
         border: item.isNew || isEditing ? "2px solid green" : "none",
+        justifyContent: "space-between",
       }}
       onClick={onClickHandler}
       onContextMenu={onContextMenuHandler}>
@@ -100,7 +101,7 @@ const DirectoryButton = ({
         )}
       </Box>
       {item.type === DirectoryType.FOLDER && (
-        <>
+        <Box sx={{ display: "flex" }}>
           <CreateNewFolderIcon
             onClick={(e) => {
               e.stopPropagation();
@@ -115,7 +116,7 @@ const DirectoryButton = ({
               addDirectory(item.id, DirectoryType.FILE);
             }}
           />
-        </>
+        </Box>
       )}
     </Button>
   );

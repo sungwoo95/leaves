@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Button from "@mui/material/Button";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import Explorer from "./Explorer";
 import { Directory, DirectoryType, MyForestInfo, UpdateName } from "../types";
 import AddIcon from "@mui/icons-material/Add";
@@ -131,24 +131,25 @@ const PublicForest = ({ myForests }: { myForests: MyForestInfo }) => {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Button variant="text" sx={{ width: "100%", justifyContent: "flex-start" }} onClick={toggleVisibility}>
-        {forestName}
-        <CreateNewFolderIcon
-          onClick={(e) => {
-            e.stopPropagation();
-            if (!isVisible) toggleVisibility();
-            addDirectory(null, DirectoryType.FOLDER);
-          }}
-        />
-        <AddIcon
-          onClick={(e) => {
-            e.stopPropagation();
-            if (!isVisible) toggleVisibility();
-            addDirectory(null, DirectoryType.FILE);
-          }}
-        />
+      <Button variant="text" sx={{ pl: 2, width: "100%", justifyContent: "space-between" }} onClick={toggleVisibility}>
+        <Box>{forestName}</Box>
+        <Box sx={{ display: "flex" }}>
+          <CreateNewFolderIcon
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!isVisible) toggleVisibility();
+              addDirectory(null, DirectoryType.FOLDER);
+            }}
+          />
+          <AddIcon
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!isVisible) toggleVisibility();
+              addDirectory(null, DirectoryType.FILE);
+            }}
+          />
+        </Box>
       </Button>
-
       {isVisible && ( // isVisible이 true일 때만 Box 렌더링
         <Explorer directories={directories} addDirectory={addDirectory} updateIsNew={updateIsNew} updateName={updateName} />
       )}

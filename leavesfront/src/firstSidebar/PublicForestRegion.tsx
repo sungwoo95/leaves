@@ -64,15 +64,17 @@ const PublicForestRegion = () => {
 
   return (
     <Box sx={{ borderRadius: 2 }}>
-      <Button variant="text" sx={{ width: "100%", justifyContent: "flex-start" }} onClick={toggleVisibility}>
-        Public Forest
-        <AddIcon
-          onClick={(e) => {
-            e.stopPropagation();
-            if (!isVisible) toggleVisibility();
-            handleModalOpen();
-          }}
-        />
+      <Button variant="text" sx={{ width: "100%", justifyContent: "space-between" }} onClick={toggleVisibility}>
+        <Box>Public Forest</Box>
+        <Box sx={{ display: "flex" }}>
+          <AddIcon
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!isVisible) toggleVisibility();
+              handleModalOpen();
+            }}
+          />
+        </Box>
       </Button>
       <Modal open={isModalOpen} onClose={handleModalClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
         <Box sx={modalStyle}>
@@ -100,7 +102,7 @@ const PublicForestRegion = () => {
       {isVisible && (
         <Box>
           {myForests.map((item) => (
-            <Box sx={{ pl: 2, width: "100%" }} key={item.forestId.toString()}>
+            <Box sx={{ width: "100%" }} key={item.forestId.toString()}>
               <PublicForest myForests={item} />
             </Box>
           ))}
