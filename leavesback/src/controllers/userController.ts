@@ -150,10 +150,12 @@ export const readMyForests = async (req: Request, res: Response): Promise<void> 
   //objectId로 조회한 문서의 myForests응답하기.
   try {
     // 특정 필드(myForests)만 가져오기
-    const myForests = await usersCollection.findOne(
+    const document = await usersCollection.findOne(
       { _id: objectId },
       { projection: { myForests: 1, _id: 0 } }
     );
+    const myForests = document?.myForests
+    console.log(myForests);
     if (!myForests) {
       console.log("cannot find user");
       res.status(500).json({ message: "Internal server error" });

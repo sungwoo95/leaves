@@ -52,7 +52,8 @@ export const readForest = async (req: Request, res: Response): Promise<void> => 
       return;
     }
     const directories = forest.directories;
-    res.json(directories);
+    const name = forest.name;
+    res.json({directories,name});
   } catch (error) {
     console.log("[forestController]readForest Error");
     res.status(500).json({ message: "internal error" });

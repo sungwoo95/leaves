@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import Button from "@mui/material/Button";
 import { Box } from "@mui/material";
 import Explorer from "./Explorer";
-import { Directory, DirectoryType ,MyForestInfo,UpdateName } from "../types";
+import { Directory, DirectoryType, MyForestInfo, UpdateName } from "../types";
 import AddIcon from "@mui/icons-material/Add";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import axios from "axios";
@@ -11,6 +11,7 @@ import { path } from "../../config/env";
 const PublicForest = ({ myForests }: { myForests: MyForestInfo }) => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [directories, setDirectories] = useState<Directory[]>([]);
+  const [forestName, setForestName] = useState<string>("");
   const { forestId, isOwner } = myForests;
 
   const toggleVisibility = () => {
@@ -117,8 +118,10 @@ const PublicForest = ({ myForests }: { myForests: MyForestInfo }) => {
     const getData = async () => {
       try {
         const response = await axios.get(`${path}/forest/readForest/${forestId.toString()}`);
-        const newDirectories: Directory[] = response.data;
-        setDirectories(newDirectories);
+        const { directories, name } = response.data;
+        console.log(response.data);
+        setDirectories(directories);
+        setForestName(name);
       } catch (error) {
         console.log(error);
       }
@@ -129,7 +132,7 @@ const PublicForest = ({ myForests }: { myForests: MyForestInfo }) => {
   return (
     <Box sx={{ width: "100%" }}>
       <Button variant="text" sx={{ width: "100%", justifyContent: "flex-start" }} onClick={toggleVisibility}>
-        Public Forest
+        {forestName}
         <CreateNewFolderIcon
           onClick={(e) => {
             e.stopPropagation();

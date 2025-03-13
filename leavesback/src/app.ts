@@ -9,7 +9,7 @@ import forestRouter from "./routes/forestRouter";
 
 const app: Application = express();
 const PORT = process.env.PORT || 3001;
-app.use(express.json());//req.body를 자동으로 JSON 객체로 변환
+app.use(express.json());//req.body를 자동으로 객체로 변환
 app.use(cookieParser());
 app.use(
   cors({

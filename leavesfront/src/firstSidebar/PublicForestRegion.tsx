@@ -53,10 +53,8 @@ const PublicForestRegion = () => {
     const setMyForestsData = async () => {
       try {
         const response = await axios.get(`${path}/user/myForests`);
-        if (Array.isArray(response.data)) {
-          const newMyForests: MyForestInfo[] = response.data;
-          setMyForests(newMyForests);
-        }
+        const newMyForests: MyForestInfo[] = response.data;
+        setMyForests(newMyForests);
       } catch (error) {
         console.log(error);
       }
@@ -102,7 +100,7 @@ const PublicForestRegion = () => {
       {isVisible && (
         <Box>
           {myForests.map((item) => (
-            <Box sx={{ width: "100%" }} key={item.forestId.toString()}>
+            <Box sx={{ pl: 2, width: "100%" }} key={item.forestId.toString()}>
               <PublicForest myForests={item} />
             </Box>
           ))}
