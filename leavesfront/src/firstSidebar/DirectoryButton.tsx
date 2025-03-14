@@ -4,6 +4,8 @@ import AddIcon from "@mui/icons-material/Add";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import { useEffect, useRef, useState } from "react";
 import DirectoryContextMenu from "./DirectoryContextMenu";
+import { path } from "../../config/env";
+import axios from "axios";
 
 const DirectoryButton = ({
   item,
@@ -41,6 +43,9 @@ const DirectoryButton = ({
   const onClickHandler = () => {
     console.log("[DirectoryButton][Button]onClick called");
     if (item.type === DirectoryType.FOLDER) toggleVisibility(item.id);
+    if (item.type === DirectoryType.FILE){
+      console.log("[onClickHandler]treeId: ",item.treeId);
+    }
   };
 
   const onClickMenuHandler = (e: React.MouseEvent) => {
@@ -110,10 +115,14 @@ const DirectoryButton = ({
             }}
           />
           <AddIcon
-            onClick={(e) => {
+            onClick={async (e) => {
               e.stopPropagation();
               if (!isVisible) toggleVisibility(item.id);
-              addDirectory(item.id, DirectoryType.FILE);
+              //여기서 트리 생성 요청 보내고, 트리의 objectId받아서 addDirectory에 보내기.
+              const response = await axios.post(`${path}/tree/createTree`);
+              const treeId: string = response.data.treeId;
+              console.log("treeId: ", treeId); //ok
+              addDirectory(item.id, DirectoryType.FILE, treeId);
             }}
           />
         </Box>

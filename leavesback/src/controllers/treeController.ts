@@ -1,25 +1,6 @@
 import { Request, Response } from "express";
-
-type NodeData = {
-  id: string;
-  label: string;
-};
-
-type Position = {
-  x: number;
-  y: number;
-};
-
-type EdgeData = {
-  source: string;
-  target: string;
-  label: string;
-};
-
-type Tree = {
-  nodes: { data: NodeData; position: Position }[];
-  edges: { data: EdgeData }[];
-};
+import { Leaf, Tree } from "../types";
+import { leavesCollection, treesCollection } from "../config/db";
 
 const treeData: Record<string, Tree> = {
   "1": {
@@ -35,8 +16,8 @@ const treeData: Record<string, Tree> = {
   },
 };
 
-// 특정 트리 데이터 조회 (GET /tree/:treeId)
-export const getTreeData = (req: Request, res: Response): void => {
+//특정 트리 데이터 조회 (GET /tree/:treeId)
+export const readTree = (req: Request, res: Response): void => {
   console.log("[treeController]getTreeData called");
   const { treeId } = req.params;
 
@@ -47,13 +28,37 @@ export const getTreeData = (req: Request, res: Response): void => {
   }
 };
 
-export const deleteTree = (req: Request, res: Response): void => {
-  const { treeId } = req.params;
-
-  if (treeData[treeId]) {
-    delete treeData[treeId];
-    res.json({ message: `Tree ${treeId} has been deleted.` });
-  } else {
-    res.status(404).json({ error: "Tree not found" });
+//db에 새로운 Tree inserOne하기, objectId 응답하기.
+export const createTree = async (req: Request, res: Response): Promise<void> => {
+  //하나의 leaf생성, 
+  //해당 leaf를 데이터로.
+  try {
+    const newLeaf: Leaf = {
+      title: "Untitled",
+      contents: "",
+    }
+    const insertLeafResult = await leavesCollection.insertOne(newLeaf);
+    if (!insertLeafResult.acknowledged) {
+      console.log("[TreeController][createTree]insert new leaf error")
+      res.status(500).json({ message: "Internal server error" });
+      return;
+    }
+    const leafId = insertLeafResult.insertedId.toString();
+    const newTree: Tree = {
+      nodes: [{ data: { id: leafId, label: "Untitled" }, position: { x: 300, y: 50 } },],
+      edges: [],
+    }
+    const insertTreeResult = await treesCollection.insertOne(newTree);
+    if (!insertTreeResult.acknowledged) {
+      console.log("[TreeController][createTree]insert new Tree error")
+      res.status(500).json({ message: "Internal server error" });
+      return;
+    }
+    const treeId = insertTreeResult.insertedId;
+    res.json({treeId});
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+    return;
   }
 };
+

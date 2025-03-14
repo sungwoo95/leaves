@@ -1,5 +1,5 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
-import { Forest, User } from "../types";
+import { Forest, Leaf, Tree, User } from "../types";
 
 const uri: string | undefined = process.env.MONGO_URI;
 
@@ -15,6 +15,7 @@ export const client = new MongoClient(uri, {
     deprecationErrors: true,
   },
 });
+
 enum Database {
   NAMUNIBS = "namunibs",
 }
@@ -22,12 +23,16 @@ enum Database {
 enum Collection {
   USERS = "users",
   FORESTS = "forests",
+  TREES = "trees",
+  Leaves = "leaves",
 }
 
 const db = client.db(Database.NAMUNIBS);
 
 export const usersCollection = db.collection<User>(Collection.USERS);
 export const forestsCollection = db.collection<Forest>(Collection.FORESTS);
+export const treesCollection = db.collection<Tree>(Collection.TREES);
+export const leavesCollection = db.collection<Leaf>(Collection.Leaves);
 
 export const connectToDB = async (): Promise<MongoClient> => {
   try {

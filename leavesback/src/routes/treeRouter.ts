@@ -1,10 +1,9 @@
 import { Router } from "express";
-import { getTreeData, deleteTree } from "../controllers/treeController";
+import { createTree, readTree } from "../controllers/treeController";
 
-const treeRouter: Router = Router(); 
+const treeRouter: Router = Router();
 
-treeRouter.get("/:treeId", getTreeData);
-
-treeRouter.delete("/:treeId", deleteTree);
+treeRouter.get("/:treeId", readTree);
+treeRouter.post("/createTree", createTree);
 
 export default treeRouter;

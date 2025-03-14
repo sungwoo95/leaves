@@ -18,9 +18,10 @@ const PublicForest = ({ myForests }: { myForests: MyForestInfo }) => {
     setIsVisible((prev) => !prev);
   };
 
-  const addDirectory = (targetId: null | string = null, type: DirectoryType): void => {
+  const addDirectory = (targetId: null | string = null, type: DirectoryType, treeId?: string): void => {
     const directory: Directory = {
       id: crypto.randomUUID(),
+      treeId,
       type: type,
       isNew: true,
       name: "Untitled",
@@ -143,10 +144,13 @@ const PublicForest = ({ myForests }: { myForests: MyForestInfo }) => {
             }}
           />
           <AddIcon
-            onClick={(e) => {
+            onClick={async (e) => {
               e.stopPropagation();
               if (!isVisible) toggleVisibility();
-              addDirectory(null, DirectoryType.FILE);
+              const response = await axios.post(`${path}/tree/createTree`);
+              const treeId: string = response.data.treeId;
+              console.log("treeId: ", treeId); 
+              addDirectory(null, DirectoryType.FILE, treeId);
             }}
           />
         </Box>

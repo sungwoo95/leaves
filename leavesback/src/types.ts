@@ -1,5 +1,26 @@
 import { ObjectId } from "mongodb";
 
+export type NodeData = {
+  id: string;
+  label: string;
+};
+
+export type Position = {
+  x: number;
+  y: number;
+};
+
+export type EdgeData = {
+  source: string;
+  target: string;
+  label: string;
+};
+
+export type Tree = {
+  nodes: { data: NodeData; position: Position }[];
+  edges: { data: EdgeData }[];
+};
+
 export type User = {
   password: string,
   email: string,
@@ -32,3 +53,8 @@ export type Directory = {
   name: string,
   children: Directory[],
 };
+
+export type Leaf = {
+  title: string,
+  contents: string, //blocknote에 맞게 변경 필요.
+}

@@ -1,4 +1,4 @@
-export type AddDirectory = (tartgetId: null | string, type: DirectoryType) => void;
+export type AddDirectory = (tartgetId: null | string, type: DirectoryType, treeId?: string) => void;
 
 export type UpdateIsNew = (targetId: string) => void;
 
@@ -12,11 +12,12 @@ export enum DirectoryType {
 }
 
 export type Directory = {
-  id: string,
-  type: DirectoryType,
-  isNew: boolean,
-  name: string,
-  children: Directory[],
+  id: string;
+  treeId?: string;
+  type: DirectoryType;
+  isNew: boolean;
+  name: string;
+  children: Directory[];
 };
 
 export type Position = {
@@ -25,6 +26,6 @@ export type Position = {
 };
 
 export type MyForestInfo = {
-  forestId: string,
+  forestId: string;
   isOwner: boolean;
 };
