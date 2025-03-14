@@ -26,8 +26,8 @@ export type User = {
   email: string,
   directories: Directory[],
   myForests: MyForestInfo[],
-  treeId: string | null,
-  leafId: string | null,
+  treeId: string | undefined,
+  leafId: string | undefined,
 }
 
 export type MyForestInfo = {

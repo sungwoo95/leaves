@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import DirectoryContextMenu from "./DirectoryContextMenu";
 import { path } from "../../config/env";
 import axios from "axios";
+import { useSpaceContext } from "../Space";
 
 const DirectoryButton = ({
   item,
@@ -27,7 +28,17 @@ const DirectoryButton = ({
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [menuPosition, setMenuPosition] = useState<Position | undefined>(undefined);
   const inputRef = useRef<HTMLInputElement | undefined>(undefined);
-
+  const spaceContext = useSpaceContext();
+  try {
+    if (!spaceContext) {
+      //SpaceContext.Provider의 하위 컴포넌트가 아닐 경우
+      throw new Error("//SpaceContext.Provider의 하위 컴포넌트가 아님");
+    }
+  } catch (err) {
+    console.error((err as Error).message);
+    return <p>오류가 발생했습니다.</p>;
+  }
+  const { setTreeId } = spaceContext;
   const exitEditMode = (): void => {
     console.log("[DirectoryButton]exitEditMode called");
     //편집 내용 업데이트.
@@ -43,8 +54,9 @@ const DirectoryButton = ({
   const onClickHandler = () => {
     console.log("[DirectoryButton][Button]onClick called");
     if (item.type === DirectoryType.FOLDER) toggleVisibility(item.id);
-    if (item.type === DirectoryType.FILE){
-      console.log("[onClickHandler]treeId: ",item.treeId);
+    if (item.type === DirectoryType.FILE) {
+      console.log("[onClickHandler]treeId: ", item.treeId);
+      setTreeId(item.treeId);
     }
   };
 

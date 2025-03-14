@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { Leaf, Tree } from "../types";
 import { leavesCollection, treesCollection } from "../config/db";
+import { ObjectId } from "mongodb";
 
 const treeData: Record<string, Tree> = {
   "1": {
@@ -17,15 +18,19 @@ const treeData: Record<string, Tree> = {
 };
 
 //특정 트리 데이터 조회 (GET /tree/:treeId)
-export const readTree = (req: Request, res: Response): void => {
-  console.log("[treeController]getTreeData called");
+export const readTree = async (req: Request, res: Response): Promise<void> => {
   const { treeId } = req.params;
-
-  if (treeData[treeId]) {
-    res.json(treeData[treeId]);
-  } else {
-    res.status(404).json({ error: "Tree not found" });
+  console.log("[treeController][readTree]treeId:", treeId);
+  try {
+    const tree = await treesCollection.findOne({
+      _id: new ObjectId(treeId)
+    })  
+    res.json(tree);
+  } catch (error) {
+    console.log("[treeController][readTree]find Tree error");
+    res.status(500).json({message:"internal server error"});
   }
+  
 };
 
 //db에 새로운 Tree inserOne하기, objectId 응답하기.
@@ -55,7 +60,7 @@ export const createTree = async (req: Request, res: Response): Promise<void> => 
       return;
     }
     const treeId = insertTreeResult.insertedId;
-    res.json({treeId});
+    res.json({ treeId });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
     return;

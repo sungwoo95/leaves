@@ -1,8 +1,8 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
 
 type SpaceContextType = {
-  treeId: number;
-  setTreeId: React.Dispatch<React.SetStateAction<number>>;
+  treeId: string | undefined;
+  setTreeId: React.Dispatch<React.SetStateAction<string | undefined>>;
   leafId: string | undefined;
   setLeafId: React.Dispatch<React.SetStateAction<string | undefined>>;
 };
@@ -14,7 +14,7 @@ type SpaceProps = {
 const SpaceContext = createContext<SpaceContextType | undefined>(undefined);
 
 export function Space({ children }: SpaceProps) {
-  const [treeId, setTreeId] = useState<number>(1);
+  const [treeId, setTreeId] = useState<string | undefined>(undefined);
   const [leafId, setLeafId] = useState<string | undefined>(undefined);
 
   return (

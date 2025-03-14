@@ -12,8 +12,8 @@ const createUser = (email: string, password: string): User => {
     password,
     directories: [],
     myForests: [],
-    treeId: null,
-    leafId: null,
+    treeId: undefined,
+    leafId: undefined,
   };
 };
 
