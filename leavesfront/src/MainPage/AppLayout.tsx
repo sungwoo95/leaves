@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
-import FirstSidebar from "./FirstSidebar";
-import SecondSidebar from "./SecondSidebar";
-import MainContent from "./MainContent";
+import MainContent from "./MainContent/MainContent";
+import FirstSidebar from "./firstSidebar/FirstSidebar";
+import SecondSidebar from "./SecondSidebar/SecondSidebar";
 
 const AppLayout: React.FC = () => {
   return (

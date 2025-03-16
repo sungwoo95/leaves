@@ -1,10 +1,10 @@
 import { useRef, useEffect, useCallback, useState } from "react";
 import axios from "axios";
 import CytoscapeComponent from "react-cytoscapejs";
-import { useSpaceContext } from "./Space";
 import cytoscape from "cytoscape";
 import { useTheme } from "@mui/material/styles";
-import { path } from "../config/env";
+import { useSpaceContext } from "../Space";
+import { path } from "../../../config/env";
 
 const Tree: React.FC = () => {
   const spaceContext = useSpaceContext();

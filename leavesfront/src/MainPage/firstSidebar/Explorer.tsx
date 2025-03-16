@@ -1,4 +1,4 @@
-import { AddDirectory, Directory, UpdateIsNew, UpdateName } from "../types";
+import { AddDirectory, Directory, UpdateIsNew, UpdateName } from "../../types";
 import { useState } from "react";
 import { Box } from "@mui/material";
 import DirectoryButton from "./DirectoryButton";

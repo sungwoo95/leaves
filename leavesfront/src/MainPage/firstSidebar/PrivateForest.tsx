@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import Button from "@mui/material/Button";
 import { Box } from "@mui/material";
 import Explorer from "./Explorer";
-import { Directory, DirectoryType, UpdateName } from "../types";
+import { Directory, DirectoryType, UpdateName } from "../../types";
 import AddIcon from "@mui/icons-material/Add";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import axios from "axios";
-import { path } from "../../config/env";
+import { path } from "../../../config/env";
 
 const PrivateForest = () => {
   const [isVisible, setIsVisible] = useState<boolean>(false);

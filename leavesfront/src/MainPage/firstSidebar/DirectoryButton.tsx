@@ -1,10 +1,10 @@
 import { Button, Box, TextField } from "@mui/material";
-import { AddDirectory, Directory, DirectoryType, Position, UpdateIsNew, UpdateName } from "../types";
+import { AddDirectory, Directory, DirectoryType, Position, UpdateIsNew, UpdateName } from "../../types";
 import AddIcon from "@mui/icons-material/Add";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import { useEffect, useRef, useState } from "react";
 import DirectoryContextMenu from "./DirectoryContextMenu";
-import { path } from "../../config/env";
+import { path } from "../../../config/env";
 import axios from "axios";
 import { useSpaceContext } from "../Space";
 

@@ -1,7 +1,7 @@
 import { Paper } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import PrivateForestRegion from "./firstSidebar/PrivateForestRegion";
-import PublicForestRegion from "./firstSidebar/PublicForestRegion";
+import PrivateForestRegion from "./PrivateForestRegion";
+import PublicForestRegion from "./PublicForestRegion";
 
 const FirstSidebar: React.FC = () => {
   const theme = useTheme();
