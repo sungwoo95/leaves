@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import DirectoryContextMenu from "./DirectoryContextMenu";
 import { path } from "../../../config/env";
 import axios from "axios";
-import { useSpaceContext } from "../Space";
+import { useMainPageContext } from "../MainPageManager";
 
 const DirectoryButton = ({
   item,
@@ -28,7 +28,7 @@ const DirectoryButton = ({
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [menuPosition, setMenuPosition] = useState<Position | undefined>(undefined);
   const inputRef = useRef<HTMLInputElement | undefined>(undefined);
-  const spaceContext = useSpaceContext();
+  const spaceContext = useMainPageContext();
   try {
     if (!spaceContext) {
       //SpaceContext.Provider의 하위 컴포넌트가 아닐 경우

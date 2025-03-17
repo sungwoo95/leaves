@@ -3,7 +3,7 @@ import MainContent from "./MainContent/MainContent";
 import FirstSidebar from "./firstSidebar/FirstSidebar";
 import SecondSidebar from "./SecondSidebar/SecondSidebar";
 
-const AppLayout: React.FC = () => {
+const MainPageLayout: React.FC = () => {
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>  
       <Box sx={{ flex: 1.5 }}>  
@@ -19,4 +19,4 @@ const AppLayout: React.FC = () => {
   );
 };
 
-export default AppLayout;
+export default MainPageLayout;

@@ -3,11 +3,11 @@ import axios from "axios";
 import CytoscapeComponent from "react-cytoscapejs";
 import cytoscape from "cytoscape";
 import { useTheme } from "@mui/material/styles";
-import { useSpaceContext } from "../Space";
 import { path } from "../../../config/env";
+import { useMainPageContext } from "../MainPageManager";
 
 const Tree: React.FC = () => {
-  const spaceContext = useSpaceContext();
+  const spaceContext = useMainPageContext();
   try {
     if (!spaceContext) {
       //SpaceContext.Provider의 하위 컴포넌트가 아닐 경우

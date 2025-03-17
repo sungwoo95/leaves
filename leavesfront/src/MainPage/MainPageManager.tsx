@@ -1,24 +1,24 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
 
-type SpaceContextType = {
+type MainPageContextType = {
   treeId: string | undefined;
   setTreeId: React.Dispatch<React.SetStateAction<string | undefined>>;
   leafId: string | undefined;
   setLeafId: React.Dispatch<React.SetStateAction<string | undefined>>;
 };
 
-type SpaceProps = {
+type MainPageProps = {
   children: ReactNode;
 };
 //Context 생성
-const SpaceContext = createContext<SpaceContextType | undefined>(undefined);
+const MainPageContext = createContext<MainPageContextType | undefined>(undefined);
 
-export function Space({ children }: SpaceProps) {
+export function MainPageManager({ children }: MainPageProps) {
   const [treeId, setTreeId] = useState<string | undefined>(undefined);
   const [leafId, setLeafId] = useState<string | undefined>(undefined);
 
   return (
-    <SpaceContext.Provider
+    <MainPageContext.Provider
       value={{
         treeId,
         setTreeId,
@@ -26,8 +26,8 @@ export function Space({ children }: SpaceProps) {
         setLeafId,
       }}>
       {children}
-    </SpaceContext.Provider>
+    </MainPageContext.Provider>
   );
 }
 
-export const useSpaceContext = () => useContext(SpaceContext);
+export const useMainPageContext = () => useContext(MainPageContext);

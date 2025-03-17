@@ -1,11 +1,11 @@
-import AppLayout from "./AppLayout";
-import { Space } from "./Space";
+import MainPageLayout from "./MainPageLayout";
+import { MainPageManager } from "./MainPageManager";
 
 const MainPage: React.FC = () => {
   return (
-    <Space>
-      <AppLayout />
-    </Space>
+    <MainPageManager>
+      <MainPageLayout/>
+    </MainPageManager>
   );
 };
 
