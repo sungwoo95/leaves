@@ -34,7 +34,7 @@ export const forestsCollection = db.collection<Forest>(Collection.FORESTS);
 export const treesCollection = db.collection<Tree>(Collection.TREES);
 export const leavesCollection = db.collection<Leaf>(Collection.Leaves);
 
-export const connectToDB = async (): Promise<MongoClient> => {
+export const connectToMongoDB = async (): Promise<MongoClient> => {
   try {
     await client.connect();
     // 연결 테스트: admin 데이터베이스에 ping 명령 실행

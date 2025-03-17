@@ -3,35 +3,59 @@ import express, { Application } from "express";
 import cors from "cors";
 import treeRouter from "./routes/treeRouter";
 import userRouter from "./routes/userRouter";
-import { connectToDB } from "./config/db";
+import { connectToMongoDB } from "./config/db";
 import cookieParser from "cookie-parser";
 import forestRouter from "./routes/forestRouter";
+import { WebSocket, WebSocketServer } from "ws";
+import { handleConnection } from "./websocket/wsHandlers";
 
 const app: Application = express();
-const PORT = process.env.PORT || 3001;
-app.use(express.json());//req.body를 자동으로 객체로 변환
-app.use(cookieParser());
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-  })
-);
+const REST_API_PORT = 3001;
+const WS_PORT = 8081;
 
-app.use("/api/tree", treeRouter);
-app.use("/api/user", userRouter);
-app.use("/api/forest", forestRouter);
-
-const startServer = async () => {
-  console.log("startServer");
+const setUpExpress = () => {
+  app.use(express.json());//req.body를 자동으로 객체로 변환
+  app.use(cookieParser());
+  app.use(
+    cors({
+      origin: "http://localhost:5173",
+      credentials: true,
+    })
+  );
+}
+const setUpRestApiServer = () => {
+  app.use("/api/tree", treeRouter);
+  app.use("/api/user", userRouter);
+  app.use("/api/forest", forestRouter);
+}
+const startRestApiServer = () => {
+  setUpExpress();
+  setUpRestApiServer();
+  app.listen(REST_API_PORT, () => {
+    console.log(`Server is running on port ${REST_API_PORT}`);
+  });
+}
+const startWebSocketServer = () => {
+  const wsServer: WebSocketServer = new WebSocket.Server({ port: WS_PORT });
+  wsServer.on("connection", (ws: WebSocket) => {
+    console.log("New WebSocket client connected");
+    handleConnection(ws, wsServer);
+  });
+  console.log(`WebSocket server running on port ${WS_PORT}`);
+};
+const connectToDB = async () => {
   try {
-    await connectToDB(); // 
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
+    await connectToMongoDB();
   } catch (err: unknown) {
-    console.error("Failed to start server:", err);
+    console.error("Failed to connect to db :", err);
   }
 };
+const startApp = () => {
+  setUpExpress();
+  startRestApiServer();
+  startWebSocketServer();
+  connectToDB();
+}
 
-startServer(); 
+startApp();
+
