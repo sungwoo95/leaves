@@ -156,7 +156,7 @@ const PublicForest = ({ myForests }: { myForests: MyForestInfo }) => {
         </Box>
       </Button>
       {isVisible && ( // isVisible이 true일 때만 Box 렌더링
-        <Explorer directories={directories} addDirectory={addDirectory} updateIsNew={updateIsNew} updateName={updateName} />
+        <Explorer isPublic ={true} directories={directories} addDirectory={addDirectory} updateIsNew={updateIsNew} updateName={updateName} />
       )}
     </Box>
   );

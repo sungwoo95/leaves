@@ -4,12 +4,14 @@ import { Box } from "@mui/material";
 import DirectoryButton from "./DirectoryButton";
 
 const Explorer = ({
+  isPublic,
   directories,
   level = 2,
   addDirectory,
   updateIsNew,
   updateName,
 }: {
+  isPublic: boolean;
   directories: Directory[];
   level?: number;
   addDirectory: AddDirectory;
@@ -26,6 +28,7 @@ const Explorer = ({
       {directories.map((item) => (
         <Box sx={{ width: "100%" }} key={item.id}>
           <DirectoryButton
+            isPublic={isPublic}
             item={item}
             level={level}
             isVisible={openState[item.id]}
@@ -35,7 +38,14 @@ const Explorer = ({
             updateName={updateName}
           />
           {openState[item.id] && item.type === "folder" && item.children && (
-            <Explorer directories={item.children} level={level + 1} addDirectory={addDirectory} updateIsNew={updateIsNew} updateName={updateName} />
+            <Explorer
+              isPublic={isPublic}
+              directories={item.children}
+              level={level + 1}
+              addDirectory={addDirectory}
+              updateIsNew={updateIsNew}
+              updateName={updateName}
+            />
           )}
         </Box>
       ))}

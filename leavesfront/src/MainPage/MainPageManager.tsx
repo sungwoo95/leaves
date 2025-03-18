@@ -7,6 +7,10 @@ type MainPageContextType = {
   leafId: string | undefined;
   setLeafId: React.Dispatch<React.SetStateAction<string | undefined>>;
   ws: WebSocket | undefined;
+  isPublicTree: boolean | undefined;
+  setIsPublicTree: React.Dispatch<React.SetStateAction<boolean | undefined>>;
+  isPublicLeaf: boolean | undefined;
+  setIsPublicLeaf: React.Dispatch<React.SetStateAction<boolean | undefined>>;
 };
 
 type MainPageProps = {
@@ -18,6 +22,8 @@ const MainPageContext = createContext<MainPageContextType | undefined>(undefined
 export function MainPageManager({ children }: MainPageProps) {
   const [treeId, setTreeId] = useState<string | undefined>(undefined);
   const [leafId, setLeafId] = useState<string | undefined>(undefined);
+  const [isPublicTree, setIsPublicTree] = useState<boolean| undefined>(undefined);
+  const [isPublicLeaf, setIsPublicLeaf] = useState<boolean | undefined>(undefined);
   const [ws, setWs] = useState<WebSocket | undefined>(undefined);
   useEffect(() => {
     console.log("[MainPageManager] useEffect called");
@@ -70,6 +76,10 @@ export function MainPageManager({ children }: MainPageProps) {
         leafId,
         setLeafId,
         ws,
+        isPublicTree,
+        setIsPublicTree,
+        isPublicLeaf,
+        setIsPublicLeaf,
       }}>
       {children}
     </MainPageContext.Provider>

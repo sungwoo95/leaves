@@ -7,17 +7,17 @@ import { path } from "../../../config/env";
 import { useMainPageContext } from "../MainPageManager";
 
 const Tree: React.FC = () => {
-  const spaceContext = useMainPageContext();
+  const mainPageContext = useMainPageContext();
   try {
-    if (!spaceContext) {
-      //SpaceContext.Provider의 하위 컴포넌트가 아닐 경우
-      throw new Error("//SpaceContext.Provider의 하위 컴포넌트가 아님");
+    if (!mainPageContext) {
+      //mainPageContext.Provider의 하위 컴포넌트가 아닐 경우
+      throw new Error("//mainPageContext.Provider의 하위 컴포넌트가 아님");
     }
   } catch (err) {
     console.error((err as Error).message);
     return <p>오류가 발생했습니다.</p>;
   }
-  const { treeId, leafId, setLeafId } = spaceContext;
+  const { treeId, leafId, setLeafId, isPublicTree, setIsPublicLeaf } = mainPageContext;
   const cyRef = useRef<cytoscape.Core | undefined>(undefined);
   const [nodes, setNodes] = useState<any[]>([]);
   const [edges, setEdges] = useState<any[]>([]);
@@ -61,9 +61,9 @@ const Tree: React.FC = () => {
   }, [leafId]);
 
   const handleLeafClick = (event: cytoscape.EventObject) => {
-    console.log("handleLeafClick 호출");
     const leafId = event.target.id();
     setLeafId(leafId);
+    setIsPublicLeaf(isPublicTree);
   };
 
   //tree데이터 가져오기.
