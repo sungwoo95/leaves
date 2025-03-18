@@ -6,7 +6,6 @@ import { ObjectId } from "mongodb";
 
 export const createForest = async (req: Request, res: Response): Promise<void> => {
   const forestName = req.body.forestName;
-  console.log(forestName);
   const cookies = req.cookies;
   if (!cookies) {
     res.status(401).json({ message: "Unauthorized: No token provided" });
