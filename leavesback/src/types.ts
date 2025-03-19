@@ -58,3 +58,7 @@ export type Leaf = {
   title: string,
   contents: string, //blocknote에 맞게 변경 필요.
 }
+
+export enum WsMessageType {
+  JOIN_Leaf = "joinLeaf",
+}

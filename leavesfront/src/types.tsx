@@ -29,3 +29,7 @@ export type MyForestInfo = {
   forestId: string;
   isOwner: boolean;
 };
+
+export enum WsMessageType {
+  JOIN_Leaf = "joinLeaf",
+}
