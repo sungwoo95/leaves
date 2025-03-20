@@ -20,13 +20,13 @@ const Leaf: React.FC = () => {
   if (!mainPageContext) {
     return <p>mainPageContext.Provider의 하위 컴포넌트가 아님.</p>;
   }
-  const { leafId, isPublicLeaf, ws } = mainPageContext;
+  const { leafId, ws } = mainPageContext;
 
   const handleTitleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
     setTitle(newTitle);
-    if (isPublicLeaf && ws) {
-      console.log("[Leaf]handleTitleChange called")
+    if (ws) {
+      console.log("[Leaf]handleTitleChange called");
       ws.send(JSON.stringify({ type: WsMessageType.UPDATE_LEAF_TITLE, data: { leafId, title: newTitle } }));
     }
   };
@@ -48,22 +48,20 @@ const Leaf: React.FC = () => {
       }
     };
     const handleMessage = () => {
-      if(ws){
+      if (ws) {
         ws.onmessage = (event) => {
           const message = JSON.parse(event.data);
-          const {type,data} = message;
+          const { type, data } = message;
           if (type === WsMessageType.UPDATE_LEAF_TITLE && data.leafId === leafId) {
             setTitle(data.title);
           }
-        }
+        };
       }
     };
     if (leafId) {
       getLeafData();
-      if (isPublicLeaf) {
-        joinLeafGroup();
-        handleMessage();
-      }
+      joinLeafGroup();
+      handleMessage();
     }
   }, [leafId, ws]);
 
