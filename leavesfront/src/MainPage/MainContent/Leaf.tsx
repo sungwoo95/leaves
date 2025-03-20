@@ -26,6 +26,7 @@ const Leaf: React.FC = () => {
     const newTitle = e.target.value;
     setTitle(newTitle);
     if (isPublicLeaf && ws) {
+      console.log("[Leaf]handleTitleChange called")
       ws.send(JSON.stringify({ type: WsMessageType.UPDATE_LEAF_TITLE, data: { leafId, title: newTitle } }));
     }
   };
@@ -57,7 +58,6 @@ const Leaf: React.FC = () => {
         }
       }
     };
-
     if (leafId) {
       getLeafData();
       if (isPublicLeaf) {
