@@ -31,5 +31,6 @@ export type MyForestInfo = {
 };
 
 export enum WsMessageType {
-  JOIN_Leaf = "joinLeaf",
+  JOIN_LEAF = "joinLeaf",
+  UPDATE_LEAF_TITLE = "updateTitle",
 }

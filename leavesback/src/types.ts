@@ -60,5 +60,6 @@ export type Leaf = {
 }
 
 export enum WsMessageType {
-  JOIN_Leaf = "joinLeaf",
+  JOIN_LEAF = "joinLeaf",
+  UPDATE_LEAF_TITLE = "updateTitle",
 }

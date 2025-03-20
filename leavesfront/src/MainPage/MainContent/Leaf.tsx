@@ -8,27 +8,65 @@ import { useCreateBlockNote } from "@blocknote/react";
 import "./editorStyles.css";
 import { useMainPageContext } from "../MainPageManager";
 import { WsMessageType } from "../../types";
+import axios from "axios";
+import { path } from "../../../config/env";
 
 const Leaf: React.FC = () => {
   const theme = useTheme();
   const [title, setTitle] = useState<string>("");
+  const [contents, setContents] = useState<string>("");
   const editor = useCreateBlockNote();
-
   const mainPageContext = useMainPageContext();
   if (!mainPageContext) {
     return <p>mainPageContext.Provider의 하위 컴포넌트가 아님.</p>;
   }
   const { leafId, isPublicLeaf, ws } = mainPageContext;
 
+  const handleTitleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTitle = e.target.value;
+    setTitle(newTitle);
+    if (isPublicLeaf && ws) {
+      ws.send(JSON.stringify({ type: WsMessageType.UPDATE_LEAF_TITLE, data: { leafId, title: newTitle } }));
+    }
+  };
+
   useEffect(() => {
+    const getLeafData = async () => {
+      try {
+        const response = await axios.get(`${path}/leaf/${leafId}`);
+        const leaf = response.data;
+        setTitle(leaf.title);
+        setContents(leaf.contents);
+      } catch (error) {
+        console.log("[Leaf]get leaf data error");
+      }
+    };
+    const joinLeafGroup = () => {
+      if (ws) {
+        ws.send(JSON.stringify({ type: WsMessageType.JOIN_LEAF, data: { leafId } }));
+      }
+    };
+    const handleMessage = () => {
+      if(ws){
+        ws.onmessage = (event) => {
+          const message = JSON.parse(event.data);
+          const {type,data} = message;
+          if (type === WsMessageType.UPDATE_LEAF_TITLE && data.leafId === leafId) {
+            setTitle(data.title);
+          }
+        }
+      }
+    };
+
     if (leafId) {
-      if (isPublicLeaf && ws) {
-        ws.send(JSON.stringify({ type: WsMessageType.JOIN_Leaf, data: { leafId } }));
-      } else {
-        //Rest Api
+      getLeafData();
+      if (isPublicLeaf) {
+        joinLeafGroup();
+        handleMessage();
       }
     }
-  }, [leafId]);
+  }, [leafId, ws]);
+
   return (
     <Box
       sx={{
@@ -42,7 +80,7 @@ const Leaf: React.FC = () => {
           flex: 1,
           bgcolor: theme.palette.mode === "dark" ? "#121212" : "white",
         }}>
-        <TextField value={title} fullWidth onChange={(e) => setTitle(e.target.value)} />
+        <TextField value={title} fullWidth onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTitleChange(e)} />
         <BlockNoteView editor={editor} data-theming-css-variables-demo />
       </Box>
     </Box>

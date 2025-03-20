@@ -8,6 +8,7 @@ import cookieParser from "cookie-parser";
 import forestRouter from "./routes/forestRouter";
 import { WebSocket, WebSocketServer } from "ws";
 import { handleConnection } from "./websocket/wsHandlers";
+import leafRouter from "./routes/leafRouter";
 
 const App = () => {
   const app: Application = express();
@@ -29,6 +30,7 @@ const App = () => {
     app.use("/api/tree", treeRouter);
     app.use("/api/user", userRouter);
     app.use("/api/forest", forestRouter);
+    app.use("/api/leaf", leafRouter);
   }
   const startRestApiServer = () => {
     setUpExpress();

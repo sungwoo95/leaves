@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response } from "express"; 
 import { Leaf, Tree } from "../types";
 import { leavesCollection, treesCollection } from "../config/db";
 import { ObjectId } from "mongodb";
@@ -30,7 +30,6 @@ export const readTree = async (req: Request, res: Response): Promise<void> => {
     console.log("[treeController][readTree]find Tree error");
     res.status(500).json({message:"internal server error"});
   }
-  
 };
 
 //db에 새로운 Tree inserOne하기, objectId 응답하기.
