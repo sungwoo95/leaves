@@ -1,6 +1,6 @@
 import { Box, TextField } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "@blocknote/core/fonts/inter.css";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
@@ -15,6 +15,7 @@ const Leaf: React.FC = () => {
   const theme = useTheme();
   const [title, setTitle] = useState<string>("");
   const [contents, setContents] = useState<string>("");
+  const owningTreeId = useRef<string | undefined>(undefined);
   const editor = useCreateBlockNote();
   const mainPageContext = useMainPageContext();
   if (!mainPageContext) {
@@ -36,8 +37,10 @@ const Leaf: React.FC = () => {
       try {
         const response = await axios.get(`${path}/leaf/${leafId}`);
         const leaf = response.data;
-        setTitle(leaf.title);
-        setContents(leaf.contents);
+        const { title, contents } = leaf;
+        setTitle(title);
+        setContents(contents);
+        owningTreeId.current = leaf.owningTreeId;
       } catch (error) {
         console.log("[Leaf]get leaf data error");
       }
