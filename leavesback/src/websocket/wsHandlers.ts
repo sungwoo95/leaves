@@ -9,7 +9,7 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
       const leafId: string = data.leafId;
       if (!wsGroups.has(leafId)) wsGroups.set(leafId, new Set());
       wsGroups.get(leafId)?.add(ws);
-      console.log(`success to join ${leafId}`);
+      console.log(`success to join leafgroup: ${leafId}`);
     },
     [WsMessageType.UPDATE_LEAF_TITLE]: async (data) => {
       const leafId: string = data.leafId;
@@ -48,6 +48,12 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
         }
       }
     },
+    [WsMessageType.JOIN_TREE]: (data) => {
+      const treeId: string = data.treeId;
+      if (!wsGroups.has(treeId)) wsGroups.set(treeId, new Set());
+      wsGroups.get(treeId)?.add(ws);
+      console.log(`success to join treegroup: ${treeId}`);
+    }
   }
   ws.on("message", (rawData) => {
     const message = JSON.parse(rawData.toString());

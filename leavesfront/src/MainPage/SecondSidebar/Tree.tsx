@@ -5,6 +5,7 @@ import cytoscape from "cytoscape";
 import { useTheme } from "@mui/material/styles";
 import { path } from "../../../config/env";
 import { useMainPageContext } from "../MainPageManager";
+import { WsMessageType } from "../../types";
 
 const Tree: React.FC = () => {
   const mainPageContext = useMainPageContext();
@@ -17,12 +18,12 @@ const Tree: React.FC = () => {
     console.error((err as Error).message);
     return <p>오류가 발생했습니다.</p>;
   }
-  const { treeId, leafId, setLeafId, isPublicTree, setIsPublicLeaf } = mainPageContext;
+  const { ws, treeId, leafId, setLeafId, isPublicTree, setIsPublicLeaf } = mainPageContext;
   const cyRef = useRef<cytoscape.Core | undefined>(undefined);
   const [nodes, setNodes] = useState<any[]>([]);
   const [edges, setEdges] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  
+
   const theme = useTheme();
 
   //leafId로 중앙 정렬.
@@ -67,11 +68,12 @@ const Tree: React.FC = () => {
   };
 
   //tree데이터 가져오기.
+  //tree그룹(websocket)에 참가하기.
   useEffect(() => {
     const getTreeData = async () => {
       try {
         setLoading(true);
-        console.log("[Tree][getTreeData]treeId:",treeId);
+        console.log("[Tree][getTreeData]treeId:", treeId);
         const response = await axios.get(`${path}/tree/${treeId}`);
         setNodes(response.data.nodes);
         setEdges(response.data.edges);
@@ -81,11 +83,16 @@ const Tree: React.FC = () => {
         setLoading(false);
       }
     };
-
+    const joinTreeGroup = () => {
+      if (ws) {
+        ws.send(JSON.stringify({ type: WsMessageType.JOIN_TREE, data: { treeId } }));
+      }
+    };
     if (treeId) {
       getTreeData();
+      joinTreeGroup();
     }
-  }, [path, treeId]);
+  }, [treeId, ws]);
 
   //노드 정렬.
   useEffect(() => {
