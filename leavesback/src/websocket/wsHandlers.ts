@@ -1,6 +1,6 @@
 import { WebSocket } from "ws";
 import { WsMessageType } from "../types";
-import { leavesCollection } from "../config/db";
+import { leavesCollection, treesCollection } from "../config/db";
 import { ObjectId } from "mongodb";
 
 export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSocket>>) => {
@@ -12,25 +12,51 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
       console.log(`success to join leafgroup: ${leafId}`);
     },
     [WsMessageType.UPDATE_LEAF_TITLE]: async (data) => {
-      const leafId: string = data.leafId;
-      const title: string = data.title;
-      console.log("[wsHandlers][updateTitle]title: ", title);
+      const { owningTreeId, leafId, title }: { owningTreeId: string; leafId: string; title: string } = data;
+      console.log("[wsHandlers][updateLeafTitle]owningTreeId:", owningTreeId);
       try {
-        const result = await leavesCollection.updateOne(
+        //리프 문서 업데이트.
+        const updateLeafResult = await leavesCollection.updateOne(
           { _id: new ObjectId(leafId) },
           { $set: { title } }
         );
-        if (result.modifiedCount === 0) {
-          throw new Error("No document updated. LeafId may be incorrect.");
+        if (updateLeafResult.modifiedCount === 0) {
+          console.log("[wsHandlers][updateLeafTitle]update leaf document error");
+          throw new Error("No leaf document updated.");
         }
-        const clients = wsGroups.get(leafId);
-        if (clients) {
-          clients.forEach(client => {
+        //리프 그룹 브로드 캐스트.
+        const leafClients = wsGroups.get(leafId);
+        if (leafClients) {
+          leafClients.forEach(client => {
             if (client.readyState === WebSocket.OPEN) {
               client.send(
                 JSON.stringify({
                   type: WsMessageType.UPDATE_LEAF_TITLE,
                   data: { leafId, title }
+                })
+              );
+            }
+          });
+        }
+        //트리 문서 업데이트.
+        const updateTreeResult = await treesCollection.updateOne(
+          { _id: new ObjectId(owningTreeId), "nodes.data.id": leafId },
+          { $set: { "nodes.$.data.label": title } }
+        )
+        if (updateTreeResult.modifiedCount === 0) {
+          console.log("[wsHandlers][updateLeafTitle]update tree document error");
+          throw new Error("No tree document updated.");
+        }
+        //트리 그룹 브로드 캐스트.
+        const treeClients = wsGroups.get(owningTreeId);
+        if (treeClients) {
+          treeClients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN) {
+              console.log("[wsHandlers]send to treeClients");
+              client.send(
+                JSON.stringify({
+                  type: WsMessageType.UPDATE_LEAF_TITLE,
+                  data: { treeId: owningTreeId, leafId, title }
                 })
               );
             }

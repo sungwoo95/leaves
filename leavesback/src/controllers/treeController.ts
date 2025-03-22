@@ -3,20 +3,6 @@ import { Leaf, Tree } from "../types";
 import { leavesCollection, treesCollection } from "../config/db";
 import { ObjectId } from "mongodb";
 
-const treeData: Record<string, Tree> = {
-  "1": {
-    nodes: [
-      { data: { id: "root", label: "Root Node" }, position: { x: 300, y: 50 } },
-      { data: { id: "child1", label: "Child Node 1" }, position: { x: 200, y: 200 } },
-      { data: { id: "child2", label: "Child Node 2" }, position: { x: 400, y: 200 } },
-    ],
-    edges: [
-      { data: { source: "root", target: "child1", label: "Edge to Child 1" } },
-      { data: { source: "root", target: "child2", label: "Edge to Child 2" } },
-    ],
-  },
-};
-
 //특정 트리 데이터 조회 (GET /tree/:treeId)
 export const readTree = async (req: Request, res: Response): Promise<void> => {
   const { treeId } = req.params;

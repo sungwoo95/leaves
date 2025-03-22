@@ -15,7 +15,7 @@ const Leaf: React.FC = () => {
   const theme = useTheme();
   const [title, setTitle] = useState<string>("");
   const [contents, setContents] = useState<string>("");
-  const owningTreeId = useRef<string | undefined>(undefined);
+  const owningTreeIdRef = useRef<string | undefined>(undefined);
   const editor = useCreateBlockNote();
   const mainPageContext = useMainPageContext();
   if (!mainPageContext) {
@@ -25,10 +25,11 @@ const Leaf: React.FC = () => {
 
   const handleTitleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
+    const owningTreeId = owningTreeIdRef.current;
     setTitle(newTitle);
     if (ws) {
       console.log("[Leaf]handleTitleChange called");
-      ws.send(JSON.stringify({ type: WsMessageType.UPDATE_LEAF_TITLE, data: { leafId, title: newTitle } }));
+      ws.send(JSON.stringify({ type: WsMessageType.UPDATE_LEAF_TITLE, data: { owningTreeId, leafId, title: newTitle } }));
     }
   };
 
@@ -40,7 +41,7 @@ const Leaf: React.FC = () => {
         const { title, contents } = leaf;
         setTitle(title);
         setContents(contents);
-        owningTreeId.current = leaf.owningTreeId;
+        owningTreeIdRef.current = leaf.owningTreeId;
       } catch (error) {
         console.log("[Leaf]get leaf data error");
       }
@@ -50,21 +51,23 @@ const Leaf: React.FC = () => {
         ws.send(JSON.stringify({ type: WsMessageType.JOIN_LEAF, data: { leafId } }));
       }
     };
-    const handleMessage = () => {
+    const handleMessage = (event: MessageEvent) => {
+      const message = JSON.parse(event.data);
+      const { type, data } = message;
+      if (type === WsMessageType.UPDATE_LEAF_TITLE && data.leafId === leafId) {
+        setTitle(data.title);
+      }
+    };
+
+    const addWsEventListener = () => {
       if (ws) {
-        ws.onmessage = (event) => {
-          const message = JSON.parse(event.data);
-          const { type, data } = message;
-          if (type === WsMessageType.UPDATE_LEAF_TITLE && data.leafId === leafId) {
-            setTitle(data.title);
-          }
-        };
+        ws.addEventListener("message", handleMessage);
       }
     };
     if (leafId) {
       getLeafData();
       joinLeafGroup();
-      handleMessage();
+      addWsEventListener();
     }
   }, [leafId, ws]);
 
