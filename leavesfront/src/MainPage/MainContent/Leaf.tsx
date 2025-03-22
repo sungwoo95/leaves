@@ -16,6 +16,7 @@ const Leaf: React.FC = () => {
   const [title, setTitle] = useState<string>("");
   const [contents, setContents] = useState<string>("");
   const owningTreeIdRef = useRef<string | undefined>(undefined);
+  const prevLeafId = useRef<string | null>(null);
   const editor = useCreateBlockNote();
   const mainPageContext = useMainPageContext();
   if (!mainPageContext) {
@@ -47,8 +48,9 @@ const Leaf: React.FC = () => {
       }
     };
     const joinLeafGroup = () => {
-      if (ws) {
-        ws.send(JSON.stringify({ type: WsMessageType.JOIN_LEAF, data: { leafId } }));
+      if (ws && leafId) {
+        ws.send(JSON.stringify({ type: WsMessageType.JOIN_LEAF, data: { leafId, prevLeafId: prevLeafId.current } }));
+        prevLeafId.current = leafId;
       }
     };
     const handleMessage = (event: MessageEvent) => {

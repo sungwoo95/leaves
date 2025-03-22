@@ -6,7 +6,15 @@ import { ObjectId } from "mongodb";
 export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSocket>>) => {
   const messageHandler: Partial<Record<WsMessageType, (message: any) => void>> = {
     [WsMessageType.JOIN_LEAF]: (data) => {
-      const leafId: string = data.leafId;
+      const { leafId, prevLeafId }: { leafId: string; prevLeafId: string | null } = data;
+      //새로운 그룹 참가 전, 기존의 그룹에서 삭제.
+      if (prevLeafId && wsGroups.has(prevLeafId)) {
+        const prevGroup = wsGroups.get(prevLeafId);
+        prevGroup?.delete(ws);
+        if (prevGroup && prevGroup.size === 0) {
+          wsGroups.delete(prevLeafId);
+        }
+      }
       if (!wsGroups.has(leafId)) wsGroups.set(leafId, new Set());
       wsGroups.get(leafId)?.add(ws);
       console.log(`success to join leafgroup: ${leafId}`);
