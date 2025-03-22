@@ -29,7 +29,6 @@ const Leaf: React.FC = () => {
     const owningTreeId = owningTreeIdRef.current;
     setTitle(newTitle);
     if (ws) {
-      console.log("[Leaf]handleTitleChange called");
       ws.send(JSON.stringify({ type: WsMessageType.UPDATE_LEAF_TITLE, data: { owningTreeId, leafId, title: newTitle } }));
     }
   };

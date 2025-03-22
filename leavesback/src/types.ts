@@ -38,7 +38,7 @@ export type MyForestInfo = {
 export type Forest = {
   name: string,
   directories: Directory[],
-  participants: ObjectId[], 
+  participants: ObjectId[],
 }
 
 export enum DirectoryType {
@@ -65,4 +65,5 @@ export enum WsMessageType {
   UPDATE_LEAF_TITLE = "updateLeafTitle",
   UPDATE_LEAF_TITLE_ERROR = "updateLeafTitleError",
   JOIN_TREE = "joinTree",
+  UPDATE_TREE_LABEL = "updateTreeLabel",
 }

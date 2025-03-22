@@ -92,7 +92,7 @@ const Tree: React.FC = () => {
     const handleMessage = (event: MessageEvent) => {
       const message = JSON.parse(event.data);
       const { type, data } = message;
-      if (type === WsMessageType.UPDATE_LEAF_TITLE && data.treeId === treeId) {
+      if (type === WsMessageType.UPDATE_TREE_LABEL && data.treeId === treeId) {
         const targetId = data.leafId;
         const newTitle = data.title;
         console.log(targetId, newTitle);

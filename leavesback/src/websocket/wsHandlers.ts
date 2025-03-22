@@ -36,7 +36,7 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
         const leafClients = wsGroups.get(leafId);
         if (leafClients) {
           leafClients.forEach(client => {
-            if (client.readyState === WebSocket.OPEN) {
+            if (client.readyState === WebSocket.OPEN && client !== ws) {
               client.send(
                 JSON.stringify({
                   type: WsMessageType.UPDATE_LEAF_TITLE,
@@ -63,7 +63,7 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
               console.log("[wsHandlers]send to treeClients");
               client.send(
                 JSON.stringify({
-                  type: WsMessageType.UPDATE_LEAF_TITLE,
+                  type: WsMessageType.UPDATE_TREE_LABEL,
                   data: { treeId: owningTreeId, leafId, title }
                 })
               );

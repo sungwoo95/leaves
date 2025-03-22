@@ -35,4 +35,5 @@ export enum WsMessageType {
   UPDATE_LEAF_TITLE = "updateLeafTitle",
   UPDATE_LEAF_TITLE_ERROR = "updateLeafTitleError",
   JOIN_TREE = "joinTree",
+  UPDATE_TREE_LABEL = "updateTreeLabel",
 }
