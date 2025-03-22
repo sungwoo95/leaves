@@ -23,7 +23,7 @@ const Tree: React.FC = () => {
   const [nodes, setNodes] = useState<any[]>([]);
   const [edges, setEdges] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
+  const prevTreeId = useRef<string | null>(null);
   const theme = useTheme();
 
   //leafId로 중앙 정렬.
@@ -84,8 +84,9 @@ const Tree: React.FC = () => {
       }
     };
     const joinTreeGroup = () => {
-      if (ws) {
-        ws.send(JSON.stringify({ type: WsMessageType.JOIN_TREE, data: { treeId } }));
+      if (ws && treeId) {
+        ws.send(JSON.stringify({ type: WsMessageType.JOIN_TREE, data: { treeId, prevTreeId: prevTreeId.current } }));
+        prevTreeId.current = treeId;
       }
     };
     const handleMessage = (event: MessageEvent) => {

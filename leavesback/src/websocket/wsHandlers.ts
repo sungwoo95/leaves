@@ -83,7 +83,15 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
       }
     },
     [WsMessageType.JOIN_TREE]: (data) => {
-      const treeId: string = data.treeId;
+      const { treeId, prevTreeId }: { treeId: string; prevTreeId: string | null } = data;
+      //새로운 그룹 참가 전, 기존의 그룹에서 삭제.
+      if (prevTreeId && wsGroups.has(prevTreeId)) {
+        const prevGroup = wsGroups.get(prevTreeId);
+        prevGroup?.delete(ws);
+        if (prevGroup && prevGroup.size === 0) {
+          wsGroups.delete(prevTreeId);
+        }
+      }
       if (!wsGroups.has(treeId)) wsGroups.set(treeId, new Set());
       wsGroups.get(treeId)?.add(ws);
       console.log(`success to join treegroup: ${treeId}`);
