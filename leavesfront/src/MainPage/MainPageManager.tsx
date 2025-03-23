@@ -1,5 +1,6 @@
-import React, { createContext, useState, useContext, ReactNode, useEffect } from "react";
-import { WS_PATH } from "../../config/env";
+import React, { createContext, useState, useContext, ReactNode, useEffect, useRef } from "react";
+import { path, WS_PATH } from "../../config/env";
+import axios from "axios";
 
 type MainPageContextType = {
   treeId: string | undefined;
@@ -22,9 +23,10 @@ const MainPageContext = createContext<MainPageContextType | undefined>(undefined
 export function MainPageManager({ children }: MainPageProps) {
   const [treeId, setTreeId] = useState<string | undefined>(undefined);
   const [leafId, setLeafId] = useState<string | undefined>(undefined);
-  const [isPublicTree, setIsPublicTree] = useState<boolean| undefined>(undefined);
+  const [isPublicTree, setIsPublicTree] = useState<boolean | undefined>(undefined);
   const [isPublicLeaf, setIsPublicLeaf] = useState<boolean | undefined>(undefined);
   const [ws, setWs] = useState<WebSocket | undefined>(undefined);
+  const isMount = useRef<boolean>(true);
   useEffect(() => {
     console.log("[MainPageManager] useEffect called");
     let reconnectTimeout: NodeJS.Timeout;
@@ -41,7 +43,8 @@ export function MainPageManager({ children }: MainPageProps) {
         console.error("WebSocket 오류 발생:", error);
       };
       webSocketInstance.onclose = (event) => {
-        if (!navigator.onLine) { //확인 필요.(wifi종료해도 수행x)
+        if (!navigator.onLine) {
+          //확인 필요.(wifi종료해도 수행x)
           console.warn("오프라인 상태 감지됨. 네트워크 복구 시 재연결 예정.");
           window.addEventListener(
             "online",
@@ -68,6 +71,39 @@ export function MainPageManager({ children }: MainPageProps) {
       clearTimeout(reconnectTimeout);
     };
   }, []);
+  useEffect(() => {
+    const getMainPageData = async () => {
+      try {
+        const response = await axios.get(`${path}/user/mainPage`);
+        const mainPageData = response.data;
+        if (mainPageData.treeId) {
+          setTreeId(mainPageData.treeId);
+        }
+        if (mainPageData.leafId) {
+          setLeafId(mainPageData.leafId);
+        }
+      } catch (error) {
+        console.log("[MainPageManager][getMainPageData]get /user/mainPage error");
+      }
+    };
+    getMainPageData();
+  }, []);
+  useEffect(() => {
+    if (isMount.current) {
+      isMount.current = false;
+      return;
+    }
+    console.log("[MainPageManager] treeId,leafId changed");
+    const postMainPageData = async () => {
+      const postData = { treeId, leafId };
+      try {
+        console.log("[MainPageManager] postData:", postData);
+        await axios.post(`${path}/user/mainPage`, postData);
+      } catch (error) {}
+      console.log("[MainPageManager][postMainPageData]post /user/mainPage error");
+    };
+    postMainPageData();
+  }, [treeId, leafId]);
   return (
     <MainPageContext.Provider
       value={{

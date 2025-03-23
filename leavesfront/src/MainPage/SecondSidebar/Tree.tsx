@@ -75,8 +75,11 @@ const Tree: React.FC = () => {
         setLoading(true);
         console.log("[Tree][getTreeData]treeId:", treeId);
         const response = await axios.get(`${path}/tree/${treeId}`);
-        setNodes(response.data.nodes);
-        setEdges(response.data.edges);
+        console.log("response.data:",response.data);
+        if (response.data) {
+          setNodes(response.data.nodes);
+          setEdges(response.data.edges);
+        }
       } catch (error) {
         console.error("Error fetching tree data:", error);
       } finally {

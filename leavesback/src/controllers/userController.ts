@@ -168,3 +168,57 @@ export const readMyForests = async (req: Request, res: Response): Promise<void> 
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const readMainPageData = async (req: Request, res: Response): Promise<void> => {
+  const cookies = req.cookies;
+  if (!cookies) {
+    res.status(401).json({ message: "Unauthorized: No token provided" });
+    return;
+  }
+  const accessToken = cookies.access_token;
+  const objectId = parseAccessToken(accessToken, res);
+  //todo: 상황별 예외처리 
+  if (!objectId) {
+    return;
+  }
+  try {
+    const document = await usersCollection.findOne(
+      { _id: objectId },
+      { projection: { _id: 0, treeId: 1, leafId: 1 } }
+    );
+    if (!document) {
+      console.log("cannot find user");
+      res.status(500).json({ message: "Internal server error" });
+      return;
+    }
+    res.json(document);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const postMainPageData = async (req: Request, res: Response): Promise<void> => {
+  const cookies = req.cookies;
+  if (!cookies) {
+    res.status(401).json({ message: "Unauthorized: No token provided" });
+    return;
+  }
+  const accessToken = cookies.access_token;
+  const objectId = parseAccessToken(accessToken, res);
+  console.log("req.body: ", req.body);
+  const { treeId, leafId } = req.body;
+  //todo: 상황별 예외처리 
+  if (!objectId) {
+    return;
+  }
+  try {
+    const document = await usersCollection.updateOne(
+      { _id: objectId },
+      { $set: { treeId, leafId } }
+    );
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
