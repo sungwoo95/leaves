@@ -80,14 +80,18 @@ const Leaf: React.FC = () => {
         display: "flex",
         flexDirection: "column",
       }}>
-      <Box
-        sx={{
-          flex: 1,
-          bgcolor: theme.palette.mode === "dark" ? "#121212" : "white",
-        }}>
-        <TextField value={title} fullWidth onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTitleChange(e)} />
-        <BlockNoteView editor={editor} data-theming-css-variables-demo />
-      </Box>
+      {leafId ? (
+        <Box
+          sx={{
+            flex: 1,
+            bgcolor: theme.palette.mode === "dark" ? "#121212" : "white",
+          }}>
+          <TextField value={title} fullWidth onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTitleChange(e)} />
+          <BlockNoteView editor={editor} data-theming-css-variables-demo />
+        </Box>
+      ) : (
+        <p>no leaf is open</p>
+      )}
     </Box>
   );
 };
