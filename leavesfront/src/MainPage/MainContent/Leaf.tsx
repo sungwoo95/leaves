@@ -59,17 +59,14 @@ const Leaf: React.FC = () => {
         setTitle(data.title);
       }
     };
-
-    const addWsEventListener = () => {
-      if (ws) {
-        ws.addEventListener("message", handleMessage);
-      }
-    };
     if (leafId) {
       getLeafData();
       joinLeafGroup();
-      addWsEventListener();
+      ws?.addEventListener("message", handleMessage);
     }
+    return () => {
+      ws?.removeEventListener("message", handleMessage);
+    };
   }, [leafId, ws]);
 
   return (
