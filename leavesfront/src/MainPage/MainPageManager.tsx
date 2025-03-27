@@ -93,14 +93,14 @@ export function MainPageManager({ children }: MainPageProps) {
       isMount.current = false;
       return;
     }
-    console.log("[MainPageManager] treeId,leafId changed");
     const postMainPageData = async () => {
       const postData = { treeId, leafId };
       try {
-        console.log("[MainPageManager] postData:", postData);
-        await axios.post(`${path}/user/mainPage`, postData);
-      } catch (error) {}
-      console.log("[MainPageManager][postMainPageData]post /user/mainPage error");
+        const response = await axios.post(`${path}/user/mainPage`, postData);
+        console.log("[MainPageManager][postMainPageData]response:", response.data.message);
+      } catch (error) {
+        console.log("[MainPageManager][postMainPageData]post /user/mainPage error:", error);
+      }
     };
     postMainPageData();
   }, [treeId, leafId]);

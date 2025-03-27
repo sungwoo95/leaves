@@ -206,7 +206,6 @@ export const postMainPageData = async (req: Request, res: Response): Promise<voi
   }
   const accessToken = cookies.access_token;
   const objectId = parseAccessToken(accessToken, res);
-  console.log("req.body: ", req.body);
   const { treeId, leafId } = req.body;
   //todo: 상황별 예외처리 
   if (!objectId) {
@@ -217,6 +216,17 @@ export const postMainPageData = async (req: Request, res: Response): Promise<voi
       { _id: objectId },
       { $set: { treeId, leafId } }
     );
+    if (document.matchedCount === 0) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    if (document.modifiedCount === 0) {
+      res.status(200).json({ message: "No changes made" });
+      return;
+    }
+    res.status(200).json({ message: "Update successful" });
+    return;
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal server error" });
