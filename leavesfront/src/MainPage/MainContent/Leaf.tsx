@@ -2,22 +2,20 @@ import { Box, TextField } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useEffect, useRef, useState } from "react";
 import "@blocknote/core/fonts/inter.css";
-import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
-import { useCreateBlockNote } from "@blocknote/react";
 import "./editorStyles.css";
 import { useMainPageContext } from "../MainPageManager";
 import { WsMessageType } from "../../types";
 import axios from "axios";
 import { path } from "../../../config/env";
+import { ClientSideSuspense, RoomProvider } from "@liveblocks/react";
+import { Editor } from "./Editor";
 
 const Leaf: React.FC = () => {
   const theme = useTheme();
   const [title, setTitle] = useState<string>("");
-  const [contents, setContents] = useState<string>("");
   const owningTreeIdRef = useRef<string | undefined>(undefined);
   const prevLeafId = useRef<string | null>(null);
-  const editor = useCreateBlockNote();
   const mainPageContext = useMainPageContext();
   if (!mainPageContext) {
     return <p>mainPageContext.Provider의 하위 컴포넌트가 아님.</p>;
@@ -38,9 +36,8 @@ const Leaf: React.FC = () => {
       try {
         const response = await axios.get(`${path}/leaf/${leafId}`);
         const leaf = response.data;
-        const { title, contents } = leaf;
+        const { title } = leaf;
         setTitle(title);
-        setContents(contents);
         owningTreeIdRef.current = leaf.owningTreeId;
       } catch (error) {
         console.log("[Leaf]get leaf data error");
@@ -84,7 +81,11 @@ const Leaf: React.FC = () => {
             bgcolor: theme.palette.mode === "dark" ? "#121212" : "white",
           }}>
           <TextField value={title} fullWidth onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTitleChange(e)} />
-          <BlockNoteView editor={editor} data-theming-css-variables-demo />
+          <RoomProvider id={`${leafId}`}>
+            <ClientSideSuspense fallback={<div>Loading…</div>}>
+              <Editor />
+            </ClientSideSuspense>
+          </RoomProvider>
         </Box>
       ) : (
         <p>no leaf is open</p>
