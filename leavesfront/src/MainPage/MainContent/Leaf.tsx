@@ -9,7 +9,7 @@ import { WsMessageType } from "../../types";
 import axios from "axios";
 import { path } from "../../../config/env";
 import { ClientSideSuspense, RoomProvider } from "@liveblocks/react";
-import { Editor } from "./Editor";
+import Editor from "./Editor";
 
 const Leaf: React.FC = () => {
   const theme = useTheme();

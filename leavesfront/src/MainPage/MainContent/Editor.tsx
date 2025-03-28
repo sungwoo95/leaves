@@ -1,12 +1,56 @@
 import { useCreateBlockNoteWithLiveblocks } from "@liveblocks/react-blocknote";
 import { BlockNoteView } from "@blocknote/mantine";
+import {
+  BasicTextStyleButton,
+  BlockTypeSelect,
+  ColorStyleButton,
+  CreateLinkButton,
+  FileCaptionButton,
+  FileReplaceButton,
+  FormattingToolbar,
+  FormattingToolbarController,
+  NestBlockButton,
+  TextAlignButton,
+  UnnestBlockButton,
+} from "@blocknote/react";
+import AddLeafFormattingToolBarButton from "./AddLeafFormattingToolBarButton";
 
-export function Editor() {
+
+const Editor = () => {
   const editor = useCreateBlockNoteWithLiveblocks({});
 
   return (
-    <div>
-      <BlockNoteView editor={editor} data-theming-css-variables-demo />
-    </div>
+    <BlockNoteView editor={editor} formattingToolbar={false} data-theming-css-variables-demo>
+      <FormattingToolbarController
+        formattingToolbar={() => (
+          <FormattingToolbar>
+            <BlockTypeSelect key={"blockTypeSelect"} />
+            <AddLeafFormattingToolBarButton key={"customButton"} />
+            <FileCaptionButton key={"fileCaptionButton"} />
+            <FileReplaceButton key={"replaceFileButton"} />
+
+            <BasicTextStyleButton basicTextStyle={"bold"} key={"boldStyleButton"} />
+            <BasicTextStyleButton basicTextStyle={"italic"} key={"italicStyleButton"} />
+            <BasicTextStyleButton basicTextStyle={"underline"} key={"underlineStyleButton"} />
+            <BasicTextStyleButton basicTextStyle={"strike"} key={"strikeStyleButton"} />
+            {/* Extra button to toggle code styles */}
+            <BasicTextStyleButton key={"codeStyleButton"} basicTextStyle={"code"} />
+
+            <TextAlignButton textAlignment={"left"} key={"textAlignLeftButton"} />
+            <TextAlignButton textAlignment={"center"} key={"textAlignCenterButton"} />
+            <TextAlignButton textAlignment={"right"} key={"textAlignRightButton"} />
+
+            <ColorStyleButton key={"colorStyleButton"} />
+
+            <NestBlockButton key={"nestBlockButton"} />
+            <UnnestBlockButton key={"unnestBlockButton"} />
+
+            <CreateLinkButton key={"createLinkButton"} />
+          </FormattingToolbar>
+        )}
+      />
+    </BlockNoteView>
   );
-}
+};
+
+export default Editor;
