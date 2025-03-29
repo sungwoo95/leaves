@@ -15,8 +15,7 @@ import {
 } from "@blocknote/react";
 import AddLeafFormattingToolBarButton from "./AddLeafFormattingToolBarButton";
 
-
-const Editor = () => {
+const Editor = ({ owningTreeId }: { owningTreeId: string }) => {
   const editor = useCreateBlockNoteWithLiveblocks({});
 
   return (
@@ -25,7 +24,7 @@ const Editor = () => {
         formattingToolbar={() => (
           <FormattingToolbar>
             <BlockTypeSelect key={"blockTypeSelect"} />
-            <AddLeafFormattingToolBarButton key={"customButton"} />
+            <AddLeafFormattingToolBarButton owningTreeId={owningTreeId} key={"customButton"} />
             <FileCaptionButton key={"fileCaptionButton"} />
             <FileReplaceButton key={"replaceFileButton"} />
 

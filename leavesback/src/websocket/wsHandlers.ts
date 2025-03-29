@@ -1,5 +1,5 @@
 import { WebSocket } from "ws";
-import { WsMessageType } from "../types";
+import { Leaf, WsMessageType } from "../types";
 import { leavesCollection, treesCollection } from "../config/db";
 import { ObjectId } from "mongodb";
 
@@ -95,6 +95,55 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
       if (!wsGroups.has(treeId)) wsGroups.set(treeId, new Set());
       wsGroups.get(treeId)?.add(ws);
       console.log(`success to join treegroup: ${treeId}`);
+    },
+    [WsMessageType.ADD_LEAF]: async (data) => {
+      const { leafId, owningTreeId, title }: { leafId: string; owningTreeId: string; title: string } = data;
+      const newLeaf: Leaf = {
+        title,
+        contents: "",
+      }
+      try {
+        const insertLeafResult = await leavesCollection.insertOne(newLeaf);
+        if (!insertLeafResult.acknowledged) {
+          console.error("[wsHandlers][ADD_LEAF] Failed to insert new leaf");
+          ws.send(JSON.stringify({ type: "ERROR", message: "Failed to insert new leaf." }));
+          return;
+        }
+        const childLeafId = insertLeafResult.insertedId.toString();
+        const newNode = { data: { id: childLeafId, label: title } };
+        const newEdge = { data: { source: leafId, target: childLeafId } }
+        const updateTreeResult = await treesCollection.updateOne(
+          { _id: new ObjectId(owningTreeId) },
+          {
+            $push: {
+              nodes: newNode,
+              edges: newEdge
+            }
+          }
+        );
+        if (updateTreeResult.modifiedCount === 0) {
+          console.error("[wsHandlers][ADD_LEAF] Failed to update tree with new node and edge");
+          ws.send(JSON.stringify({ type: "ERROR", message: "Failed to update tree with new node and edge." }));
+          return;
+        }
+        //트리 그룹 브로드 캐스트.
+        const treeClients = wsGroups.get(owningTreeId);
+        if (treeClients) {
+          treeClients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(
+                JSON.stringify({
+                  type: WsMessageType.UPDATE_TREE_ADD_LEAF,
+                  data: { treeId: owningTreeId, newNode, newEdge }
+                })
+              );
+            }
+          });
+        }
+      } catch (error) {
+        console.error("[wsHandlers][ADD_LEAF] Unexpected error:", error);
+        ws.send(JSON.stringify({ type: "ERROR", message: "Unexpected error occurred while adding leaf." }));
+      }
     }
   }
   ws.on("message", (rawData) => {

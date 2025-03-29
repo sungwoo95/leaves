@@ -74,7 +74,7 @@ const Leaf: React.FC = () => {
         display: "flex",
         flexDirection: "column",
       }}>
-      {leafId ? (
+      {leafId && owningTreeIdRef.current ? (
         <Box
           sx={{
             flex: 1,
@@ -83,7 +83,7 @@ const Leaf: React.FC = () => {
           <TextField value={title} fullWidth onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTitleChange(e)} />
           <RoomProvider id={`${leafId}`}>
             <ClientSideSuspense fallback={<div>Loading…</div>}>
-              <Editor />
+              <Editor owningTreeId={owningTreeIdRef.current} />
             </ClientSideSuspense>
           </RoomProvider>
         </Box>

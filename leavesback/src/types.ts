@@ -13,11 +13,11 @@ export type Position = {
 export type EdgeData = {
   source: string;
   target: string;
-  label: string;
+  label?: string;
 };
 
 export type Tree = {
-  nodes: { data: NodeData; position: Position }[];
+  nodes: { data: NodeData; position?: Position }[];
   edges: { data: EdgeData }[];
 };
 
@@ -64,6 +64,8 @@ export enum WsMessageType {
   JOIN_LEAF = "joinLeaf",
   UPDATE_LEAF_TITLE = "updateLeafTitle",
   UPDATE_LEAF_TITLE_ERROR = "updateLeafTitleError",
+  ADD_LEAF = "addLeaf",
   JOIN_TREE = "joinTree",
   UPDATE_TREE_LABEL = "updateTreeLabel",
+  UPDATE_TREE_ADD_LEAF = "updateTreeAddLeaf",
 }

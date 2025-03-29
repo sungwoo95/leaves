@@ -25,7 +25,18 @@ const Tree: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const prevTreeId = useRef<string | null>(null);
   const theme = useTheme();
-
+  const WsMessageHandlers: Record<string, (data: any) => void> = {
+    [WsMessageType.UPDATE_TREE_LABEL]: (data) => {
+      const targetId = data.leafId;
+      const newTitle = data.title;
+      setNodes((prev) => prev.map((elem) => (elem.data.id === targetId ? { ...elem, data: { ...elem.data, label: newTitle } } : elem)));
+    },
+    [WsMessageType.UPDATE_TREE_ADD_LEAF]: (data) => {
+      const { newNode, newEdge } = data;
+      setNodes((prev) => [...prev, newNode]);
+      setEdges((prev) => [...prev, newEdge]);
+    },
+  };
   //leafId로 중앙 정렬.
   const focusCurrentNode = useCallback(() => {
     if (cyRef.current && leafId) {
@@ -93,16 +104,9 @@ const Tree: React.FC = () => {
     const handleMessage = (event: MessageEvent) => {
       const message = JSON.parse(event.data);
       const { type, data } = message;
-      if (type === WsMessageType.UPDATE_TREE_LABEL && data.treeId === treeId) {
-        const targetId = data.leafId;
-        const newTitle = data.title;
-        console.log(targetId, newTitle);
-        setNodes((prev) => {
-          const newNodes = prev.map((elem) => {
-            return elem.data.id === targetId ? { ...elem, data: { ...elem.data, label: newTitle } } : elem;
-          });
-          return newNodes;
-        });
+      if (data.treeId !== treeId) return;
+      if (WsMessageHandlers[type]) {
+        WsMessageHandlers[type](data);
       }
     };
     const addWsEventListener = () => {
@@ -134,7 +138,11 @@ const Tree: React.FC = () => {
       }}
       elements={CytoscapeComponent.normalizeElements({ nodes, edges })}
       style={{ width: "100%", height: "100%" }}
-      layout={{ name: "preset" }}
+      layout={{
+        name: "breadthfirst",
+        directed: true,
+        spacingFactor: 1.5,
+      }}
       stylesheet={[
         {
           selector: "node",
