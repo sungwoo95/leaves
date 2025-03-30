@@ -73,6 +73,7 @@ const Tree: React.FC = () => {
   }, [leafId]);
 
   const handleLeafClick = (event: cytoscape.EventObject) => {
+    console.log("[Tree][handleLeafClick]id:", event.target.id());
     const leafId = event.target.id();
     setLeafId(leafId);
     setIsPublicLeaf(isPublicTree);
