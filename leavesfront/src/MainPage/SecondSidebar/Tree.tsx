@@ -64,8 +64,8 @@ const Tree: React.FC = () => {
         cy.style()
           .selector(`node[id = "${leafId}"]`)
           .style({
-            width: "40px",
-            height: "40px",
+            width: "20px",
+            height: "20px",
           })
           .update();
       }
@@ -73,7 +73,6 @@ const Tree: React.FC = () => {
   }, [leafId]);
 
   const handleLeafClick = (event: cytoscape.EventObject) => {
-    console.log("[Tree][handleLeafClick]id:", event.target.id());
     const leafId = event.target.id();
     setLeafId(leafId);
     setIsPublicLeaf(isPublicTree);
@@ -142,7 +141,7 @@ const Tree: React.FC = () => {
       layout={{
         name: "breadthfirst",
         directed: true,
-        spacingFactor: 1.5,
+        spacingFactor: 1,
       }}
       stylesheet={[
         {
@@ -150,9 +149,11 @@ const Tree: React.FC = () => {
           style: {
             "background-color": "green",
             label: "data(label)",
-            width: "30px",
-            height: "30px",
+            width: "10px",
+            height: "10px",
             color: theme.palette.mode === "dark" ? "white" : "black",
+            "text-margin-y": -2, // 여백
+            "font-size": "10px",
           },
         },
         {
