@@ -146,6 +146,105 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
         console.error("[wsHandlers][ADD_LEAF] Unexpected error:", error);
         ws.send(JSON.stringify({ type: "ERROR", message: "Unexpected error occurred while adding leaf." }));
       }
+    },
+    [WsMessageType.ADD_PARENT_LEAF]: async (data) => {
+      const { leafId, owningTreeId, title, parentLeafId }: { leafId: string; owningTreeId: string; title: string; parentLeafId: string | null } = data;
+      const newLeaf: Leaf = {
+        parentLeafId,
+        owningTreeId,
+        title,
+        contents: "",
+      }
+      try {
+        //리프 문서 삽입.
+        const insertLeafResult = await leavesCollection.insertOne(newLeaf);
+        if (!insertLeafResult.acknowledged) {
+          console.error("[wsHandlers][ADD_LEAF] Failed to insert new leaf");
+          ws.send(JSON.stringify({ type: "ERROR", message: "Failed to insert new leaf." }));
+          return;
+        }
+        //리프 문서 업데이트.
+        const newLeafId = insertLeafResult.insertedId.toString();
+        const updateLeafResult = await leavesCollection.updateOne(
+          { _id: new ObjectId(leafId) },
+          { $set: { parentLeafId: newLeafId } }
+        )
+        if (updateLeafResult.modifiedCount === 0) {
+          console.error("[wsHandlers][ADD_LEAF] Failed to update parentLeafId in leaf document");
+          ws.send(JSON.stringify({ type: "ERROR", message: "Failed to update parentLeafId in leaf document." }));
+          return;
+        }
+        //트리 문서 업데이트.
+        const newNode = { data: { id: newLeafId, label: title } };
+        let updateTreeResult;
+        if (parentLeafId) {
+          await treesCollection.updateOne(
+            { _id: new ObjectId(owningTreeId) },
+            { $pull: { edges: { data: { source: parentLeafId, target: leafId } } } } // 기존 엣지 삭제
+          );
+          updateTreeResult = await treesCollection.findOneAndUpdate(
+            { _id: new ObjectId(owningTreeId) },
+            {
+              $push: {
+                nodes: newNode, // 새로운 노드 추가
+                edges: {
+                  $each: [
+                    { data: { source: parentLeafId, target: newLeafId } }, // 부모 노드 -> 새로운 노드 엣지 추가
+                    { data: { source: newLeafId, target: leafId } } // 새로운 노드 -> 현재 노드 엣지 추가
+                  ]
+                }
+              }
+            }
+          );
+        } else {
+          const newEdge = { data: { source: newLeafId, target: leafId } }
+          updateTreeResult = await treesCollection.findOneAndUpdate(
+            { _id: new ObjectId(owningTreeId) },
+            {
+              $push: {
+                nodes: newNode,
+                edges: newEdge
+              }
+            }
+          );
+        }
+        if (!updateTreeResult) {
+          console.error("[wsHandlers][ADD_PARENT_LEAF] Failed to update tree with new node and edge");
+          ws.send(JSON.stringify({ type: "ERROR", message: "Failed to update tree with new node and edge." }));
+          return;
+        }
+        //트리 그룹 브로드 캐스트.
+        const treeClients = wsGroups.get(owningTreeId);
+        if (treeClients) {
+          treeClients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(
+                JSON.stringify({
+                  type: WsMessageType.UPDATE_TREE_ADD_PARENT_LEAF,
+                  data: { treeId: owningTreeId, treeData: updateTreeResult }
+                })
+              );
+            }
+          });
+        }
+        //리프 그룹 브로드 캐스트.
+        const leafClients = wsGroups.get(leafId);
+        if (leafClients) {
+          leafClients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(
+                JSON.stringify({
+                  type: WsMessageType.UPDATE_LEAF_PARENT,
+                  data: { leafId, parentLeafId: newLeafId }
+                })
+              );
+            }
+          });
+        }
+      } catch (error) {
+        console.error("[wsHandlers][ADD_PARENT_LEAF] Unexpected error:", error);
+        ws.send(JSON.stringify({ type: "ERROR", message: "Unexpected error occurred while adding parent leaf." }));
+      }
     }
   }
   ws.on("message", (rawData) => {

@@ -22,6 +22,17 @@ const Leaf: React.FC = () => {
     return <p>mainPageContext.Provider의 하위 컴포넌트가 아님.</p>;
   }
   const { leafId, ws } = mainPageContext;
+  const wsMessageHandler: Record<string, (data: any) => void> = {
+    [WsMessageType.UPDATE_LEAF_TITLE]: (data) => {
+      const { title } = data;
+      setTitle(title);
+    },
+    [WsMessageType.UPDATE_LEAF_PARENT]: (data) => {
+      const { parentLeafId } = data;
+      console.log("[leaf]Update leaf parent :", parentLeafId);
+      parentLeafIdRef.current = parentLeafId;
+    },
+  };
 
   const handleTitleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
@@ -54,8 +65,9 @@ const Leaf: React.FC = () => {
     const handleMessage = (event: MessageEvent) => {
       const message = JSON.parse(event.data);
       const { type, data } = message;
-      if (type === WsMessageType.UPDATE_LEAF_TITLE && data.leafId === leafId) {
-        setTitle(data.title);
+      if (data.leafId !== leafId) return;
+      if (wsMessageHandler[type]) {
+        wsMessageHandler[type](data);
       }
     };
     if (leafId) {

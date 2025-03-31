@@ -25,7 +25,7 @@ const Tree: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const prevTreeId = useRef<string | null>(null);
   const theme = useTheme();
-  const WsMessageHandlers: Record<string, (data: any) => void> = {
+  const wsMessageHandler: Record<string, (data: any) => void> = {
     [WsMessageType.UPDATE_TREE_LABEL]: (data) => {
       const targetId = data.leafId;
       const newTitle = data.title;
@@ -35,6 +35,13 @@ const Tree: React.FC = () => {
       const { newNode, newEdge } = data;
       setNodes((prev) => [...prev, newNode]);
       setEdges((prev) => [...prev, newEdge]);
+    },
+    [WsMessageType.UPDATE_TREE_ADD_PARENT_LEAF]: (data) => {
+      console.log("[UPDATE_PARENT_LEAF]", data);
+      const { treeData } = data;
+      const { nodes, edges } = treeData;
+      setNodes(nodes);
+      setEdges(edges);
     },
   };
   //leafId로 중앙 정렬.
@@ -105,8 +112,8 @@ const Tree: React.FC = () => {
       const message = JSON.parse(event.data);
       const { type, data } = message;
       if (data.treeId !== treeId) return;
-      if (WsMessageHandlers[type]) {
-        WsMessageHandlers[type](data);
+      if (wsMessageHandler[type]) {
+        wsMessageHandler[type](data);
       }
     };
     const addWsEventListener = () => {
@@ -119,6 +126,9 @@ const Tree: React.FC = () => {
       joinTreeGroup();
       addWsEventListener();
     }
+    return () => {
+      ws?.removeEventListener("message", handleMessage);
+    };
   }, [treeId, ws]);
 
   //노드 정렬.
