@@ -15,9 +15,9 @@ const CreateParentLeafFormattingToolBarButton = ({ owningTreeId, parentLeafId }:
       mainTooltip={"Create parent leaf"}
       onClick={() => {
         const selectedText = editor.getSelectedText();
-        console.log("[CreateParentLeafFormattingToolBarButton] Selected text:", selectedText);
+        console.log("[CreateParentLeafFormattingToolBarButton] parentLeafId:", parentLeafId);
         if (ws) {
-          ws.send(JSON.stringify({ type: WsMessageType.ADD_LEAF, data: { leafId, owningTreeId, title: selectedText } }));
+          ws.send(JSON.stringify({ type: WsMessageType.ADD_LEAF, data: { leafId, owningTreeId, title: selectedText, parentLeafId } }));
         }
       }}>
       <img src={"/addParentLeafIcon.png"} style={{ width: "15px", height: "20px" }} />

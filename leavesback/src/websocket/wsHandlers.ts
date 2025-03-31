@@ -99,7 +99,7 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
     [WsMessageType.ADD_LEAF]: async (data) => {
       const { leafId, owningTreeId, title, parentLeafId }: { leafId: string; owningTreeId: string; title: string; parentLeafId: string | null } = data;
       const newLeaf: Leaf = {
-        parentLeafId,
+        parentLeafId: leafId,
         owningTreeId,
         title,
         contents: "",

@@ -37,10 +37,10 @@ const Leaf: React.FC = () => {
       try {
         const response = await axios.get(`${path}/leaf/${leafId}`);
         const leaf = response.data;
-        const { title } = leaf;
+        const { title, owningTreeId, parentLeafId } = leaf;
         setTitle(title);
-        owningTreeIdRef.current = leaf.owningTreeId;
-        parentLeafIdRef.current = leaf.parentTreeId;
+        owningTreeIdRef.current = owningTreeId;
+        parentLeafIdRef.current = parentLeafId;
       } catch (error) {
         console.log("[Leaf]get leaf data error");
       }
