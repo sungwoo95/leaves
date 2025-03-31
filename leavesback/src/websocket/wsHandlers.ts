@@ -96,8 +96,8 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
       wsGroups.get(treeId)?.add(ws);
       console.log(`success to join treegroup: ${treeId}`);
     },
-    [WsMessageType.ADD_LEAF]: async (data) => {
-      const { leafId, owningTreeId, title, parentLeafId }: { leafId: string; owningTreeId: string; title: string; parentLeafId: string | null } = data;
+    [WsMessageType.ADD_CHILD_LEAF]: async (data) => {
+      const { leafId, owningTreeId, title }: { leafId: string; owningTreeId: string; title: string; } = data;
       const newLeaf: Leaf = {
         parentLeafId: leafId,
         owningTreeId,
@@ -135,7 +135,7 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
             if (client.readyState === WebSocket.OPEN) {
               client.send(
                 JSON.stringify({
-                  type: WsMessageType.UPDATE_TREE_ADD_LEAF,
+                  type: WsMessageType.UPDATE_TREE_ADD_CHILD_LEAF,
                   data: { treeId: owningTreeId, newNode, newEdge }
                 })
               );

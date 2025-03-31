@@ -31,7 +31,7 @@ const Tree: React.FC = () => {
       const newTitle = data.title;
       setNodes((prev) => prev.map((elem) => (elem.data.id === targetId ? { ...elem, data: { ...elem.data, label: newTitle } } : elem)));
     },
-    [WsMessageType.UPDATE_TREE_ADD_LEAF]: (data) => {
+    [WsMessageType.UPDATE_TREE_ADD_CHILD_LEAF]: (data) => {
       const { newNode, newEdge } = data;
       setNodes((prev) => [...prev, newNode]);
       setEdges((prev) => [...prev, newEdge]);

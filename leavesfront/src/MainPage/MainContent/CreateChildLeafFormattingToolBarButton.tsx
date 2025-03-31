@@ -17,7 +17,7 @@ const CreateChildLeafFormattingToolBarButton = ({ owningTreeId }: { owningTreeId
         const selectedText = editor.getSelectedText();
         console.log("[CreateLeafFormattingToolBarButton] Selected text:", selectedText);
         if (ws) {
-          ws.send(JSON.stringify({ type: WsMessageType.ADD_LEAF, data: { leafId, owningTreeId, title: selectedText, parentLeafId: null } }));
+          ws.send(JSON.stringify({ type: WsMessageType.ADD_CHILD_LEAF, data: { leafId, owningTreeId, title: selectedText } }));
         }
       }}>
       <img src={"/addChildLeafIcon.png"} style={{ width: "15px", height: "20px" }} />
