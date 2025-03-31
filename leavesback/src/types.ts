@@ -55,6 +55,7 @@ export type Directory = {
 };
 
 export type Leaf = {
+  parentLeafId: string | null,
   owningTreeId?: string,
   title: string,
   contents: string, //blocknote에 맞게 변경 필요.

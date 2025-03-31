@@ -15,6 +15,7 @@ const Leaf: React.FC = () => {
   const theme = useTheme();
   const [title, setTitle] = useState<string>("");
   const owningTreeIdRef = useRef<string | undefined>(undefined);
+  const parentLeafIdRef = useRef<string | null>(null);
   const prevLeafId = useRef<string | null>(null);
   const mainPageContext = useMainPageContext();
   if (!mainPageContext) {
@@ -39,6 +40,7 @@ const Leaf: React.FC = () => {
         const { title } = leaf;
         setTitle(title);
         owningTreeIdRef.current = leaf.owningTreeId;
+        parentLeafIdRef.current = leaf.parentTreeId;
       } catch (error) {
         console.log("[Leaf]get leaf data error");
       }
@@ -83,7 +85,7 @@ const Leaf: React.FC = () => {
           <TextField value={title} fullWidth onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTitleChange(e)} />
           <RoomProvider id={`${leafId}`}>
             <ClientSideSuspense fallback={<div>Loading…</div>}>
-              <Editor owningTreeId={owningTreeIdRef.current} />
+              <Editor parentLeafId={parentLeafIdRef.current} owningTreeId={owningTreeIdRef.current} />
             </ClientSideSuspense>
           </RoomProvider>
         </Box>

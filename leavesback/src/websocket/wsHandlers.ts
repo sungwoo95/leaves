@@ -97,8 +97,9 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
       console.log(`success to join treegroup: ${treeId}`);
     },
     [WsMessageType.ADD_LEAF]: async (data) => {
-      const { leafId, owningTreeId, title }: { leafId: string; owningTreeId: string; title: string } = data;
+      const { leafId, owningTreeId, title, parentLeafId }: { leafId: string; owningTreeId: string; title: string; parentLeafId: string | null } = data;
       const newLeaf: Leaf = {
+        parentLeafId,
         owningTreeId,
         title,
         contents: "",

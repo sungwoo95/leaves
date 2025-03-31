@@ -13,9 +13,10 @@ import {
   TextAlignButton,
   UnnestBlockButton,
 } from "@blocknote/react";
-import AddLeafFormattingToolBarButton from "./AddLeafFormattingToolBarButton";
+import CreateChildLeafFormattingToolBarButton from "./CreateChildLeafFormattingToolBarButton";
+import CreateParentLeafFormattingToolBarButton from "./CreateParentLeafFormattingToolBarButton";
 
-const Editor = ({ owningTreeId }: { owningTreeId: string }) => {
+const Editor = ({ owningTreeId, parentLeafId }: { owningTreeId: string; parentLeafId: string | null }) => {
   const editor = useCreateBlockNoteWithLiveblocks({});
 
   return (
@@ -24,7 +25,8 @@ const Editor = ({ owningTreeId }: { owningTreeId: string }) => {
         formattingToolbar={() => (
           <FormattingToolbar>
             <BlockTypeSelect key={"blockTypeSelect"} />
-            <AddLeafFormattingToolBarButton owningTreeId={owningTreeId} key={"customButton"} />
+            <CreateParentLeafFormattingToolBarButton parentLeafId={parentLeafId} owningTreeId={owningTreeId} key={"CreateParentLeafButton"} />
+            <CreateChildLeafFormattingToolBarButton owningTreeId={owningTreeId} key={"CreateChildLeafButton"} />
             <FileCaptionButton key={"fileCaptionButton"} />
             <FileReplaceButton key={"replaceFileButton"} />
 

@@ -22,6 +22,7 @@ export const readTree = async (req: Request, res: Response): Promise<void> => {
 export const createTree = async (req: Request, res: Response): Promise<void> => {
   try {
     const newLeaf: Leaf = {
+      parentLeafId: null,
       title: "Untitled",
       contents: "",
     }
