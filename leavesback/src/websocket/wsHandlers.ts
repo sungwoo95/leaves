@@ -149,6 +149,8 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
     },
     [WsMessageType.ADD_PARENT_LEAF]: async (data) => {
       const { leafId, owningTreeId, title, parentLeafId }: { leafId: string; owningTreeId: string; title: string; parentLeafId: string | null } = data;
+      let deleteEdge: any = null;
+      const newEdgeList: any[] = [];
       const newLeaf: Leaf = {
         parentLeafId,
         owningTreeId,
@@ -178,27 +180,31 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
         const newNode = { data: { id: newLeafId, label: title } };
         let updateTreeResult;
         if (parentLeafId) {
+          const newEdge1 = { data: { source: parentLeafId, target: newLeafId } };
+          const newEdge2 = { data: { source: newLeafId, target: leafId } }
+          deleteEdge = { data: { source: parentLeafId, target: leafId } }
           await treesCollection.updateOne(
             { _id: new ObjectId(owningTreeId) },
-            { $pull: { edges: { data: { source: parentLeafId, target: leafId } } } } // 기존 엣지 삭제
+            { $pull: { edges: deleteEdge } } // 기존 엣지 삭제
           );
-          updateTreeResult = await treesCollection.findOneAndUpdate(
+          updateTreeResult = await treesCollection.updateOne(
             { _id: new ObjectId(owningTreeId) },
             {
               $push: {
                 nodes: newNode, // 새로운 노드 추가
                 edges: {
                   $each: [
-                    { data: { source: parentLeafId, target: newLeafId } }, // 부모 노드 -> 새로운 노드 엣지 추가
-                    { data: { source: newLeafId, target: leafId } } // 새로운 노드 -> 현재 노드 엣지 추가
+                    newEdge1, // 부모 노드 -> 새로운 노드 엣지 추가
+                    newEdge2 // 새로운 노드 -> 현재 노드 엣지 추가
                   ]
                 }
               }
             }
           );
+          newEdgeList.push(newEdge1, newEdge2);
         } else {
           const newEdge = { data: { source: newLeafId, target: leafId } }
-          updateTreeResult = await treesCollection.findOneAndUpdate(
+          updateTreeResult = await treesCollection.updateOne(
             { _id: new ObjectId(owningTreeId) },
             {
               $push: {
@@ -207,6 +213,7 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
               }
             }
           );
+          newEdgeList.push(newEdge);
         }
         if (!updateTreeResult) {
           console.error("[wsHandlers][ADD_PARENT_LEAF] Failed to update tree with new node and edge");
@@ -221,7 +228,7 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
               client.send(
                 JSON.stringify({
                   type: WsMessageType.UPDATE_TREE_ADD_PARENT_LEAF,
-                  data: { treeId: owningTreeId, treeData: updateTreeResult }
+                  data: { treeId: owningTreeId, newNode, deleteEdge, newEdgeList }
                 })
               );
             }

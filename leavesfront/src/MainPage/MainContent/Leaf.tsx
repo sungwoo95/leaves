@@ -29,7 +29,6 @@ const Leaf: React.FC = () => {
     },
     [WsMessageType.UPDATE_LEAF_PARENT]: (data) => {
       const { parentLeafId } = data;
-      console.log("[leaf]Update leaf parent :", parentLeafId);
       parentLeafIdRef.current = parentLeafId;
     },
   };
@@ -97,7 +96,7 @@ const Leaf: React.FC = () => {
           <TextField value={title} fullWidth onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTitleChange(e)} />
           <RoomProvider id={`${leafId}`}>
             <ClientSideSuspense fallback={<div>Loading…</div>}>
-              <Editor parentLeafId={parentLeafIdRef.current} owningTreeId={owningTreeIdRef.current} />
+              <Editor parentLeafIdRef={parentLeafIdRef} owningTreeId={owningTreeIdRef.current} />
             </ClientSideSuspense>
           </RoomProvider>
         </Box>

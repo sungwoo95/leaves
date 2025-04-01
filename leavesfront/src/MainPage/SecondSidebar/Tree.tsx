@@ -33,15 +33,42 @@ const Tree: React.FC = () => {
     },
     [WsMessageType.UPDATE_TREE_ADD_CHILD_LEAF]: (data) => {
       const { newNode, newEdge } = data;
-      setNodes((prev) => [...prev, newNode]);
-      setEdges((prev) => [...prev, newEdge]);
+      const cy = cyRef.current!;
+      const currentZoom = cy.zoom();
+      const currentPan = cy.pan();
+      cy.add(newNode);
+      cy.add(newEdge);
+      const layout = cy.layout({
+        name: "breadthfirst",
+        directed: true,
+        spacingFactor: 1,
+      });
+      layout.run();
+      cy.zoom(currentZoom);
+      cy.pan(currentPan);
     },
     [WsMessageType.UPDATE_TREE_ADD_PARENT_LEAF]: (data) => {
-      console.log("[UPDATE_PARENT_LEAF]", data);
-      const { treeData } = data;
-      const { nodes, edges } = treeData;
-      setNodes(nodes);
-      setEdges(edges);
+      const { newNode, deleteEdge, newEdgeList } = data;
+      const cy = cyRef.current!;
+      const currentZoom = cy.zoom();
+      const currentPan = cy.pan();
+      cy.add(newNode);
+      if (deleteEdge) {
+        const { source, target } = deleteEdge.data;
+        const targetEdges = cy.edges(`[source="${source}"][target="${target}"]`);
+        targetEdges.remove();
+      }
+      newEdgeList.forEach((elem: any) => {
+        cy.add(elem);
+      });
+      const layout = cy.layout({
+        name: "breadthfirst",
+        directed: true,
+        spacingFactor: 1,
+      });
+      layout.run();
+      cy.zoom(currentZoom);
+      cy.pan(currentPan);
     },
   };
   //leafId로 중앙 정렬.

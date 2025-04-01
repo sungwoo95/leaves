@@ -16,7 +16,7 @@ import {
 import CreateChildLeafFormattingToolBarButton from "./CreateChildLeafFormattingToolBarButton";
 import CreateParentLeafFormattingToolBarButton from "./CreateParentLeafFormattingToolBarButton";
 
-const Editor = ({ owningTreeId, parentLeafId }: { owningTreeId: string; parentLeafId: string | null }) => {
+const Editor = ({ owningTreeId, parentLeafIdRef }: { owningTreeId: string; parentLeafIdRef: React.RefObject<string | null> }) => {
   const editor = useCreateBlockNoteWithLiveblocks({});
 
   return (
@@ -25,7 +25,7 @@ const Editor = ({ owningTreeId, parentLeafId }: { owningTreeId: string; parentLe
         formattingToolbar={() => (
           <FormattingToolbar>
             <BlockTypeSelect key={"blockTypeSelect"} />
-            <CreateParentLeafFormattingToolBarButton parentLeafId={parentLeafId} owningTreeId={owningTreeId} key={"CreateParentLeafButton"} />
+            <CreateParentLeafFormattingToolBarButton parentLeafIdRef={parentLeafIdRef} owningTreeId={owningTreeId} key={"CreateParentLeafButton"} />
             <CreateChildLeafFormattingToolBarButton owningTreeId={owningTreeId} key={"CreateChildLeafButton"} />
             <FileCaptionButton key={"fileCaptionButton"} />
             <FileReplaceButton key={"replaceFileButton"} />
