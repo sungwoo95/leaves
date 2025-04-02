@@ -22,7 +22,7 @@ const PrivateForest = () => {
       treeId,
       type: type,
       isNew: true,
-      name: "Untitled",
+      name: "Untitled Tree",
       children: [],
     };
     const newDirectories = (directories: Directory[]): Directory[] => {
@@ -148,7 +148,6 @@ const PrivateForest = () => {
               if (!isVisible) toggleVisibility();
               const response = await axios.post(`${path}/tree/createTree`);
               const treeId: string = response.data.treeId;
-              console.log("treeId: ", treeId);
               addDirectory(null, DirectoryType.FILE, treeId);
             }}
           />

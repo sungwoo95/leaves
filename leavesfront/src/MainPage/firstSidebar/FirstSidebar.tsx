@@ -18,7 +18,6 @@ const FirstSidebar: React.FC = () => {
         bgcolor: theme.palette.mode === "dark" ? "#001000" : "white",
         color: theme.palette.mode === "dark" ? "white" : "black",
       }}>
-      Sidebar Left
       <PrivateForestRegion/>
       <PublicForestRegion/>
     </Paper>

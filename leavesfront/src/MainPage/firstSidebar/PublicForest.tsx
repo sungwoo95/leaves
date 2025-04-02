@@ -24,7 +24,7 @@ const PublicForest = ({ myForests }: { myForests: MyForestInfo }) => {
       treeId,
       type: type,
       isNew: true,
-      name: "Untitled",
+      name: "Untitled Tree",
       children: [],
     };
     const newDirectories = (directories: Directory[]): Directory[] => {

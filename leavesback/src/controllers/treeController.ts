@@ -23,7 +23,7 @@ export const createTree = async (req: Request, res: Response): Promise<void> => 
   try {
     const newLeaf: Leaf = {
       parentLeafId: null,
-      title: "Untitled",
+      title: "First Leaf",
       contents: "",
     }
     const insertLeafResult = await leavesCollection.insertOne(newLeaf);
@@ -34,7 +34,7 @@ export const createTree = async (req: Request, res: Response): Promise<void> => 
     }
     const leafId = insertLeafResult.insertedId;
     const newTree: Tree = {
-      nodes: [{ data: { id: leafId.toString(), label: "Untitled" } },],
+      nodes: [{ data: { id: leafId.toString(), label: "First Leaf" } },],
       edges: [],
     }
     const insertTreeResult = await treesCollection.insertOne(newTree);
