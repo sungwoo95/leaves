@@ -24,7 +24,7 @@ const PublicForest = ({ myForests }: { myForests: MyForestInfo }) => {
       treeId,
       type: type,
       isNew: true,
-      name: "Untitled Tree",
+      name: type === DirectoryType.FILE ? "Untitled Tree" : "Untitled Folder",
       children: [],
     };
     const newDirectories = (directories: Directory[]): Directory[] => {
@@ -149,14 +149,14 @@ const PublicForest = ({ myForests }: { myForests: MyForestInfo }) => {
               if (!isVisible) toggleVisibility();
               const response = await axios.post(`${path}/tree/createTree`);
               const treeId: string = response.data.treeId;
-              console.log("treeId: ", treeId); 
+              console.log("treeId: ", treeId);
               addDirectory(null, DirectoryType.FILE, treeId);
             }}
           />
         </Box>
       </Button>
       {isVisible && ( // isVisible이 true일 때만 Box 렌더링
-        <Explorer isPublic ={true} directories={directories} addDirectory={addDirectory} updateIsNew={updateIsNew} updateName={updateName} />
+        <Explorer isPublic={true} directories={directories} addDirectory={addDirectory} updateIsNew={updateIsNew} updateName={updateName} />
       )}
     </Box>
   );

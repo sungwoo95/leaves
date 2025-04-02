@@ -22,7 +22,7 @@ const PrivateForest = () => {
       treeId,
       type: type,
       isNew: true,
-      name: "Untitled Tree",
+      name: type === DirectoryType.FILE ? "Untitled Tree" : "Untitled Folder",
       children: [],
     };
     const newDirectories = (directories: Directory[]): Directory[] => {
