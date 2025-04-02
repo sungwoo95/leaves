@@ -6,6 +6,7 @@ import { useTheme } from "@mui/material/styles";
 import { path } from "../../../config/env";
 import { useMainPageContext } from "../MainPageManager";
 import { WsMessageType } from "../../types";
+import NoTreeIsOpen from "./NoTreeIsOpen";
 
 const Tree: React.FC = () => {
   const mainPageContext = useMainPageContext();
@@ -163,11 +164,11 @@ const Tree: React.FC = () => {
     focusCurrentNode();
   }, [leafId, focusCurrentNode]);
 
-  if (loading) {
+  if (loading && treeId) {
     return <p>Loading tree data...</p>;
   }
 
-  return (
+  return treeId ? (
     <CytoscapeComponent
       cy={(cy) => {
         cyRef.current = cy;
@@ -202,6 +203,8 @@ const Tree: React.FC = () => {
         },
       ]}
     />
+  ) : (
+    <NoTreeIsOpen />
   );
 };
 

@@ -10,6 +10,7 @@ import axios from "axios";
 import { path } from "../../../config/env";
 import { ClientSideSuspense, RoomProvider } from "@liveblocks/react";
 import Editor from "./Editor";
+import NoLeafIsOpen from "./NoLeafIsOpen";
 
 const Leaf: React.FC = () => {
   const theme = useTheme();
@@ -101,7 +102,7 @@ const Leaf: React.FC = () => {
           </RoomProvider>
         </Box>
       ) : (
-        <p>no leaf is open</p>
+        <NoLeafIsOpen />
       )}
     </Box>
   );
