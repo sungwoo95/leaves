@@ -77,4 +77,5 @@ export enum WsMessageType {
   UPDATE_TREE_LABEL = "updateTreeLabel",
   UPDATE_TREE_ADD_CHILD_LEAF = "updateTreeAddChildLeaf",
   UPDATE_TREE_ADD_PARENT_LEAF = "updateTreeAddParentLeaf",
+  UPDATE_TREE_CONQUER = "updateTreeConquer",
 }

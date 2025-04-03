@@ -1,5 +1,5 @@
 import { WebSocket } from "ws";
-import { IsConquer, Leaf, NodeData, WsMessageType } from "../types";
+import { IsConquer, Leaf, WsMessageType } from "../types";
 import { leavesCollection, treesCollection } from "../config/db";
 import { ObjectId } from "mongodb";
 
@@ -251,6 +251,42 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
       } catch (error) {
         console.error("[wsHandlers][ADD_PARENT_LEAF] Unexpected error:", error);
         ws.send(JSON.stringify({ type: "ERROR", message: "Unexpected error occurred while adding parent leaf." }));
+      }
+    },
+    [WsMessageType.UPDATE_TREE_CONQUER]: async (data) => {
+      const { treeId, leafId, isConquer }: { treeId: string, leafId: string, isConquer: IsConquer } = data;
+      const newIsConquer = isConquer === IsConquer.FALSE ? IsConquer.TRUE : IsConquer.FALSE;
+      try {
+        const resultDocument = await treesCollection.findOneAndUpdate(
+          { _id: new ObjectId(treeId), "nodes.data.id": leafId }, // 특정 treeId 문서에서 nodes 배열 내 leafId 찾기
+          {
+            $set: {
+              "nodes.$.data.isConquer": newIsConquer
+            },
+          },
+          { returnDocument: "after", projection: { nodes: 1, _id: 0 } } // 업데이트된 nodes만 반환
+        );
+
+        if (!resultDocument) {
+          throw new Error(`Node with id ${leafId} not found in tree ${treeId}`);
+        }
+        const nodes = resultDocument.nodes;
+        //트리 그룹 브로드 캐스트.
+        const treeClients = wsGroups.get(treeId);
+        if (treeClients) {
+          treeClients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(
+                JSON.stringify({
+                  type: WsMessageType.UPDATE_TREE_CONQUER,
+                  data: { treeId, nodes }
+                })
+              );
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Error updating isConquer field:", error);
       }
     }
   }

@@ -75,7 +75,12 @@ const Tree: React.FC = () => {
       cy.zoom(currentZoom);
       cy.pan(currentPan);
     },
+    [WsMessageType.UPDATE_TREE_CONQUER]: (data) => {
+      const { nodes } = data;
+      setNodes(nodes);
+    },
   };
+
   //leafId로 중앙 정렬.
   const focusCurrentNode = useCallback(() => {
     if (cyRef.current && leafId) {
@@ -116,8 +121,11 @@ const Tree: React.FC = () => {
     setLeafId(leafId);
     setIsPublicLeaf(isPublicTree);
   };
+
   const handleConquerClick = (event: cytoscape.EventObject) => {
-    console.log(event);
+    const leafId = event.target.id();
+    const isConquer = event.target.data("isConquer");
+    ws?.send(JSON.stringify({ type: WsMessageType.UPDATE_TREE_CONQUER, data: { treeId, leafId, isConquer } }));
   };
   //tree데이터 가져오기.
   //tree그룹(websocket)에 참가하기.
