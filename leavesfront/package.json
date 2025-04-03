@@ -17,6 +17,7 @@
     "axios": "^1.7.9",
     "cra-template": "1.2.0",
     "cytoscape": "^3.31.0",
+    "cytoscape-context-menus": "^4.2.1",
     "react": "^19.0.0",
     "react-cytoscapejs": "^2.0.0",
     "react-dom": "^19.0.0",
@@ -46,6 +47,7 @@
     ]
   },
   "devDependencies": {
+    "@types/cytoscape-context-menus": "^4.1.4",
     "@types/mongodb": "^4.0.6",
     "@types/node": "^22.13.4",
     "@types/react": "^19.0.10",

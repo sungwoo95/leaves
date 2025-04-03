@@ -7,6 +7,10 @@ import { path } from "../../../config/env";
 import { useMainPageContext } from "../MainPageManager";
 import { WsMessageType } from "../../types";
 import NoTreeIsOpen from "./NoTreeIsOpen";
+import contextMenus from "cytoscape-context-menus";
+import "cytoscape-context-menus/cytoscape-context-menus.css";
+
+cytoscape.use(contextMenus); // 플러그인 활성화
 
 const Tree: React.FC = () => {
   const mainPageContext = useMainPageContext();
@@ -112,7 +116,9 @@ const Tree: React.FC = () => {
     setLeafId(leafId);
     setIsPublicLeaf(isPublicTree);
   };
-
+  const handleConquerClick = (event: cytoscape.EventObject) => {
+    console.log(event);
+  };
   //tree데이터 가져오기.
   //tree그룹(websocket)에 참가하기.
   useEffect(() => {
@@ -173,6 +179,17 @@ const Tree: React.FC = () => {
       cy={(cy) => {
         cyRef.current = cy;
         cy.on("tap", "node", handleLeafClick);
+        //우클릭 메뉴 추가.
+        cy.contextMenus({
+          menuItems: [
+            {
+              id: "conquer",
+              content: "Conquer",
+              selector: "node",
+              onClickFunction: handleConquerClick,
+            },
+          ],
+        });
       }}
       elements={CytoscapeComponent.normalizeElements({ nodes, edges })}
       style={{ width: "100%", height: "100%" }}
