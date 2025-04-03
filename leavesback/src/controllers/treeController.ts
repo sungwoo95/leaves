@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Leaf, Tree } from "../types";
+import { IsConquer, Leaf, Tree } from "../types";
 import { leavesCollection, treesCollection } from "../config/db";
 import { ObjectId } from "mongodb";
 
@@ -34,7 +34,7 @@ export const createTree = async (req: Request, res: Response): Promise<void> => 
     }
     const leafId = insertLeafResult.insertedId;
     const newTree: Tree = {
-      nodes: [{ data: { id: leafId.toString(), label: "First Leaf" } },],
+      nodes: [{ data: { id: leafId.toString(), label: "First Leaf", isConquer: IsConquer.FALSE } },],
       edges: [],
     }
     const insertTreeResult = await treesCollection.insertOne(newTree);

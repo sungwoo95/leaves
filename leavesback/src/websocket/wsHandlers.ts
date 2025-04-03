@@ -1,5 +1,5 @@
 import { WebSocket } from "ws";
-import { Leaf, WsMessageType } from "../types";
+import { IsConquer, Leaf, NodeData, WsMessageType } from "../types";
 import { leavesCollection, treesCollection } from "../config/db";
 import { ObjectId } from "mongodb";
 
@@ -112,7 +112,7 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
           return;
         }
         const childLeafId = insertLeafResult.insertedId.toString();
-        const newNode = { data: { id: childLeafId, label: title } };
+        const newNode = { data: { id: childLeafId, label: title, isConquer: IsConquer.FALSE } };
         const newEdge = { data: { source: leafId, target: childLeafId } }
         const updateTreeResult = await treesCollection.updateOne(
           { _id: new ObjectId(owningTreeId) },
@@ -177,7 +177,7 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
           return;
         }
         //트리 문서 업데이트.
-        const newNode = { data: { id: newLeafId, label: title } };
+        const newNode = { data: { id: newLeafId, label: title, isConquer: IsConquer.FALSE } };
         let updateTreeResult;
         if (parentLeafId) {
           const newEdge1 = { data: { source: parentLeafId, target: newLeafId } };

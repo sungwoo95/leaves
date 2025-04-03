@@ -1,8 +1,13 @@
 import { ObjectId } from "mongodb";
 
+export enum IsConquer {
+  TRUE = "true",
+  FALSE = "false"
+};
 export type NodeData = {
   id: string;
   label: string;
+  isConquer: IsConquer;
 };
 
 export type Position = {

@@ -195,6 +195,12 @@ const Tree: React.FC = () => {
           },
         },
         {
+          selector: "node[isConquer='true']", //isConquer가 true인 노드는 다음 style이 overwright.
+          style: {
+            "background-color": "red",
+          },
+        },
+        {
           selector: "edge",
           style: {
             width: 2,
