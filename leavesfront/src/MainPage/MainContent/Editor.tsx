@@ -15,8 +15,10 @@ import {
 } from "@blocknote/react";
 import CreateChildLeafFormattingToolBarButton from "./CreateChildLeafFormattingToolBarButton";
 import CreateParentLeafFormattingToolBarButton from "./CreateParentLeafFormattingToolBarButton";
+import { useStorage } from "@liveblocks/react/suspense";
 
 const Editor = ({ owningTreeId, parentLeafIdRef }: { owningTreeId: string; parentLeafIdRef: React.RefObject<string | null> }) => {
+  const storage = useStorage((root) => root);
   const editor = useCreateBlockNoteWithLiveblocks({});
 
   return (

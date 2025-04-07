@@ -11,6 +11,7 @@ import { path } from "../../../config/env";
 import { ClientSideSuspense, RoomProvider } from "@liveblocks/react";
 import Editor from "./Editor";
 import NoLeafIsOpen from "./NoLeafIsOpen";
+import EditorFallback from "./EditorFallback";
 
 const Leaf: React.FC = () => {
   const theme = useTheme();
@@ -96,7 +97,7 @@ const Leaf: React.FC = () => {
           }}>
           <TextField value={title} fullWidth onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTitleChange(e)} />
           <RoomProvider id={`${leafId}`}>
-            <ClientSideSuspense fallback={<div>Loading…</div>}>
+            <ClientSideSuspense fallback={<EditorFallback />}>
               <Editor parentLeafIdRef={parentLeafIdRef} owningTreeId={owningTreeIdRef.current} />
             </ClientSideSuspense>
           </RoomProvider>
