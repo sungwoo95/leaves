@@ -18,7 +18,7 @@ const DirectoryButton = ({
   updateIsNew,
   updateName,
 }: {
-  isPublic : boolean;
+  isPublic: boolean;
   item: Directory;
   level: number;
   isVisible: boolean;
@@ -77,6 +77,10 @@ const DirectoryButton = ({
     setMenuPosition(undefined);
   };
 
+  const enterEditMode = () => {
+    setIsEditing(true);
+  };
+
   useEffect(() => {
     if ((item.isNew || isEditing) && inputRef.current) {
       inputRef.current.focus();
@@ -95,7 +99,13 @@ const DirectoryButton = ({
       }}
       onClick={onClickHandler}
       onContextMenu={onContextMenuHandler}>
-      <DirectoryContextMenu open={!!menuPosition} menuPosition={menuPosition} onCloseHandler={onCloseHandler} onClickMenuHandler={onClickMenuHandler} />
+      <DirectoryContextMenu
+        open={!!menuPosition}
+        menuPosition={menuPosition}
+        onCloseHandler={onCloseHandler}
+        onClickMenuHandler={onClickMenuHandler}
+        enterEditMode={enterEditMode}
+      />
       <Box
         sx={{
           width: "100%",
