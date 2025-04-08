@@ -16,6 +16,8 @@ const PrivateForest = () => {
     setIsVisible((prev) => !prev);
   };
 
+  //Directory[]에서 targetId를 가진 Directory의 children에 Directory를 추가.
+  //targetId가 null인 경우 Directory[]에 Directory를 추가
   const addDirectory = (targetId: null | string = null, type: DirectoryType, treeId?: string): void => {
     const directory: Directory = {
       id: crypto.randomUUID(),
@@ -54,6 +56,32 @@ const PrivateForest = () => {
         postDirectories(result);
         return result;
       }
+    });
+  };
+
+  const deleteDirectory = (targetId: string): void => {
+    const newDirectories = (directories: Directory[]): Directory[] => {
+      for (let i = 0; i < directories.length; i++) {
+        const elem = directories[i];
+        if (elem.id === targetId) {
+          //targetId 찾았을 경우 새로운 Directory[]반환.
+          return [...directories.slice(0, i), ...directories.slice(i + 1)];
+        }
+        if (elem.children.length > 0) {
+          const updatedChildren = newDirectories(elem.children);
+          //새로운 Directory[]반환 시, 새로운 Directory[]반환.
+          if (updatedChildren !== elem.children) {
+            return [...directories.slice(0, i), { ...elem, children: updatedChildren }, ...directories.slice(i + 1)];
+          }
+        }
+      }
+      return directories; // 못 찾았으면 그대로 반환
+    };
+
+    setDirectories((prevDirectories) => {
+      const result = newDirectories(prevDirectories);
+      postDirectories(result);
+      return result;
     });
   };
 
@@ -155,7 +183,14 @@ const PrivateForest = () => {
       </Button>
 
       {isVisible && ( // isVisible이 true일 때만 Box 렌더링
-        <Explorer isPublic={false} directories={directories} addDirectory={addDirectory} updateIsNew={updateIsNew} updateName={updateName} />
+        <Explorer
+          isPublic={false}
+          directories={directories}
+          addDirectory={addDirectory}
+          updateIsNew={updateIsNew}
+          updateName={updateName}
+          deleteDirectory={deleteDirectory}
+        />
       )}
     </Box>
   );

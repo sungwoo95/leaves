@@ -17,6 +17,7 @@ const DirectoryButton = ({
   addDirectory,
   updateIsNew,
   updateName,
+  deleteDirectory,
 }: {
   isPublic: boolean;
   item: Directory;
@@ -26,6 +27,7 @@ const DirectoryButton = ({
   addDirectory: AddDirectory;
   updateIsNew: UpdateIsNew;
   updateName: UpdateName;
+  deleteDirectory: (id: string) => void;
 }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [menuPosition, setMenuPosition] = useState<Position | undefined>(undefined);
@@ -81,6 +83,16 @@ const DirectoryButton = ({
     setIsEditing(true);
   };
 
+  const onClickRenameHandler = () => {
+    enterEditMode();
+    onCloseHandler();
+  };
+
+  const onClickDeleteHandler = () => {
+    onCloseHandler();
+    deleteDirectory(item.id);
+  };
+
   useEffect(() => {
     if ((item.isNew || isEditing) && inputRef.current) {
       inputRef.current.focus();
@@ -104,7 +116,8 @@ const DirectoryButton = ({
         menuPosition={menuPosition}
         onCloseHandler={onCloseHandler}
         onClickMenuHandler={onClickMenuHandler}
-        enterEditMode={enterEditMode}
+        onClickRenameHandler={onClickRenameHandler}
+        onClickDeleteHandler={onClickDeleteHandler}
       />
       <Box
         sx={{

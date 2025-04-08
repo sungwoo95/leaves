@@ -6,22 +6,20 @@ const DirectoryContextMenu = ({
   menuPosition,
   onCloseHandler,
   onClickMenuHandler,
-  enterEditMode,
+  onClickRenameHandler,
+  onClickDeleteHandler,
 }: {
   open: boolean;
   menuPosition: Position | undefined;
   onCloseHandler: () => void;
   onClickMenuHandler: OnClickMenuHandler;
-  enterEditMode: () => void;
+  onClickRenameHandler: () => void;
+  onClickDeleteHandler: () => void;
 }) => {
-  const onClickRenameHandler = () => {
-    enterEditMode();
-    onCloseHandler();
-  };
   return (
     <Menu open={open} onClose={onCloseHandler} anchorReference="anchorPosition" anchorPosition={menuPosition} onClick={onClickMenuHandler}>
       <MenuItem onClick={onClickRenameHandler}>Rename</MenuItem>
-      <MenuItem>Delete</MenuItem>
+      <MenuItem onClick={onClickDeleteHandler}>Delete</MenuItem>
       <MenuItem>Properties</MenuItem>
     </Menu>
   );

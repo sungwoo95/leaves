@@ -10,6 +10,7 @@ const Explorer = ({
   addDirectory,
   updateIsNew,
   updateName,
+  deleteDirectory,
 }: {
   isPublic: boolean;
   directories: Directory[];
@@ -17,6 +18,7 @@ const Explorer = ({
   addDirectory: AddDirectory;
   updateIsNew: UpdateIsNew;
   updateName: UpdateName;
+  deleteDirectory: (id: string) => void;
 }) => {
   const [openState, setOpenState] = useState<Record<string, boolean>>({});
 
@@ -36,6 +38,7 @@ const Explorer = ({
             addDirectory={addDirectory}
             updateIsNew={updateIsNew}
             updateName={updateName}
+            deleteDirectory={deleteDirectory}
           />
           {openState[item.id] && item.type === "folder" && item.children && (
             <Explorer
@@ -45,6 +48,7 @@ const Explorer = ({
               addDirectory={addDirectory}
               updateIsNew={updateIsNew}
               updateName={updateName}
+              deleteDirectory={deleteDirectory}
             />
           )}
         </Box>
