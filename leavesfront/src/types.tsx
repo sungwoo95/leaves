@@ -43,3 +43,24 @@ export enum WsMessageType {
   UPDATE_TREE_ADD_PARENT_LEAF = "updateTreeAddParentLeaf",
   UPDATE_TREE_CONQUER = "updateTreeConquer",
 }
+
+export enum IsConquer {
+  TRUE = "true",
+  FALSE = "false"
+};
+
+export type Node = {
+  id: string;
+  label: string;
+  isConquer: IsConquer;
+};
+
+export type Link = {
+  source: string;
+  target: string;
+};
+
+export type TreeData = {
+  nodes: Node[];
+  links: Link[];
+};

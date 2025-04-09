@@ -34,8 +34,8 @@ export const createTree = async (req: Request, res: Response): Promise<void> => 
     }
     const leafId = insertLeafResult.insertedId;
     const newTree: Tree = {
-      nodes: [{ data: { id: leafId.toString(), label: "First Leaf", isConquer: IsConquer.FALSE } },],
-      edges: [],
+      nodes: [{ id: leafId.toString(), label: "First Leaf", isConquer: IsConquer.FALSE }],
+      links: [],
     }
     const insertTreeResult = await treesCollection.insertOne(newTree);
     if (!insertTreeResult.acknowledged) {

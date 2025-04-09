@@ -4,26 +4,21 @@ export enum IsConquer {
   TRUE = "true",
   FALSE = "false"
 };
-export type NodeData = {
+
+export type Node = {
   id: string;
   label: string;
   isConquer: IsConquer;
 };
 
-export type Position = {
-  x: number;
-  y: number;
-};
-
-export type EdgeData = {
+export type Link = {
   source: string;
   target: string;
-  label?: string;
 };
 
 export type Tree = {
-  nodes: { data: NodeData; position?: Position }[];
-  edges: { data: EdgeData }[];
+  nodes: Node[];
+  links: Link[];
 };
 
 export type User = {
