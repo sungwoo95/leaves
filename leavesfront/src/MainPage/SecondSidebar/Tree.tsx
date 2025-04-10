@@ -10,6 +10,35 @@ import { ForceGraph2D } from "react-force-graph";
 import { forceCollide } from "d3-force";
 
 const Tree = ({ containerRef }: { containerRef: any | null }) => {
+  // const sampleTreeData: TreeData = {
+  //   nodes: [
+  //     { id: "1", label: "Main Root Node", isConquer: IsConquer.FALSE },
+  //     { id: "2", label: "Introduction to Topic A", isConquer: IsConquer.TRUE },
+  //     { id: "3", label: "Overview of Topic B", isConquer: IsConquer.FALSE },
+  //     { id: "4", label: "Deep Dive into Topic C", isConquer: IsConquer.FALSE },
+  //     { id: "5", label: "Details of A1 Subpart", isConquer: IsConquer.TRUE },
+  //     { id: "6", label: "Exploring A2 Section", isConquer: IsConquer.FALSE },
+  //     { id: "7", label: "B1 Concepts Explained", isConquer: IsConquer.FALSE },
+  //     { id: "8", label: "Summary of B2 Ideas", isConquer: IsConquer.TRUE },
+  //     { id: "9", label: "Understanding C1 Flow", isConquer: IsConquer.FALSE },
+  //     { id: "10", label: "C2 Key Takeaways", isConquer: IsConquer.TRUE },
+  //     { id: "11", label: "A1-1 Extended Notes", isConquer: IsConquer.FALSE },
+  //     { id: "12", label: "B1-1 Final Thoughts", isConquer: IsConquer.TRUE },
+  //   ],
+  //   links: [
+  //     { source: "1", target: "2" },
+  //     { source: "1", target: "3" },
+  //     { source: "1", target: "4" },
+  //     { source: "2", target: "5" },
+  //     { source: "2", target: "6" },
+  //     { source: "3", target: "7" },
+  //     { source: "3", target: "8" },
+  //     { source: "4", target: "9" },
+  //     { source: "4", target: "10" },
+  //     { source: "5", target: "11" },
+  //     { source: "7", target: "12" },
+  //   ],
+  // };
   const mainPageContext = useMainPageContext();
   try {
     if (!mainPageContext) {
@@ -41,46 +70,16 @@ const Tree = ({ containerRef }: { containerRef: any | null }) => {
     },
   };
 
-  // const handleNodeClick = (event: cytoscape.EventObject) => {
-  //   const leafId = event.target.id();
-  //   setLeafId(leafId);
-  //   setIsPublicLeaf(isPublicTree);
-  // };
+  const handleNodeClick = (node: any) => {
+    const leafId = node.id;
+    setLeafId(leafId);
+    setIsPublicLeaf(isPublicTree);
+  };
 
-  // const handleConquerClick = (event: cytoscape.EventObject) => {
-  //   const leafId = event.target.id();
-  //   const isConquer = event.target.data("isConquer");
-  //   ws?.send(JSON.stringify({ type: WsMessageType.UPDATE_TREE_CONQUER, data: { treeId, leafId, isConquer } }));
-  // };
-
-  const sampleTreeData: TreeData = {
-    nodes: [
-      { id: "1", label: "Main Root Node", isConquer: IsConquer.FALSE },
-      { id: "2", label: "Introduction to Topic A", isConquer: IsConquer.TRUE },
-      { id: "3", label: "Overview of Topic B", isConquer: IsConquer.FALSE },
-      { id: "4", label: "Deep Dive into Topic C", isConquer: IsConquer.FALSE },
-      { id: "5", label: "Details of A1 Subpart", isConquer: IsConquer.TRUE },
-      { id: "6", label: "Exploring A2 Section", isConquer: IsConquer.FALSE },
-      { id: "7", label: "B1 Concepts Explained", isConquer: IsConquer.FALSE },
-      { id: "8", label: "Summary of B2 Ideas", isConquer: IsConquer.TRUE },
-      { id: "9", label: "Understanding C1 Flow", isConquer: IsConquer.FALSE },
-      { id: "10", label: "C2 Key Takeaways", isConquer: IsConquer.TRUE },
-      { id: "11", label: "A1-1 Extended Notes", isConquer: IsConquer.FALSE },
-      { id: "12", label: "B1-1 Final Thoughts", isConquer: IsConquer.TRUE },
-    ],
-    links: [
-      { source: "1", target: "2" },
-      { source: "1", target: "3" },
-      { source: "1", target: "4" },
-      { source: "2", target: "5" },
-      { source: "2", target: "6" },
-      { source: "3", target: "7" },
-      { source: "3", target: "8" },
-      { source: "4", target: "9" },
-      { source: "4", target: "10" },
-      { source: "5", target: "11" },
-      { source: "7", target: "12" },
-    ],
+  const handleConquerClick = (event: cytoscape.EventObject) => {
+    const leafId = event.target.id();
+    const isConquer = event.target.data("isConquer");
+    ws?.send(JSON.stringify({ type: WsMessageType.UPDATE_TREE_CONQUER, data: { treeId, leafId, isConquer } }));
   };
 
   //tree데이터 가져오기.
@@ -89,7 +88,6 @@ const Tree = ({ containerRef }: { containerRef: any | null }) => {
     const getTreeData = async () => {
       try {
         setLoading(true);
-        setTreeData(sampleTreeData);
         const response = await axios.get(`${path}/tree/${treeId}`);
         if (response.data) {
           setTreeData(response.data);
@@ -190,6 +188,7 @@ const Tree = ({ containerRef }: { containerRef: any | null }) => {
       }}
       dagMode="td" // top-down 계층 구조
       dagLevelDistance={70} // 계층 간 거리
+      onNodeClick={handleNodeClick}
     />
   ) : (
     <NoTreeIsOpen />
