@@ -84,22 +84,27 @@ const Tree = ({ containerRef }: { containerRef: any | null }) => {
   };
 
   //tree데이터 가져오기.
-  //tree그룹(websocket)에 참가하기.
   useEffect(() => {
+    if (!treeId) return;
     const getTreeData = async () => {
       try {
         setLoading(true);
         setTreeData(sampleTreeData);
-        // todo
-        // const response = await axios.get(`${path}/tree/${treeId}`);
-        // if (response.data) {
-        // }
+        const response = await axios.get(`${path}/tree/${treeId}`);
+        if (response.data) {
+          setTreeData(response.data);
+        }
       } catch (error) {
         console.log("[Tree][getTreeData]Error fetching tree data:", error);
       } finally {
         setLoading(false);
       }
     };
+    getTreeData();
+  }, [treeId]);
+
+  //tree그룹(websocket)에 참가하기.
+  useEffect(() => {
     const joinTreeGroup = () => {
       if (ws && treeId) {
         ws.send(JSON.stringify({ type: WsMessageType.JOIN_TREE, data: { treeId, prevTreeId: prevTreeId.current } }));
@@ -120,7 +125,6 @@ const Tree = ({ containerRef }: { containerRef: any | null }) => {
       }
     };
     if (treeId) {
-      getTreeData();
       joinTreeGroup();
       addWsEventListener();
     }
