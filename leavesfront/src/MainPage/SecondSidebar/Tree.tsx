@@ -127,7 +127,42 @@ const Tree = ({ containerRef }: { containerRef: any | null }) => {
     return <p>Loading tree data...</p>;
   }
 
-  return treeData ? <ForceGraph2D ref={fgRef} graphData={treeData} width={dimensions.width} height={dimensions.height} /> : <NoTreeIsOpen />;
+  return treeData ? (
+    <ForceGraph2D
+      ref={fgRef}
+      graphData={treeData}
+      width={dimensions.width}
+      height={dimensions.height}
+      nodeCanvasObject={(node, ctx, globalScale) => {
+        //node : 노드 데이터.
+        //ctx:캔버스 2D 렌더링 컨텍스트(접근 가능한 정보나 기능의 집합).
+        //globalScale: 줌 레벨.
+        const label = node.label;
+        const fontSize = 12 / globalScale;
+        const radius = 5 / globalScale;
+        const isConquer = node.isConquer;
+        //도형 그리기.
+        ctx.beginPath(); //이전 경로를 끊고, 새로운 도형을 그리기 위한 경로를 시작
+        ctx.arc(
+          node.x!, // 원의 중심 x 좌표 (노드 위치)
+          node.y!, // 원의 중심 y 좌표 (노드 위치)
+          radius, // 반지름
+          0, // 시작 각도 (0 라디안)
+          2 * Math.PI // 끝 각도 (360도 = 2π 라디안)
+        );
+        ctx.fillStyle = isConquer === IsConquer.TRUE ? "red" : "green";
+        ctx.fill(); // 설정된 색상으로 원을 채움
+
+        //텍스트 그리기.
+        ctx.font = `${fontSize}px Sans-Serif`;
+        ctx.textAlign = "center";
+        ctx.fillStyle = theme.palette.mode === "dark" ? "white" : "black";
+        ctx.fillText(label, node.x!, node.y! - radius - fontSize / 2);
+      }}
+    />
+  ) : (
+    <NoTreeIsOpen />
+  );
 };
 
 export default Tree;
