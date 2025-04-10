@@ -3,7 +3,7 @@ import axios from "axios";
 import { useTheme } from "@mui/material/styles";
 import { path } from "../../../config/env";
 import { useMainPageContext } from "../MainPageManager";
-import { IsConquer, TreeData, WsMessageType } from "../../types";
+import { IsConquer, Node, TreeData, WsMessageType } from "../../types";
 import NoTreeIsOpen from "./NoTreeIsOpen";
 import "aframe"; // react-force-graph보다 먼저 import
 import { ForceGraph2D } from "react-force-graph";
@@ -55,7 +55,6 @@ const Tree = ({ containerRef }: { containerRef: any | null }) => {
   const theme = useTheme();
   const [treeData, setTreeData] = useState<TreeData | undefined>(undefined);
   const fgRef = useRef<any>(undefined);
-
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const wsMessageHandler: Record<string, (data: any) => void> = {
     [WsMessageType.UPDATE_TREE_LABEL]: (data) => {},
@@ -70,15 +69,15 @@ const Tree = ({ containerRef }: { containerRef: any | null }) => {
     },
   };
 
-  const handleNodeClick = (node: any) => {
+  const handleNodeClick = (node: Node) => {
     const leafId = node.id;
     setLeafId(leafId);
     setIsPublicLeaf(isPublicTree);
   };
 
-  const handleConquerClick = (event: cytoscape.EventObject) => {
-    const leafId = event.target.id();
-    const isConquer = event.target.data("isConquer");
+  const handleConquerClick = (node: Node) => {
+    const leafId = node.id;
+    const isConquer = node.isConquer;
     ws?.send(JSON.stringify({ type: WsMessageType.UPDATE_TREE_CONQUER, data: { treeId, leafId, isConquer } }));
   };
 
@@ -189,6 +188,9 @@ const Tree = ({ containerRef }: { containerRef: any | null }) => {
       dagMode="td" // top-down 계층 구조
       dagLevelDistance={70} // 계층 간 거리
       onNodeClick={handleNodeClick}
+      linkColor={(link) => {
+        return theme.palette.mode === "dark" ? "#888" : "rgba(0,0,0,0.2)";
+      }}
     />
   ) : (
     <NoTreeIsOpen />
