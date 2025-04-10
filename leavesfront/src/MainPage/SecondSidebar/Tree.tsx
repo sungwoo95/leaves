@@ -8,7 +8,7 @@ import NoTreeIsOpen from "./NoTreeIsOpen";
 import "aframe"; // react-force-graph보다 먼저 import
 import { ForceGraph2D } from "react-force-graph";
 
-const Tree: React.FC = () => {
+const Tree = ({ containerRef }: { containerRef: any | null }) => {
   const mainPageContext = useMainPageContext();
   try {
     if (!mainPageContext) {
@@ -25,6 +25,8 @@ const Tree: React.FC = () => {
   const theme = useTheme();
   const [treeData, setTreeData] = useState<TreeData | undefined>(undefined);
   const fgRef = useRef<any>(undefined);
+
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const wsMessageHandler: Record<string, (data: any) => void> = {
     [WsMessageType.UPDATE_TREE_LABEL]: (data) => {},
     [WsMessageType.UPDATE_TREE_ADD_CHILD_LEAF]: (data) => {
@@ -63,6 +65,7 @@ const Tree: React.FC = () => {
       { source: "2", target: "4" },
     ],
   };
+
   //tree데이터 가져오기.
   //tree그룹(websocket)에 참가하기.
   useEffect(() => {
@@ -109,11 +112,22 @@ const Tree: React.FC = () => {
     };
   }, [treeId, ws]);
 
+  //observer등록. 추적하는 컴포넌트의 크기가 변경되면 setDimensions호출.
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      setDimensions({ width, height });
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   if (loading && treeId) {
     return <p>Loading tree data...</p>;
   }
 
-  return treeData ? <ForceGraph2D ref={fgRef} graphData={treeData} /> : <NoTreeIsOpen />;
+  return treeData ? <ForceGraph2D ref={fgRef} graphData={treeData} width={dimensions.width} height={dimensions.height} /> : <NoTreeIsOpen />;
 };
 
 export default Tree;
