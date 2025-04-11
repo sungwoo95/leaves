@@ -65,8 +65,9 @@ const Tree = ({ containerRef }: { containerRef: any | null }) => {
     [WsMessageType.UPDATE_TREE_ADD_PARENT_LEAF]: (data) => {
       //const { newNode, deleteEdge, newEdgeList } = data;
     },
-    [WsMessageType.UPDATE_TREE_CONQUER]: (data) => {
-      //const { nodes } = data;
+    [WsMessageType.UPDATE_TREE_DATA]: (data) => {
+      const { newTreeData } = data;
+      setTreeData(newTreeData);
     },
   };
   const [menuPosition, setMenuPosition] = useState<Position | null>(null);

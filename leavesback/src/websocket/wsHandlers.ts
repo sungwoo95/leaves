@@ -47,24 +47,23 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
           });
         }
         //트리 문서 업데이트.
-        const updateTreeResult = await treesCollection.updateOne(
-          { _id: new ObjectId(owningTreeId), "nodes.data.id": leafId },
-          { $set: { "nodes.$.data.label": title } }
+        const resultDocument = await treesCollection.findOneAndUpdate(
+          { _id: new ObjectId(owningTreeId), "nodes.id": leafId },
+          { $set: { "nodes.$.label": title } },
+          { returnDocument: "after", projection: { _id: 0 } }
         )
-        if (updateTreeResult.modifiedCount === 0) {
-          console.log("[wsHandlers][updateLeafTitle]update tree document error");
-          throw new Error("No tree document updated.");
+        if (!resultDocument) {
+          throw new Error("[WsHandlers][UPDATE_LEAF_TITLE]트리 문서 업데이트 에러.");
         }
         //트리 그룹 브로드 캐스트.
         const treeClients = wsGroups.get(owningTreeId);
         if (treeClients) {
           treeClients.forEach(client => {
             if (client.readyState === WebSocket.OPEN) {
-              console.log("[wsHandlers]send to treeClients");
               client.send(
                 JSON.stringify({
-                  type: WsMessageType.UPDATE_TREE_LABEL,
-                  data: { treeId: owningTreeId, leafId, title }
+                  type: WsMessageType.UPDATE_TREE_DATA,
+                  data: { treeId: owningTreeId, newTreeData: resultDocument }
                 })
               );
             }
@@ -258,19 +257,17 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
       const newIsConquer = isConquer === IsConquer.FALSE ? IsConquer.TRUE : IsConquer.FALSE;
       try {
         const resultDocument = await treesCollection.findOneAndUpdate(
-          { _id: new ObjectId(treeId), "nodes.data.id": leafId }, // 특정 treeId 문서에서 nodes 배열 내 leafId 찾기
+          { _id: new ObjectId(treeId), "nodes.id": leafId }, // 특정 treeId 문서에서 nodes 배열 내 leafId 찾기
           {
             $set: {
-              "nodes.$.data.isConquer": newIsConquer
+              "nodes.$.isConquer": newIsConquer
             },
           },
-          { returnDocument: "after", projection: { nodes: 1, _id: 0 } } // 업데이트된 nodes만 반환
+          { returnDocument: "after", projection: { _id: 0 } }
         );
-
         if (!resultDocument) {
           throw new Error(`Node with id ${leafId} not found in tree ${treeId}`);
         }
-        const nodes = resultDocument.nodes;
         //트리 그룹 브로드 캐스트.
         const treeClients = wsGroups.get(treeId);
         if (treeClients) {
@@ -278,8 +275,8 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
             if (client.readyState === WebSocket.OPEN) {
               client.send(
                 JSON.stringify({
-                  type: WsMessageType.UPDATE_TREE_CONQUER,
-                  data: { treeId, nodes }
+                  type: WsMessageType.UPDATE_TREE_DATA,
+                  data: { treeId, newTreeData: resultDocument }
                 })
               );
             }
