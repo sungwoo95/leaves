@@ -115,7 +115,6 @@ const DirectoryButton = ({
         open={!!menuPosition}
         menuPosition={menuPosition}
         onCloseHandler={onCloseHandler}
-        onClickMenuHandler={onClickMenuHandler}
         onClickRenameHandler={onClickRenameHandler}
         onClickDeleteHandler={onClickDeleteHandler}
       />

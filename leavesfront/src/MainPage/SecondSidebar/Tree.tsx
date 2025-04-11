@@ -3,11 +3,12 @@ import axios from "axios";
 import { useTheme } from "@mui/material/styles";
 import { path } from "../../../config/env";
 import { useMainPageContext } from "../MainPageManager";
-import { IsConquer, Node, TreeData, WsMessageType } from "../../types";
+import { IsConquer, Node, Position, TreeData, WsMessageType } from "../../types";
 import NoTreeIsOpen from "./NoTreeIsOpen";
 import "aframe"; // react-force-graph보다 먼저 import
 import { ForceGraph2D } from "react-force-graph";
 import { forceCollide } from "d3-force";
+import NodeContextMenu from "./NodeContextMenu";
 
 const Tree = ({ containerRef }: { containerRef: any | null }) => {
   // const sampleTreeData: TreeData = {
@@ -68,17 +69,23 @@ const Tree = ({ containerRef }: { containerRef: any | null }) => {
       //const { nodes } = data;
     },
   };
-
+  const [menuPosition, setMenuPosition] = useState<Position | null>(null);
+  const [clickLeafId, setClickLeafId] = useState<string | null>(null);
+  const [isConquer, setIsConquer] = useState<IsConquer | undefined>(undefined);
   const handleNodeClick = (node: Node) => {
     const leafId = node.id;
     setLeafId(leafId);
     setIsPublicLeaf(isPublicTree);
   };
 
-  const handleConquerClick = (node: Node) => {
-    const leafId = node.id;
-    const isConquer = node.isConquer;
-    ws?.send(JSON.stringify({ type: WsMessageType.UPDATE_TREE_CONQUER, data: { treeId, leafId, isConquer } }));
+  const handleNodeRightClick = (node: Node, event: MouseEvent) => {
+    const position = {
+      top: event.clientY,
+      left: event.clientX,
+    };
+    setMenuPosition(position);
+    setClickLeafId(node.id);
+    setIsConquer(node.isConquer);
   };
 
   //tree데이터 가져오기.
@@ -154,44 +161,48 @@ const Tree = ({ containerRef }: { containerRef: any | null }) => {
   }
 
   return treeData ? (
-    <ForceGraph2D
-      ref={fgRef}
-      graphData={treeData}
-      width={dimensions.width}
-      height={dimensions.height}
-      nodeCanvasObject={(node, ctx, globalScale) => {
-        //node : 노드 데이터.
-        //ctx:캔버스 2D 렌더링 컨텍스트(접근 가능한 정보나 기능의 집합).
-        //globalScale: 줌 레벨.
-        const label = node.label;
-        const fontSize = 12 / globalScale;
-        const radius = 5 / globalScale;
-        const isConquer = node.isConquer;
-        //도형 그리기.
-        ctx.beginPath(); //이전 경로를 끊고, 새로운 도형을 그리기 위한 경로를 시작
-        ctx.arc(
-          node.x!, // 원의 중심 x 좌표 (노드 위치)
-          node.y!, // 원의 중심 y 좌표 (노드 위치)
-          radius, // 반지름
-          0, // 시작 각도 (0 라디안)
-          2 * Math.PI // 끝 각도 (360도 = 2π 라디안)
-        );
-        ctx.fillStyle = isConquer === IsConquer.TRUE ? "red" : "green";
-        ctx.fill(); // 설정된 색상으로 원을 채움
+    <div>
+      <ForceGraph2D
+        ref={fgRef}
+        graphData={treeData}
+        width={dimensions.width}
+        height={dimensions.height}
+        nodeCanvasObject={(node, ctx, globalScale) => {
+          //node : 노드 데이터.
+          //ctx:캔버스 2D 렌더링 컨텍스트(접근 가능한 정보나 기능의 집합).
+          //globalScale: 줌 레벨.
+          const label = node.label;
+          const fontSize = 12 / globalScale;
+          const radius = 5 / globalScale;
+          const isConquer = node.isConquer;
+          //도형 그리기.
+          ctx.beginPath(); //이전 경로를 끊고, 새로운 도형을 그리기 위한 경로를 시작
+          ctx.arc(
+            node.x!, // 원의 중심 x 좌표 (노드 위치)
+            node.y!, // 원의 중심 y 좌표 (노드 위치)
+            radius, // 반지름
+            0, // 시작 각도 (0 라디안)
+            2 * Math.PI // 끝 각도 (360도 = 2π 라디안)
+          );
+          ctx.fillStyle = isConquer === IsConquer.TRUE ? "red" : "green";
+          ctx.fill(); // 설정된 색상으로 원을 채움
 
-        //텍스트 그리기.
-        ctx.font = `${fontSize}px Sans-Serif`;
-        ctx.textAlign = "center";
-        ctx.fillStyle = theme.palette.mode === "dark" ? "white" : "black";
-        ctx.fillText(label, node.x!, node.y! - radius - fontSize / 2);
-      }}
-      dagMode="td" // top-down 계층 구조
-      dagLevelDistance={70} // 계층 간 거리
-      onNodeClick={handleNodeClick}
-      linkColor={(link) => {
-        return theme.palette.mode === "dark" ? "#888" : "rgba(0,0,0,0.2)";
-      }}
-    />
+          //텍스트 그리기.
+          ctx.font = `${fontSize}px Sans-Serif`;
+          ctx.textAlign = "center";
+          ctx.fillStyle = theme.palette.mode === "dark" ? "white" : "black";
+          ctx.fillText(label, node.x!, node.y! - radius - fontSize / 2);
+        }}
+        dagMode="td" // top-down 계층 구조
+        dagLevelDistance={70} // 계층 간 거리
+        onNodeClick={handleNodeClick}
+        linkColor={(link) => {
+          return theme.palette.mode === "dark" ? "#888" : "rgba(0,0,0,0.2)";
+        }}
+        onNodeRightClick={handleNodeRightClick}
+      />
+      <NodeContextMenu menuPosition={menuPosition} clickLeafId={clickLeafId} isConquer={isConquer} setMenuPosition={setMenuPosition} />
+    </div>
   ) : (
     <NoTreeIsOpen />
   );
