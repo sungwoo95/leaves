@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@xyflow/react": "^12.5.5"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.1"
+  }
+}
