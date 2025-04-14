@@ -5,22 +5,53 @@ import { path } from "../../../config/env";
 import { useMainPageContext } from "../MainPageManager";
 import { WsMessageType } from "../../types";
 import NoTreeIsOpen from "./NoTreeIsOpen";
-import {
-  ReactFlow,
-  addEdge,
-  applyNodeChanges,
-  applyEdgeChanges,
-  type Node,
-  type Edge,
-  type FitViewOptions,
-  type OnConnect,
-  type OnNodesChange,
-  type OnEdgesChange,
-  type OnNodeDrag,
-  type DefaultEdgeOptions,
-} from "@xyflow/react";
+import { ReactFlow, type Node, type Edge, ReactFlowProvider } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import ELK, { ElkNode } from "elkjs/lib/elk.bundled.js";
 
+const elk = new ELK();
+const elkOptions = {
+  "elk.algorithm": "layered",
+  "elk.direction": "DOWN", // 트리 구조
+  "elk.layered.spacing.nodeNodeBetweenLayers": "100",
+  "elk.spacing.nodeNode": "80",
+};
+const getLayoutedNodes = async (nodes: Node[], edges: Edge[]): Promise<Node[]> => {
+  const graph = {
+    id: "root",
+    layoutOptions: elkOptions,
+    children: nodes.map((node) => ({
+      ...node,
+      width: 150,
+      height: 50,
+    })),
+    edges: edges.map((e) => ({
+      id: e.id,
+      sources: [e.source],
+      targets: [e.target],
+    })),
+  };
+  try {
+    const layoutedGraph = await elk.layout(graph);
+    if (!layoutedGraph.children) {
+      throw new Error("[Tree] Layout calculation failed: children is undefined.");
+    }
+    const layoutedNodes: Node[] = layoutedGraph.children.map((node) => {
+      const { x, y, width, height, ...rest } = node;
+      return {
+        ...rest,
+        position: {
+          x: x ?? 0, // x가 null또는 undefined일 경우 0.
+          y: y ?? 0,
+        },
+      };
+    });
+    return layoutedNodes;
+  } catch (error) {
+    console.log("[Tree]elk.layout 에러");
+    return [];
+  }
+};
 const Tree: React.FC = () => {
   const mainPageContext = useMainPageContext();
   try {
@@ -137,7 +168,7 @@ const Tree: React.FC = () => {
     };
   }, [treeId, ws]);
 
-  //tree데이터 가져오기.
+  //그래프 데이터 설정하기.
   useEffect(() => {
     const getTreeData = async () => {
       try {
@@ -149,14 +180,26 @@ const Tree: React.FC = () => {
         //   setEdges(response.data.edges);
         // }
         const initialNodes: Node[] = [
-          { id: "1", data: { label: "Node 1" }, position: { x: 5, y: 5 } },
-          { id: "2", data: { label: "Node 2" }, position: { x: 5, y: 100 } },
+          { id: "1", data: { label: "Root Node" }, position: { x: 0, y: 0 } },
+          { id: "2", data: { label: "Child A" }, position: { x: 0, y: 0 } },
+          { id: "3", data: { label: "Child B" }, position: { x: 0, y: 0 } },
+          { id: "4", data: { label: "Grandchild A1" }, position: { x: 0, y: 0 } },
+          { id: "5", data: { label: "Grandchild A2" }, position: { x: 0, y: 0 } },
+          { id: "6", data: { label: "Grandchild B1" }, position: { x: 0, y: 0 } },
+          { id: "7", data: { label: "Grandchild B2" }, position: { x: 0, y: 0 } },
         ];
 
-        const edges: Edge[] = [{ id: "e1-2", source: "1", target: "2" }];
+        const edges: Edge[] = [
+          { id: "e1-2", source: "1", target: "2" },
+          { id: "e1-3", source: "1", target: "3" },
+          { id: "e2-4", source: "2", target: "4" },
+          { id: "e2-5", source: "2", target: "5" },
+          { id: "e3-6", source: "3", target: "6" },
+          { id: "e3-7", source: "3", target: "7" },
+        ];
 
         //elk로 layoutedNodes 만들기.
-        const layoutedNodes = initialNodes;
+        const layoutedNodes = await getLayoutedNodes(initialNodes, edges);
         //nodes,edges설정하기.
         setNodes(layoutedNodes);
         setEdges(edges);
