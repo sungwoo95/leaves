@@ -5,9 +5,10 @@ import { path } from "../../../config/env";
 import { useMainPageContext } from "../MainPageManager";
 import { WsMessageType } from "../../types";
 import NoTreeIsOpen from "./NoTreeIsOpen";
-import { ReactFlow, type Node, type Edge, ReactFlowProvider } from "@xyflow/react";
+import { ReactFlow, type Node, type Edge } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import ELK, { ElkNode } from "elkjs/lib/elk.bundled.js";
+import { forceSimulation, forceManyBody, forceCollide, Simulation } from "d3-force";
 
 const elk = new ELK();
 const elkOptions = {
@@ -16,6 +17,7 @@ const elkOptions = {
   "elk.layered.spacing.nodeNodeBetweenLayers": "100",
   "elk.spacing.nodeNode": "80",
 };
+let isSimulationActivated: Simulation<any, any> | null = null;
 const getLayoutedNodes = async (nodes: Node[], edges: Edge[]): Promise<Node[]> => {
   const graph = {
     id: "root",
@@ -52,6 +54,38 @@ const getLayoutedNodes = async (nodes: Node[], edges: Edge[]): Promise<Node[]> =
     return [];
   }
 };
+const applyForceLayoutAnimated = (nodes: any[], setNodes: React.Dispatch<React.SetStateAction<Node[]>>) => {
+  if (isSimulationActivated) {
+    isSimulationActivated.stop();
+  }
+  const sim = forceSimulation(nodes)
+    .force("charge", forceManyBody().strength(-50)) // 서로 밀어내는 힘
+    .force("collision", forceCollide().radius(80)) // 충돌 방지
+    .alpha(1) // 초기 에너지 (애니메이션 강도)
+    .alphaDecay(0.05) // 서서히 멈추게 하는 감쇠율
+    .on("tick", () => {
+      // 매 프레임마다 노드 위치 갱신
+      setNodes((prevNodes) =>
+        prevNodes.map((node, i) => ({
+          ...node,
+          position: {
+            x: nodes[i].x ?? 0,
+            y: nodes[i].y ?? 0,
+          },
+        }))
+      );
+    });
+  isSimulationActivated = sim;
+
+  //시뮬레이션 정지
+  setTimeout(() => {
+    sim.stop();
+    if (isSimulationActivated === sim) {
+      isSimulationActivated = null;
+    }
+  }, 2000);
+};
+
 const Tree: React.FC = () => {
   const mainPageContext = useMainPageContext();
   try {
@@ -64,21 +98,25 @@ const Tree: React.FC = () => {
     return <p>오류가 발생했습니다.</p>;
   }
   const { ws, treeId, leafId, setLeafId, isPublicTree, setIsPublicLeaf } = mainPageContext;
-  const [nodes, setNodes] = useState<Node[] | undefined>(undefined);
-  const [edges, setEdges] = useState<Edge[] | undefined>(undefined);
+  const [nodes, setNodes] = useState<Node[]>([]);
+  const [edges, setEdges] = useState<Edge[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const prevTreeId = useRef<string | null>(null);
   const theme = useTheme();
+  const handleAddNode = (newNode: Node, newEdge: Edge) => {
+    const updatedNodes = [...nodes, newNode];
+    const updatedEdges = [...edges, newEdge];
+    setEdges(updatedEdges);
+
+    // 애니메이션으로 force 적용
+    applyForceLayoutAnimated(updatedNodes, setNodes);
+  };
+
   const wsMessageHandler: Record<string, (data: any) => void> = {
     [WsMessageType.UPDATE_TREE_LABEL]: (data) => {
       const targetId = data.leafId;
       const newTitle = data.title;
-      if (nodes)
-        setNodes((prev) => {
-          if (prev) {
-            return prev.map((elem) => (elem.data.id === targetId ? { ...elem, data: { ...elem.data, label: newTitle } } : elem));
-          }
-        });
+      if (nodes) setNodes((prev) => prev.map((elem) => (elem.data.id === targetId ? { ...elem, data: { ...elem.data, label: newTitle } } : elem)));
     },
     [WsMessageType.UPDATE_TREE_ADD_CHILD_LEAF]: (data) => {
       const { newNode, newEdge } = data;
@@ -180,7 +218,7 @@ const Tree: React.FC = () => {
         //   setEdges(response.data.edges);
         // }
         const initialNodes: Node[] = [
-          { id: "1", data: { label: "Root Node" }, position: { x: 0, y: 0 } },
+          { id: "1", data: { label: "Root Noded" }, position: { x: 0, y: 0 } },
           { id: "2", data: { label: "Child A" }, position: { x: 0, y: 0 } },
           { id: "3", data: { label: "Child B" }, position: { x: 0, y: 0 } },
           { id: "4", data: { label: "Grandchild A1" }, position: { x: 0, y: 0 } },
@@ -200,7 +238,6 @@ const Tree: React.FC = () => {
 
         //elk로 layoutedNodes 만들기.
         const layoutedNodes = await getLayoutedNodes(initialNodes, edges);
-        //nodes,edges설정하기.
         setNodes(layoutedNodes);
         setEdges(edges);
       } catch (error) {
@@ -223,7 +260,7 @@ const Tree: React.FC = () => {
     return <p>Loading tree data...</p>;
   }
 
-  return nodes && edges ? <ReactFlow nodes={nodes} edges={edges} /> : <NoTreeIsOpen />;
+  return nodes.length > 0 ? <ReactFlow nodes={nodes} edges={edges} /> : <NoTreeIsOpen />;
 };
 
 export default Tree;
