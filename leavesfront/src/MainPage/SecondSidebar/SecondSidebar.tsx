@@ -1,15 +1,16 @@
 import { Paper, Box } from "@mui/material";
-import Tree from "./Tree"; 
+import Tree from "./Tree";
 import { useTheme } from "@mui/material/styles";
 
 const SecondSidebar: React.FC = () => {
   const theme = useTheme();
   return (
-    <Paper sx={{ 
-      height: "100vh", 
-      bgcolor: theme.palette.mode === "dark" ? "black" : "white",
+    <Paper
+      sx={{
+        height: "100vh",
+        bgcolor: theme.palette.mode === "dark" ? "black" : "white",
       }}>
-      <Box sx={{ overflow: "hidden", height: "100vh" }}>
+      <Box style={{ width: "100%", height: "100%" }}>
         <Tree />
       </Box>
     </Paper>
