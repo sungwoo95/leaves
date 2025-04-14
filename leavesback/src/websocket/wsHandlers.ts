@@ -2,6 +2,7 @@ import { WebSocket } from "ws";
 import { IsConquer, Leaf, WsMessageType } from "../types";
 import { leavesCollection, treesCollection } from "../config/db";
 import { ObjectId } from "mongodb";
+import { v4 as uuidv4 } from 'uuid';
 
 export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSocket>>) => {
   const messageHandler: Partial<Record<WsMessageType, (message: any) => void>> = {
@@ -112,8 +113,9 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
           return;
         }
         const childLeafId = insertLeafResult.insertedId.toString();
-        const newNode = { data: { id: childLeafId, label: title, isConquer: IsConquer.FALSE } };
-        const newEdge = { data: { source: leafId, target: childLeafId } }
+        //todo 클라이언트로부터 position받아오기
+        const newNode = { id: childLeafId, data: { label: title, isConquer: IsConquer.FALSE }, position: { x: 0, y: 0 } };
+        const newEdge = { id: "uuid", source: leafId, target: childLeafId };
         const updateTreeResult = await treesCollection.updateOne(
           { _id: new ObjectId(owningTreeId) },
           {
@@ -177,11 +179,11 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
           return;
         }
         //트리 문서 업데이트.
-        const newNode = { data: { id: newLeafId, label: title, isConquer: IsConquer.FALSE } };
+        const newNode = { id: newLeafId, data: { label: title, isConquer: IsConquer.FALSE }, position: { x: 0, y: 0 } };
         let updateTreeResult;
         if (parentLeafId) {
-          const newEdge1 = { data: { source: parentLeafId, target: newLeafId } };
-          const newEdge2 = { data: { source: newLeafId, target: leafId } }
+          const newEdge1 = { id: uuidv4(), source: parentLeafId, target: newLeafId };
+          const newEdge2 = { id: uuidv4(), source: newLeafId, target: leafId }
           deleteEdge = { data: { source: parentLeafId, target: leafId } }
           await treesCollection.updateOne(
             { _id: new ObjectId(owningTreeId) },
@@ -203,7 +205,7 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
           );
           newEdgeList.push(newEdge1, newEdge2);
         } else {
-          const newEdge = { data: { source: newLeafId, target: leafId } }
+          const newEdge = { id: uuidv4(), source: newLeafId, target: leafId }
           updateTreeResult = await treesCollection.updateOne(
             { _id: new ObjectId(owningTreeId) },
             {

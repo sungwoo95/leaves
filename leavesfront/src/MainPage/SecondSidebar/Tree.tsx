@@ -212,30 +212,11 @@ const Tree: React.FC = () => {
       try {
         setLoading(true);
         ////서버에서 초기 데이터 가져오기.
-        // const response = await axios.get(`${path}/tree/${treeId}`);
-        // if (response.data) {
-        //   setNodes(response.data.nodes);
-        //   setEdges(response.data.edges);
-        // }
-        const initialNodes: Node[] = [
-          { id: "1", data: { label: "Root Noded" }, position: { x: 0, y: 0 } },
-          { id: "2", data: { label: "Child A" }, position: { x: 0, y: 0 } },
-          { id: "3", data: { label: "Child B" }, position: { x: 0, y: 0 } },
-          { id: "4", data: { label: "Grandchild A1" }, position: { x: 0, y: 0 } },
-          { id: "5", data: { label: "Grandchild A2" }, position: { x: 0, y: 0 } },
-          { id: "6", data: { label: "Grandchild B1" }, position: { x: 0, y: 0 } },
-          { id: "7", data: { label: "Grandchild B2" }, position: { x: 0, y: 0 } },
-        ];
-
-        const edges: Edge[] = [
-          { id: "e1-2", source: "1", target: "2" },
-          { id: "e1-3", source: "1", target: "3" },
-          { id: "e2-4", source: "2", target: "4" },
-          { id: "e2-5", source: "2", target: "5" },
-          { id: "e3-6", source: "3", target: "6" },
-          { id: "e3-7", source: "3", target: "7" },
-        ];
-
+        const response = await axios.get(`${path}/tree/${treeId}`);
+        const treeData = response.data;
+        if (!treeData) throw new Error("[Tree]서버에서 받은 tree 데이터 없음");
+        const initialNodes = treeData.nodes;
+        const edges = treeData.edges;
         //elk로 layoutedNodes 만들기.
         const layoutedNodes = await getLayoutedNodes(initialNodes, edges);
         setNodes(layoutedNodes);

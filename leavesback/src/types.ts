@@ -1,3 +1,4 @@
+import { type Edge, type Node } from "@xyflow/react";
 import { ObjectId } from "mongodb";
 
 export enum IsConquer {
@@ -5,7 +6,6 @@ export enum IsConquer {
   FALSE = "false"
 };
 export type NodeData = {
-  id: string;
   label: string;
   isConquer: IsConquer;
 };
@@ -15,15 +15,9 @@ export type Position = {
   y: number;
 };
 
-export type EdgeData = {
-  source: string;
-  target: string;
-  label?: string;
-};
-
 export type Tree = {
-  nodes: { data: NodeData; position?: Position }[];
-  edges: { data: EdgeData }[];
+  nodes: Node<NodeData>[];
+  edges: Edge[];
 };
 
 export type User = {
