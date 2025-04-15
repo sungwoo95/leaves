@@ -10,7 +10,7 @@ export type NodeData = {
   isConquer: IsConquer;
 };
 
-export type Position = {
+export type NodePosition = {
   x: number;
   y: number;
 };
@@ -21,9 +21,18 @@ export type EdgeData = {
   label?: string;
 };
 
+export type Node = {
+  data: NodeData;
+  position?: NodePosition;
+}
+
+export type Edge = {
+  data: EdgeData;
+}
+
 export type Tree = {
-  nodes: { data: NodeData; position?: Position }[];
-  edges: { data: EdgeData }[];
+  nodes: Node[];
+  edges: Edge[];
 };
 
 export type User = {
