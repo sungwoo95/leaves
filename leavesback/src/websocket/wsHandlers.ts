@@ -114,7 +114,7 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
         }
         const childLeafId = insertLeafResult.insertedId.toString();
         //todo 클라이언트로부터 position받아오기
-        const newNode = { id: childLeafId, data: { label: title, isConquer: IsConquer.FALSE }, position: { x: 0, y: 0 } };
+        const newNode = { id: childLeafId, type: "circle", data: { label: title, isConquer: IsConquer.FALSE }, position: { x: 0, y: 0 } };
         const newEdge = { id: "uuid", source: leafId, target: childLeafId };
         const updateTreeResult = await treesCollection.updateOne(
           { _id: new ObjectId(owningTreeId) },
@@ -179,7 +179,7 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
           return;
         }
         //트리 문서 업데이트.
-        const newNode = { id: newLeafId, data: { label: title, isConquer: IsConquer.FALSE }, position: { x: 0, y: 0 } };
+        const newNode = { id: newLeafId, type: "circle", data: { label: title, isConquer: IsConquer.FALSE }, position: { x: 0, y: 0 } };
         let updateTreeResult;
         if (parentLeafId) {
           const newEdge1 = { id: uuidv4(), source: parentLeafId, target: newLeafId };

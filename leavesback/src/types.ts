@@ -5,19 +5,20 @@ export enum IsConquer {
   TRUE = "true",
   FALSE = "false"
 };
+
 export type NodeData = {
   label: string;
   isConquer: IsConquer;
 };
 
-export type Position = {
-  x: number;
-  y: number;
-};
-
 export type Tree = {
   nodes: Node<NodeData>[];
   edges: Edge[];
+};
+
+export type Position = {
+  x: number;
+  y: number;
 };
 
 export type User = {

@@ -3,12 +3,13 @@ import axios from "axios";
 import { useTheme } from "@mui/material/styles";
 import { path } from "../../../config/env";
 import { useMainPageContext } from "../MainPageManager";
-import { WsMessageType } from "../../types";
+import { CustomNode, WsMessageType } from "../../types";
 import NoTreeIsOpen from "./NoTreeIsOpen";
 import { ReactFlow, type Node, type Edge, useReactFlow, ReactFlowProvider, NodeMouseHandler } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import ELK from "elkjs/lib/elk.bundled.js";
 import { forceSimulation, forceManyBody, forceCollide, Simulation } from "d3-force";
+import CircleNode from "./CircleNode";
 
 const elk = new ELK();
 const elkOptions = {
@@ -142,7 +143,6 @@ const Tree: React.FC = () => {
       const { nodes } = data;
     },
   };
-
   //tree그룹(websocket)에 참가하기.
   useEffect(() => {
     const joinTreeGroup = () => {
@@ -226,7 +226,7 @@ const Tree: React.FC = () => {
     return <p>Loading tree data...</p>;
   }
 
-  return treeId ? <ReactFlow nodes={nodes} edges={edges} onNodeClick={handleNodeClick} /> : <NoTreeIsOpen />;
+  return treeId ? <ReactFlow nodeTypes={{circle:CircleNode}} nodes={nodes} edges={edges} onNodeClick={handleNodeClick} /> : <NoTreeIsOpen />;
 };
 
 export default Tree;

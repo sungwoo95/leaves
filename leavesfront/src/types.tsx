@@ -1,3 +1,4 @@
+import { Edge, type Node } from "@xyflow/react";
 export type AddDirectory = (tartgetId: null | string, type: DirectoryType, treeId?: string) => void;
 
 export type UpdateIsNew = (targetId: string) => void;
@@ -43,3 +44,23 @@ export enum WsMessageType {
   UPDATE_TREE_ADD_PARENT_LEAF = "updateTreeAddParentLeaf",
   UPDATE_TREE_CONQUER = "updateTreeConquer",
 }
+
+export enum IsConquer {
+  TRUE = "true",
+  FALSE = "false"
+};
+
+export interface CustomNode<T extends Record<string, unknown> = any> extends Node<T> {
+  x: number;
+  y: number;
+}
+
+export type NodeData = {
+  label: string;
+  isConquer: IsConquer;
+};
+
+export type Tree = {
+  nodes: CustomNode<NodeData>[];
+  edges: Edge[];
+};
