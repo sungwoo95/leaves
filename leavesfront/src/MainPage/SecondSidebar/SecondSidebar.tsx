@@ -1,6 +1,7 @@
 import { Paper, Box } from "@mui/material";
 import Tree from "./Tree";
 import { useTheme } from "@mui/material/styles";
+import {  ReactFlowProvider } from "@xyflow/react";
 
 const SecondSidebar: React.FC = () => {
   const theme = useTheme();
@@ -11,7 +12,9 @@ const SecondSidebar: React.FC = () => {
         bgcolor: theme.palette.mode === "dark" ? "black" : "white",
       }}>
       <Box style={{ width: "100%", height: "100%" }}>
-        <Tree />
+        <ReactFlowProvider>
+          <Tree />
+        </ReactFlowProvider>
       </Box>
     </Paper>
   );

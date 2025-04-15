@@ -5,9 +5,9 @@ import { path } from "../../../config/env";
 import { useMainPageContext } from "../MainPageManager";
 import { WsMessageType } from "../../types";
 import NoTreeIsOpen from "./NoTreeIsOpen";
-import { ReactFlow, type Node, type Edge } from "@xyflow/react";
+import { ReactFlow, type Node, type Edge, useReactFlow, ReactFlowProvider, NodeMouseHandler } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import ELK, { ElkNode } from "elkjs/lib/elk.bundled.js";
+import ELK from "elkjs/lib/elk.bundled.js";
 import { forceSimulation, forceManyBody, forceCollide, Simulation } from "d3-force";
 
 const elk = new ELK();
@@ -103,6 +103,9 @@ const Tree: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const prevTreeId = useRef<string | null>(null);
   const theme = useTheme();
+  const { getNodes, fitView, setCenter } = useReactFlow();
+  const [nodesReady, setNodesReady] = useState(false);
+
   const handleAddNode = (newNode: Node, newEdge: Edge) => {
     const updatedNodes = [...nodes, newNode];
     const updatedEdges = [...edges, newEdge];
@@ -110,6 +113,17 @@ const Tree: React.FC = () => {
 
     // 애니메이션으로 force 적용
     applyForceLayoutAnimated(updatedNodes, setNodes);
+  };
+
+  const handleNodeClick: NodeMouseHandler = (event, node) => {
+    setLeafId(node.id);
+    setIsPublicLeaf(isPublicTree);
+  };
+
+  const handleConquerClick = (event: any) => {
+    const leafId = event.target.id();
+    const isConquer = event.target.data("isConquer");
+    ws?.send(JSON.stringify({ type: WsMessageType.UPDATE_TREE_CONQUER, data: { treeId, leafId, isConquer } }));
   };
 
   const wsMessageHandler: Record<string, (data: any) => void> = {
@@ -127,53 +141,6 @@ const Tree: React.FC = () => {
     [WsMessageType.UPDATE_TREE_CONQUER]: (data) => {
       const { nodes } = data;
     },
-  };
-
-  // //leafId로 중앙 정렬.
-  // const focusCurrentNode = useCallback(() => {
-  //   if (cyRef.current && leafId) {
-  //     const cy = cyRef.current;
-  //     const leaf = cy.getElementById(leafId);
-
-  //     if (leaf && leaf.isNode()) {
-  //       const leafPosition = leaf.position();
-  //       const zoom = cy.zoom();
-
-  //       cy.animate(
-  //         {
-  //           pan: {
-  //             x: cy.width() / 2 - leafPosition.x * zoom,
-  //             y: cy.width() / 2 - leafPosition.y * zoom,
-  //           },
-  //         },
-  //         {
-  //           duration: 600,
-  //           easing: "ease-in-out",
-  //         }
-  //       );
-
-  //       // 강조 스타일 적용
-  //       cy.style()
-  //         .selector(`node[id = "${leafId}"]`)
-  //         .style({
-  //           width: "20px",
-  //           height: "20px",
-  //         })
-  //         .update();
-  //     }
-  //   }
-  // }, [leafId]);
-
-  const handleLeafClick = (event: any) => {
-    const leafId = event.target.id();
-    setLeafId(leafId);
-    setIsPublicLeaf(isPublicTree);
-  };
-
-  const handleConquerClick = (event: any) => {
-    const leafId = event.target.id();
-    const isConquer = event.target.data("isConquer");
-    ws?.send(JSON.stringify({ type: WsMessageType.UPDATE_TREE_CONQUER, data: { treeId, leafId, isConquer } }));
   };
 
   //tree그룹(websocket)에 참가하기.
@@ -221,6 +188,7 @@ const Tree: React.FC = () => {
         const layoutedNodes = await getLayoutedNodes(initialNodes, edges);
         setNodes(layoutedNodes);
         setEdges(edges);
+        setNodesReady(true);
       } catch (error) {
         console.log("[Tree][getTreeData]Error fetching tree data:", error);
       } finally {
@@ -232,16 +200,33 @@ const Tree: React.FC = () => {
     }
   }, [treeId]);
 
-  // //노드 정렬.
-  // useEffect(() => {
-  //   focusCurrentNode();
-  // }, [leafId, focusCurrentNode]);
+  //leafId를 기준으로 노드 정렬.
+  useEffect(() => {
+    //leafId가 undefined 즉 정렬의 기준이 되는 노드가 없는 경우 디폴트 정렬.
+    if (!leafId && nodes.length > 0) {
+      fitView(); //nodes데이터 서버 응답 전이라면 정렬 안 됨, 응답 완료 플래그(nodesReady)를 하나 도입해서 deps에 추가.
+      return;
+    }
+    const flowNodes = getNodes();
+    const targetNode = flowNodes.find((n) => n.id === leafId);
+    if (targetNode) {
+      const { x, y } = targetNode.position;
+      setCenter(x, y, { duration: 300 });
+      targetNode.style = {
+        ...(targetNode.style || {}),
+        width: 200,
+        height: 80,
+        border: "2px solid red",
+      };
+      setNodes(flowNodes);
+    }
+  }, [leafId, nodesReady]);
 
   if (loading && treeId) {
     return <p>Loading tree data...</p>;
   }
 
-  return nodes.length > 0 ? <ReactFlow nodes={nodes} edges={edges} /> : <NoTreeIsOpen />;
+  return treeId ? <ReactFlow nodes={nodes} edges={edges} onNodeClick={handleNodeClick} /> : <NoTreeIsOpen />;
 };
 
 export default Tree;
