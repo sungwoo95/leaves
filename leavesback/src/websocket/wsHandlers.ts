@@ -136,7 +136,7 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
               client.send(
                 JSON.stringify({
                   type: WsMessageType.UPDATE_TREE_ADD_CHILD_LEAF,
-                  data: { treeId: owningTreeId, newNode, newEdge }
+                  data: { treeId: owningTreeId, fromNodeId: leafId, newNode, newEdge }
                 })
               );
             }

@@ -15,11 +15,12 @@ import { forceSimulation, forceManyBody, forceCollide, Simulation } from "d3-for
 cytoscape.use(contextMenus); // 플러그인 활성화
 
 const elk = new ELK();
-
 const elkOptions = {
   "elk.algorithm": "layered",
   "elk.direction": "DOWN", // 트리 구조
 };
+const NodeOffset = { x: 50, y: 50 };
+
 // let isSimulationActivated: Simulation<any, any> | null = null;
 const getLayoutedNodes = async (nodes: Node[], edges: Edge[]): Promise<Node[]> => {
   const graph = {
@@ -115,14 +116,19 @@ const Tree: React.FC = () => {
       setNodes((prev) => prev.map((elem) => (elem.data.id === targetId ? { ...elem, data: { ...elem.data, label: newTitle } } : elem)));
     },
     [WsMessageType.UPDATE_TREE_ADD_CHILD_LEAF]: (data) => {
-      const { newNode, newEdge } = data;
+      const { fromNodeId, newNode, newEdge } = data;
       const cy = cyRef.current!;
-      const currentZoom = cy.zoom();
-      const currentPan = cy.pan();
+      //newNode의 포지션 설정.
+      const fromNode = cy.getElementById(fromNodeId);
+      if (!fromNode || fromNode.empty()) return;
+      const pos = fromNode.position();
+      
+      newNode.position = {
+        x: pos.x,
+        y: pos.y + NodeOffset.y,
+      };
       cy.add(newNode);
       cy.add(newEdge);
-      cy.zoom(currentZoom);
-      cy.pan(currentPan);
     },
     [WsMessageType.UPDATE_TREE_ADD_PARENT_LEAF]: (data) => {
       const { newNode, deleteEdge, newEdgeList } = data;
