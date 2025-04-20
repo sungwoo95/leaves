@@ -1,7 +1,7 @@
 import { useRef, useEffect, useCallback, useState } from "react";
 import axios from "axios";
 import CytoscapeComponent from "react-cytoscapejs";
-import cytoscape from "cytoscape";
+import cytoscape, { EdgeCollection, NodeCollection } from "cytoscape";
 import { useTheme } from "@mui/material/styles";
 import { path } from "../../../config/env";
 import { useMainPageContext } from "../MainPageManager";
@@ -10,7 +10,7 @@ import NoTreeIsOpen from "./NoTreeIsOpen";
 import contextMenus from "cytoscape-context-menus";
 import "cytoscape-context-menus/cytoscape-context-menus.css";
 import ELK from "elkjs/lib/elk.bundled.js";
-import { forceSimulation, forceManyBody, forceCollide, Simulation } from "d3-force";
+import { forceSimulation, forceManyBody, forceCollide, Simulation, forceLink } from "d3-force";
 
 cytoscape.use(contextMenus); // 플러그인 활성화
 
@@ -21,7 +21,7 @@ const elkOptions = {
 };
 const NodeOffset = { x: 50, y: 50 };
 
-// let isSimulationActivated: Simulation<any, any> | null = null;
+let isSimulationActivated: Simulation<any, any> | null = null;
 const getLayoutedNodes = async (nodes: Node[], edges: Edge[]): Promise<Node[]> => {
   const graph = {
     id: "root",
@@ -59,37 +59,6 @@ const getLayoutedNodes = async (nodes: Node[], edges: Edge[]): Promise<Node[]> =
     return [];
   }
 };
-// const applyForceLayoutAnimated = (nodes: any[], setNodes: React.Dispatch<React.SetStateAction<Node[]>>) => {
-//   if (isSimulationActivated) {
-//     isSimulationActivated.stop();
-//   }
-//   const sim = forceSimulation(nodes)
-//     .force("charge", forceManyBody().strength(-50)) // 서로 밀어내는 힘
-//     .force("collision", forceCollide().radius(80)) // 충돌 방지
-//     .alpha(1) // 초기 에너지 (애니메이션 강도)
-//     .alphaDecay(0.05) // 서서히 멈추게 하는 감쇠율
-//     .on("tick", () => {
-//       // 매 프레임마다 노드 위치 갱신
-//       setNodes((prevNodes) =>
-//         prevNodes.map((node, i) => ({
-//           ...node,
-//           position: {
-//             x: nodes[i].x ?? 0,
-//             y: nodes[i].y ?? 0,
-//           },
-//         }))
-//       );
-//     });
-//   isSimulationActivated = sim;
-
-//   //시뮬레이션 정지
-//   setTimeout(() => {
-//     sim.stop();
-//     if (isSimulationActivated === sim) {
-//       isSimulationActivated = null;
-//     }
-//   }, 2000);
-// };
 
 const Tree: React.FC = () => {
   const mainPageContext = useMainPageContext();
@@ -122,13 +91,16 @@ const Tree: React.FC = () => {
       const fromNode = cy.getElementById(fromNodeId);
       if (!fromNode || fromNode.empty()) return;
       const pos = fromNode.position();
-      
+
       newNode.position = {
         x: pos.x,
         y: pos.y + NodeOffset.y,
       };
       cy.add(newNode);
       cy.add(newEdge);
+      const nodes = cy.nodes();
+      const edges = cy.edges();
+      applyForceForAddNode(nodes, edges);
     },
     [WsMessageType.UPDATE_TREE_ADD_PARENT_LEAF]: (data) => {
       const { newNode, deleteEdge, newEdgeList } = data;
@@ -204,6 +176,53 @@ const Tree: React.FC = () => {
     const leafId = event.target.id();
     const isConquer = event.target.data("isConquer");
     ws?.send(JSON.stringify({ type: WsMessageType.UPDATE_TREE_CONQUER, data: { treeId, leafId, isConquer } }));
+  };
+
+  const applyForceForAddNode = (nodes: NodeCollection, edges: EdgeCollection) => {
+    if (isSimulationActivated) {
+      isSimulationActivated.stop();
+    }
+    const d3Edges = edges.map((edge) => ({
+      source: edge.source().id(),
+      target: edge.target().id(),
+    }));
+    const d3Nodes = nodes.map((ele) => ({
+      id: ele.id(),
+      x: ele.position().x,
+      y: ele.position().y,
+    }));
+    const sim = forceSimulation(d3Nodes)
+      .force("charge", forceManyBody().strength(-30)) // 서로 밀어내는 힘
+      // .force(
+      //   "link",
+      //   forceLink(d3Edges)
+      //     .id((n:any) => n.id)
+      //     .distance(100)
+      //     .strength(1)
+      // ) // 서로 당기는 힘
+      .force("collision", forceCollide().radius(30)) // 충돌 방지
+      .alpha(0.1) // 초기 에너지 (애니메이션 강도)
+      .alphaDecay(0.05) // 서서히 멈추게 하는 감쇠율
+      .on("tick", () => {
+        d3Nodes.forEach((node) => {
+          const ele = cyRef.current!.getElementById(node.id);
+          if (ele) {
+            ele.position({
+              x: node.x ?? 0,
+              y: node.y ?? 0,
+            });
+          }
+        });
+      });
+    isSimulationActivated = sim;
+
+    //시뮬레이션 정지
+    setTimeout(() => {
+      sim.stop();
+      if (isSimulationActivated === sim) {
+        isSimulationActivated = null;
+      }
+    }, 2000);
   };
 
   //노드 데이터 설정하기.
