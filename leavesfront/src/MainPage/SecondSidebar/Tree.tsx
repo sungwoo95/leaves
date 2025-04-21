@@ -146,7 +146,7 @@ const Tree: React.FC = () => {
           {
             pan: {
               x: cy.width() / 2 - leafPosition.x * zoom,
-              y: cy.width() / 2 - leafPosition.y * zoom,
+              y: cy.height() / 2 - leafPosition.y * zoom,
             },
           },
           {
@@ -201,6 +201,53 @@ const Tree: React.FC = () => {
       //     .distance(100)
       //     .strength(1)
       // ) // 서로 당기는 힘
+      .force("collision", forceCollide().radius(30)) // 충돌 방지
+      .alpha(0.1) // 초기 에너지 (애니메이션 강도)
+      .alphaDecay(0.05) // 서서히 멈추게 하는 감쇠율
+      .on("tick", () => {
+        d3Nodes.forEach((node) => {
+          const ele = cyRef.current!.getElementById(node.id);
+          if (ele) {
+            ele.position({
+              x: node.x ?? 0,
+              y: node.y ?? 0,
+            });
+          }
+        });
+      });
+    isSimulationActivated = sim;
+
+    //시뮬레이션 정지
+    setTimeout(() => {
+      sim.stop();
+      if (isSimulationActivated === sim) {
+        isSimulationActivated = null;
+      }
+    }, 2000);
+  };
+
+  const applyForceForFirstLayout = (nodes: NodeCollection, edges: EdgeCollection) => {
+    if (isSimulationActivated) {
+      isSimulationActivated.stop();
+    }
+    const d3Edges = edges.map((edge) => ({
+      source: edge.source().id(),
+      target: edge.target().id(),
+    }));
+    const d3Nodes = nodes.map((ele) => ({
+      id: ele.id(),
+      x: ele.position().x,
+      y: ele.position().y,
+    }));
+    const sim = forceSimulation(d3Nodes)
+      .force("charge", forceManyBody().strength(-30)) // 서로 밀어내는 힘
+      .force(
+        "link",
+        forceLink(d3Edges)
+          .id((n: any) => n.id)
+          .distance(100)
+          .strength(1)
+      ) // 서로 당기는 힘
       .force("collision", forceCollide().radius(30)) // 충돌 방지
       .alpha(0.1) // 초기 에너지 (애니메이션 강도)
       .alphaDecay(0.05) // 서서히 멈추게 하는 감쇠율
@@ -294,11 +341,12 @@ const Tree: React.FC = () => {
       name: "breadthfirst",
       directed: true,
       spacingFactor: 1,
+      nodeDimensionsIncludeLabels: true,
     }).run();
     const nodes = cy.nodes();
     const edges = cy.edges();
     if (nodes.length > 0) {
-      applyForceForAddNode(nodes, edges);
+      applyForceForFirstLayout(nodes, edges);
     }
   }, [treeDataFlag]);
 
