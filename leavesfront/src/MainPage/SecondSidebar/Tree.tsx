@@ -78,6 +78,7 @@ const Tree: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const prevTreeId = useRef<string | null>(null);
   const theme = useTheme();
+  const [treeDataFlag, setTreeDataFlag] = useState<boolean>(false);
   const wsMessageHandler: Record<string, (data: any) => void> = {
     [WsMessageType.UPDATE_TREE_LABEL]: (data) => {
       const targetId = data.leafId;
@@ -234,9 +235,10 @@ const Tree: React.FC = () => {
         const treeData = response.data;
         if (treeData) {
           const { nodes, edges } = treeData;
-          const layoutedNodes = await getLayoutedNodes(nodes, edges);
-          setNodes(layoutedNodes);
+          // const layoutedNodes = await getLayoutedNodes(nodes, edges);
+          setNodes(nodes);
           setEdges(edges);
+          setTreeDataFlag((prev) => !prev);
         }
       } catch (error) {
         console.log("[Tree][getTreeData]Error fetching tree data:", error);
@@ -249,23 +251,8 @@ const Tree: React.FC = () => {
     }
   }, [treeId]);
 
-  //tree데이터 가져오기.
   //tree그룹(websocket)에 참가하기.
   useEffect(() => {
-    const getTreeData = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(`${path}/tree/${treeId}`);
-        if (response.data) {
-          setNodes(response.data.nodes);
-          setEdges(response.data.edges);
-        }
-      } catch (error) {
-        console.log("[Tree][getTreeData]Error fetching tree data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     const joinTreeGroup = () => {
       if (ws && treeId) {
         ws.send(JSON.stringify({ type: WsMessageType.JOIN_TREE, data: { treeId, prevTreeId: prevTreeId.current } }));
@@ -286,7 +273,6 @@ const Tree: React.FC = () => {
       }
     };
     if (treeId) {
-      getTreeData();
       joinTreeGroup();
       addWsEventListener();
     }
@@ -299,6 +285,22 @@ const Tree: React.FC = () => {
   useEffect(() => {
     focusCurrentNode();
   }, [leafId, focusCurrentNode]);
+
+  //그래프 정렬.
+  useEffect(() => {
+    const cy = cyRef.current;
+    if (!cy) return;
+    cy.layout({
+      name: "breadthfirst",
+      directed: true,
+      spacingFactor: 1,
+    }).run();
+    const nodes = cy.nodes();
+    const edges = cy.edges();
+    if (nodes.length > 0) {
+      applyForceForAddNode(nodes, edges);
+    }
+  }, [treeDataFlag]);
 
   if (loading && treeId) {
     return <p>Loading tree data...</p>;
