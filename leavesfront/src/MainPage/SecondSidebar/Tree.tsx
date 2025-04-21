@@ -1,7 +1,7 @@
 import { useRef, useEffect, useCallback, useState } from "react";
 import axios from "axios";
 import CytoscapeComponent from "react-cytoscapejs";
-import cytoscape, { EdgeCollection, NodeCollection } from "cytoscape";
+import cytoscape, { CollectionReturnValue, EdgeCollection, NodeCollection } from "cytoscape";
 import { useTheme } from "@mui/material/styles";
 import { path } from "../../../config/env";
 import { useMainPageContext } from "../MainPageManager";
@@ -9,55 +9,21 @@ import { Edge, Node, WsMessageType } from "../../types";
 import NoTreeIsOpen from "./NoTreeIsOpen";
 import contextMenus from "cytoscape-context-menus";
 import "cytoscape-context-menus/cytoscape-context-menus.css";
-import ELK from "elkjs/lib/elk.bundled.js";
 import { forceSimulation, forceManyBody, forceCollide, Simulation, forceLink } from "d3-force";
 
 cytoscape.use(contextMenus); // 플러그인 활성화
 
-const elk = new ELK();
-const elkOptions = {
-  "elk.algorithm": "layered",
-  "elk.direction": "DOWN", // 트리 구조
-};
 const NodeOffset = { x: 50, y: 50 };
 
 let isSimulationActivated: Simulation<any, any> | null = null;
-const getLayoutedNodes = async (nodes: Node[], edges: Edge[]): Promise<Node[]> => {
-  const graph = {
-    id: "root",
-    layoutOptions: elkOptions,
-    children: nodes.map((node) => ({
-      ...node,
-      id: node.data.id,
-      width: 50,
-      height: 50,
-    })),
-    edges: edges.map((e) => ({
-      id: crypto.randomUUID(),
-      sources: [e.data.source],
-      targets: [e.data.target],
-    })),
+
+const changeNodePosition = (newNode: any, fromNode: CollectionReturnValue) => {
+  const pos = fromNode.position();
+  const randomXOffset = Math.random() * 5;
+  newNode.position = {
+    x: pos.x + randomXOffset,
+    y: pos.y + NodeOffset.y,
   };
-  try {
-    const layoutedGraph = await elk.layout(graph);
-    if (!layoutedGraph.children) {
-      throw new Error("[Tree] Layout calculation failed: children is undefined.");
-    }
-    const layoutedNodes: Node[] = layoutedGraph.children.map((node) => {
-      const { x, y, width, height, ...rest } = node;
-      return {
-        ...rest,
-        position: {
-          x: x ?? 0, // x가 null또는 undefined일 경우 0.
-          y: y ?? 0,
-        },
-      };
-    });
-    return layoutedNodes;
-  } catch (error) {
-    console.log("[Tree]elk.layout 에러");
-    return [];
-  }
 };
 
 const Tree: React.FC = () => {
@@ -91,12 +57,7 @@ const Tree: React.FC = () => {
       //newNode의 포지션 설정.
       const fromNode = cy.getElementById(fromNodeId);
       if (!fromNode || fromNode.empty()) return;
-      const pos = fromNode.position();
-
-      newNode.position = {
-        x: pos.x,
-        y: pos.y + NodeOffset.y,
-      };
+      changeNodePosition(newNode, fromNode);
       cy.add(newNode);
       cy.add(newEdge);
       const nodes = cy.nodes();
@@ -194,13 +155,13 @@ const Tree: React.FC = () => {
     }));
     const sim = forceSimulation(d3Nodes)
       .force("charge", forceManyBody().strength(-30)) // 서로 밀어내는 힘
-      // .force(
-      //   "link",
-      //   forceLink(d3Edges)
-      //     .id((n:any) => n.id)
-      //     .distance(100)
-      //     .strength(1)
-      // ) // 서로 당기는 힘
+      .force(
+        "link",
+        forceLink(d3Edges)
+          .id((n: any) => n.id)
+          .distance(100)
+          .strength(0.1)
+      ) // 서로 당기는 힘
       .force("collision", forceCollide().radius(30)) // 충돌 방지
       .alpha(0.1) // 초기 에너지 (애니메이션 강도)
       .alphaDecay(0.05) // 서서히 멈추게 하는 감쇠율
