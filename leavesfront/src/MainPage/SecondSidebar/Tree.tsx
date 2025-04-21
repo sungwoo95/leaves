@@ -45,15 +45,17 @@ const Tree: React.FC = () => {
   const prevTreeId = useRef<string | null>(null);
   const theme = useTheme();
   const [treeDataFlag, setTreeDataFlag] = useState<boolean>(false);
-  const wsMessageHandler: Record<string, (data: any) => void> = {
-    [WsMessageType.UPDATE_TREE_LABEL]: (data) => {
+  const wsMessageHandler: Record<string, (data: any, cy: cytoscape.Core) => void> = {
+    [WsMessageType.UPDATE_TREE_LABEL]: (data, cy: cytoscape.Core) => {
       const targetId = data.leafId;
       const newTitle = data.title;
-      setNodes((prev) => prev.map((elem) => (elem.data.id === targetId ? { ...elem, data: { ...elem.data, label: newTitle } } : elem)));
+      const targetNode = cy.getElementById(targetId);
+      if (targetNode) {
+        targetNode.data("label", newTitle);
+      }
     },
-    [WsMessageType.UPDATE_TREE_ADD_CHILD_LEAF]: (data) => {
+    [WsMessageType.UPDATE_TREE_ADD_CHILD_LEAF]: (data, cy: cytoscape.Core) => {
       const { fromNodeId, newNode, newEdge } = data;
-      const cy = cyRef.current!;
       //newNode의 포지션 설정.
       const fromNode = cy.getElementById(fromNodeId);
       if (!fromNode || fromNode.empty()) return;
@@ -64,9 +66,8 @@ const Tree: React.FC = () => {
       const edges = cy.edges();
       applyForceForAddNode(nodes, edges);
     },
-    [WsMessageType.UPDATE_TREE_ADD_PARENT_LEAF]: (data) => {
+    [WsMessageType.UPDATE_TREE_ADD_PARENT_LEAF]: (data, cy: cytoscape.Core) => {
       const { newNode, deleteEdge, newEdgeList } = data;
-      const cy = cyRef.current!;
       const currentZoom = cy.zoom();
       const currentPan = cy.pan();
       cy.add(newNode);
@@ -268,11 +269,13 @@ const Tree: React.FC = () => {
       }
     };
     const handleMessage = (event: MessageEvent) => {
+      const cy = cyRef.current;
+      if (!cy) return;
       const message = JSON.parse(event.data);
       const { type, data } = message;
       if (data.treeId !== treeId) return;
       if (wsMessageHandler[type]) {
-        wsMessageHandler[type](data);
+        wsMessageHandler[type](data, cy);
       }
     };
     const addWsEventListener = () => {
