@@ -7,11 +7,12 @@ import "./editorStyles.css";
 import { useMainPageContext } from "../MainPageManager";
 import { WsMessageType } from "../../types";
 import axios from "axios";
-import { path } from "../../../config/env";
+import { DEV_MODE, path } from "../../../config/config";
 import { ClientSideSuspense, RoomProvider } from "@liveblocks/react";
 import Editor from "./Editor";
 import NoLeafIsOpen from "./NoLeafIsOpen";
 import EditorFallback from "./EditorFallback";
+import DevEditor from "./DevEditor";
 
 const Leaf: React.FC = () => {
   const theme = useTheme();
@@ -96,11 +97,15 @@ const Leaf: React.FC = () => {
             bgcolor: theme.palette.mode === "dark" ? "#121212" : "white",
           }}>
           <TextField value={title} fullWidth onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTitleChange(e)} />
-          <RoomProvider id={`${leafId}`}>
-            <ClientSideSuspense fallback={<EditorFallback />}>
-              <Editor parentLeafIdRef={parentLeafIdRef} owningTreeId={owningTreeIdRef.current} />
-            </ClientSideSuspense>
-          </RoomProvider>
+          {DEV_MODE ? (
+            <DevEditor parentLeafIdRef={parentLeafIdRef} owningTreeId={owningTreeIdRef.current} />
+          ) : (
+            <RoomProvider id={`${leafId}`}>
+              <ClientSideSuspense fallback={<EditorFallback />}>
+                <Editor parentLeafIdRef={parentLeafIdRef} owningTreeId={owningTreeIdRef.current} />
+              </ClientSideSuspense>
+            </RoomProvider>
+          )}
         </Box>
       ) : (
         <NoLeafIsOpen />

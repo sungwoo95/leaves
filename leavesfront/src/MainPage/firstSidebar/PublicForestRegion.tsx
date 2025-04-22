@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import { Box, Modal, TextField, Typography } from "@mui/material";
 import axios from "axios";
-import { path } from "../../../config/env";
+import { path } from "../../../config/config";
 import PublicForest from "./PublicForest";
 import AddIcon from "@mui/icons-material/Add";
 import { MyForestInfo } from "../../types";

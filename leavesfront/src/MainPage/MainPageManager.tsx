@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect, useRef } from "react";
-import { path, WS_PATH } from "../../config/env";
+import { path, WS_PATH } from "../../config/config";
 import axios from "axios";
 
 type MainPageContextType = {

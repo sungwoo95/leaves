@@ -3,7 +3,7 @@ import axios from "axios";
 import CytoscapeComponent from "react-cytoscapejs";
 import cytoscape, { CollectionReturnValue, EdgeCollection, NodeCollection } from "cytoscape";
 import { useTheme } from "@mui/material/styles";
-import { path } from "../../../config/env";
+import { path } from "../../../config/config";
 import { useMainPageContext } from "../MainPageManager";
 import { Edge, Node, WsMessageType } from "../../types";
 import NoTreeIsOpen from "./NoTreeIsOpen";

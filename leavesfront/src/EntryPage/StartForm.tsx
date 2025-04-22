@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import axios from "axios";
 import { TextField, Button, Box, Typography, Paper } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { path } from "../../config/env";
+import { path } from "../../config/config";
 import { useNavigate } from "react-router-dom";
 
 const StartForm = () => {

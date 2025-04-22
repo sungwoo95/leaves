@@ -6,7 +6,7 @@ import { Directory, DirectoryType, UpdateName } from "../../types";
 import AddIcon from "@mui/icons-material/Add";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import axios from "axios";
-import { path } from "../../../config/env";
+import { path } from "../../../config/config";
 
 const PrivateForest = () => {
   const [isVisible, setIsVisible] = useState<boolean>(false);

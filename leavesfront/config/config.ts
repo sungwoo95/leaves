@@ -1,0 +1,3 @@
+export const path = window.location.hostname === "localhost" ? "/api" : "https://api.mywebsite.com";
+export const WS_PATH = window.location.hostname === "localhost" ? "ws://localhost:8081" : "ws://example";
+export const DEV_MODE = true;

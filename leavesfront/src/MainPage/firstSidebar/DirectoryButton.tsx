@@ -4,7 +4,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import { useEffect, useRef, useState } from "react";
 import DirectoryContextMenu from "./DirectoryContextMenu";
-import { path } from "../../../config/env";
+import { path } from "../../../config/config";
 import axios from "axios";
 import { useMainPageContext } from "../MainPageManager";
 
