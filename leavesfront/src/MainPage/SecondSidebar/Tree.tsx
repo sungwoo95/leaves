@@ -17,12 +17,20 @@ const NodeOffset = { x: 50, y: 50 };
 
 let isSimulationActivated: Simulation<any, any> | null = null;
 
-const changeNodePosition = (newNode: any, fromNode: CollectionReturnValue) => {
+const setChildNodePosition = (newNode: any, fromNode: CollectionReturnValue) => {
   const pos = fromNode.position();
   const randomXOffset = Math.random() * 5;
   newNode.position = {
     x: pos.x + randomXOffset,
     y: pos.y + NodeOffset.y,
+  };
+};
+
+const setParentNodePosition = (newNode: any, fromNode: CollectionReturnValue) => {
+  const pos = fromNode.position();
+  newNode.position = {
+    x: pos.x,
+    y: pos.y - NodeOffset.y,
   };
 };
 
@@ -59,34 +67,33 @@ const Tree: React.FC = () => {
       //newNode의 포지션 설정.
       const fromNode = cy.getElementById(fromNodeId);
       if (!fromNode || fromNode.empty()) return;
-      changeNodePosition(newNode, fromNode);
-      cy.add(newNode);
-      cy.add(newEdge);
+      setChildNodePosition(newNode, fromNode);
+      cy.batch(() => {
+        cy.add(newNode);
+        cy.add(newEdge);
+      });
       const nodes = cy.nodes();
       const edges = cy.edges();
       applyForceForAddNode(nodes, edges);
     },
     [WsMessageType.UPDATE_TREE_ADD_PARENT_LEAF]: (data, cy: cytoscape.Core) => {
-      const { newNode, deleteEdge, newEdgeList } = data;
-      const currentZoom = cy.zoom();
-      const currentPan = cy.pan();
-      cy.add(newNode);
-      if (deleteEdge) {
-        const { source, target } = deleteEdge.data;
-        const targetEdges = cy.edges(`[source="${source}"][target="${target}"]`);
-        targetEdges.remove();
-      }
-      newEdgeList.forEach((elem: any) => {
-        cy.add(elem);
+      const { fromNodeId, newNode, deleteEdge, newEdgeList } = data;
+      const fromNode = cy.getElementById(fromNodeId);
+      setParentNodePosition(newNode, fromNode);
+      cy.batch(() => {
+        cy.add(newNode);
+        if (deleteEdge) {
+          const { source, target } = deleteEdge.data;
+          const targetEdges = cy.edges(`[source="${source}"][target="${target}"]`);
+          targetEdges.remove();
+        }
+        newEdgeList.forEach((elem: any) => {
+          cy.add(elem);
+        });
       });
-      const layout = cy.layout({
-        name: "breadthfirst",
-        directed: true,
-        spacingFactor: 1,
-      });
-      layout.run();
-      cy.zoom(currentZoom);
-      cy.pan(currentPan);
+      const nodes = cy.nodes();
+      const edges = cy.edges();
+      applyForceForAddNode(nodes, edges);
     },
     [WsMessageType.UPDATE_TREE_CONQUER]: (data) => {
       const { nodes } = data;
@@ -142,6 +149,8 @@ const Tree: React.FC = () => {
   };
 
   const applyForceForAddNode = (nodes: NodeCollection, edges: EdgeCollection) => {
+    const cy = cyRef.current;
+    if (!cy) return;
     if (isSimulationActivated) {
       isSimulationActivated.stop();
     }
@@ -167,14 +176,16 @@ const Tree: React.FC = () => {
       .alpha(0.1) // 초기 에너지 (애니메이션 강도)
       .alphaDecay(0.05) // 서서히 멈추게 하는 감쇠율
       .on("tick", () => {
-        d3Nodes.forEach((node) => {
-          const ele = cyRef.current!.getElementById(node.id);
-          if (ele) {
-            ele.position({
-              x: node.x ?? 0,
-              y: node.y ?? 0,
-            });
-          }
+        cy.batch(() => {
+          d3Nodes.forEach((node) => {
+            const ele = cy.getElementById(node.id);
+            if (ele) {
+              ele.position({
+                x: node.x ?? 0,
+                y: node.y ?? 0,
+              });
+            }
+          });
         });
       });
     isSimulationActivated = sim;
