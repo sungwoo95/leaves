@@ -102,6 +102,7 @@ const DirectoryButton = ({
 
   return (
     <Button
+      disabled={isEditing || item.isNew}
       variant="text"
       sx={{
         width: "100%",
