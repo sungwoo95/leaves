@@ -95,9 +95,10 @@ const Tree: React.FC = () => {
       const edges = cy.edges();
       applyForceForAddNode(nodes, edges);
     },
-    [WsMessageType.UPDATE_TREE_CONQUER]: (data) => {
-      const { nodes } = data;
-      setNodes(nodes);
+    [WsMessageType.UPDATE_TREE_CONQUER]: (data, cy: cytoscape.Core) => {
+      const { targetNodeId, newIsConquer } = data;
+      const targetNode = cy.getElementById(targetNodeId);
+      targetNode.data("isConquer", newIsConquer);
     },
   };
 

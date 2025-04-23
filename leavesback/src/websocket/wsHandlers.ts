@@ -256,6 +256,7 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
     [WsMessageType.UPDATE_TREE_CONQUER]: async (data) => {
       const { treeId, leafId, isConquer }: { treeId: string, leafId: string, isConquer: IsConquer } = data;
       const newIsConquer = isConquer === IsConquer.FALSE ? IsConquer.TRUE : IsConquer.FALSE;
+      //트리 문서 업데이트
       try {
         const resultDocument = await treesCollection.findOneAndUpdate(
           { _id: new ObjectId(treeId), "nodes.data.id": leafId }, // 특정 treeId 문서에서 nodes 배열 내 leafId 찾기
@@ -270,7 +271,6 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
         if (!resultDocument) {
           throw new Error(`Node with id ${leafId} not found in tree ${treeId}`);
         }
-        const nodes = resultDocument.nodes;
         //트리 그룹 브로드 캐스트.
         const treeClients = wsGroups.get(treeId);
         if (treeClients) {
@@ -279,7 +279,7 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
               client.send(
                 JSON.stringify({
                   type: WsMessageType.UPDATE_TREE_CONQUER,
-                  data: { treeId, nodes }
+                  data: { treeId, targetNodeId: leafId, newIsConquer }
                 })
               );
             }
