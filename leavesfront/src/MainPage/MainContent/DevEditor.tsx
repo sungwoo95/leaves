@@ -16,7 +16,7 @@ import {
 import CreateChildLeafFormattingToolBarButton from "./CreateChildLeafFormattingToolBarButton";
 import CreateParentLeafFormattingToolBarButton from "./CreateParentLeafFormattingToolBarButton";
 
-const DevEditor = ({ owningTreeId, parentLeafIdRef }: { owningTreeId: string; parentLeafIdRef: React.RefObject<string | null> }) => {
+const DevEditor = ({ owningTreeId, parentLeafId }: { owningTreeId: string; parentLeafId: string | null }) => {
   const editor = useCreateBlockNote();
   return (
     <BlockNoteView editor={editor} formattingToolbar={false} data-theming-css-variables-demo>
@@ -24,7 +24,7 @@ const DevEditor = ({ owningTreeId, parentLeafIdRef }: { owningTreeId: string; pa
         formattingToolbar={() => (
           <FormattingToolbar>
             <BlockTypeSelect key={"blockTypeSelect"} />
-            <CreateParentLeafFormattingToolBarButton parentLeafIdRef={parentLeafIdRef} owningTreeId={owningTreeId} key={"CreateParentLeafButton"} />
+            <CreateParentLeafFormattingToolBarButton parentLeafId={parentLeafId} owningTreeId={owningTreeId} key={"CreateParentLeafButton"} />
             <CreateChildLeafFormattingToolBarButton owningTreeId={owningTreeId} key={"CreateChildLeafButton"} />
             <FileCaptionButton key={"fileCaptionButton"} />
             <FileReplaceButton key={"replaceFileButton"} />

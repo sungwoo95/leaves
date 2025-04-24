@@ -17,8 +17,8 @@ import DevEditor from "./DevEditor";
 const Leaf: React.FC = () => {
   const theme = useTheme();
   const [title, setTitle] = useState<string>("");
-  const owningTreeIdRef = useRef<string | undefined>(undefined);
-  const parentLeafIdRef = useRef<string | null>(null);
+  const [owningTreeId, setOwningTreeId] = useState<string | undefined>(undefined);
+  const [parentLeafId, setParentLeafId] = useState<string | null>(null);
   const prevLeafId = useRef<string | null>(null);
   const mainPageContext = useMainPageContext();
   if (!mainPageContext) {
@@ -32,13 +32,12 @@ const Leaf: React.FC = () => {
     },
     [WsMessageType.UPDATE_LEAF_PARENT]: (data) => {
       const { parentLeafId } = data;
-      parentLeafIdRef.current = parentLeafId;
+      setParentLeafId(parentLeafId);
     },
   };
 
   const handleTitleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
-    const owningTreeId = owningTreeIdRef.current;
     setTitle(newTitle);
     if (ws) {
       ws.send(JSON.stringify({ type: WsMessageType.UPDATE_LEAF_TITLE, data: { owningTreeId, leafId, title: newTitle } }));
@@ -52,8 +51,8 @@ const Leaf: React.FC = () => {
         const leaf = response.data;
         const { title, owningTreeId, parentLeafId } = leaf;
         setTitle(title);
-        owningTreeIdRef.current = owningTreeId;
-        parentLeafIdRef.current = parentLeafId;
+        setOwningTreeId(owningTreeId);
+        setParentLeafId(parentLeafId);
       } catch (error) {
         console.log("[Leaf]get leaf data error");
       }
@@ -90,7 +89,7 @@ const Leaf: React.FC = () => {
         display: "flex",
         flexDirection: "column",
       }}>
-      {leafId && owningTreeIdRef.current ? (
+      {leafId && owningTreeId ? (
         <Box
           sx={{
             flex: 1,
@@ -98,11 +97,11 @@ const Leaf: React.FC = () => {
           }}>
           <TextField value={title} fullWidth onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTitleChange(e)} />
           {DEV_MODE ? (
-            <DevEditor parentLeafIdRef={parentLeafIdRef} owningTreeId={owningTreeIdRef.current} />
+            <DevEditor parentLeafId={parentLeafId} owningTreeId={owningTreeId} />
           ) : (
             <RoomProvider id={`${leafId}`}>
               <ClientSideSuspense fallback={<EditorFallback />}>
-                <Editor parentLeafIdRef={parentLeafIdRef} owningTreeId={owningTreeIdRef.current} />
+                <Editor parentLeafId={parentLeafId} owningTreeId={owningTreeId} />
               </ClientSideSuspense>
             </RoomProvider>
           )}

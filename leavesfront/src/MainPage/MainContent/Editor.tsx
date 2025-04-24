@@ -17,7 +17,7 @@ import CreateChildLeafFormattingToolBarButton from "./CreateChildLeafFormattingT
 import CreateParentLeafFormattingToolBarButton from "./CreateParentLeafFormattingToolBarButton";
 import { useStorage } from "@liveblocks/react/suspense";
 
-const Editor = ({ owningTreeId, parentLeafIdRef }: { owningTreeId: string; parentLeafIdRef: React.RefObject<string | null> }) => {
+const Editor = ({ owningTreeId, parentLeafId }: { owningTreeId: string; parentLeafId: string | null }) => {
   const storage = useStorage((root) => root);
   const editor = useCreateBlockNoteWithLiveblocks({});
 
@@ -27,7 +27,7 @@ const Editor = ({ owningTreeId, parentLeafIdRef }: { owningTreeId: string; paren
         formattingToolbar={() => (
           <FormattingToolbar>
             <BlockTypeSelect key={"blockTypeSelect"} />
-            <CreateParentLeafFormattingToolBarButton parentLeafIdRef={parentLeafIdRef} owningTreeId={owningTreeId} key={"CreateParentLeafButton"} />
+            <CreateParentLeafFormattingToolBarButton parentLeafId={parentLeafId} owningTreeId={owningTreeId} key={"CreateParentLeafButton"} />
             <CreateChildLeafFormattingToolBarButton owningTreeId={owningTreeId} key={"CreateChildLeafButton"} />
             <FileCaptionButton key={"fileCaptionButton"} />
             <FileReplaceButton key={"replaceFileButton"} />
