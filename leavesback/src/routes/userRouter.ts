@@ -1,12 +1,9 @@
 import { Router } from "express";
-import { postMainPageData, readDirectories, readMainPageData, readMyForests, updateUserDirectories, userStart } from "../controllers/userController";
+import { postMainPageData, readMainPageData, readMyForests, userStart } from "../controllers/userController";
 
 const userRouter: Router = Router();
 //auth
 userRouter.post("/start", userStart);
-//directoreis
-userRouter.get("/directories", readDirectories);
-userRouter.post("/directories", updateUserDirectories);
 //myForests
 userRouter.get("/myForests", readMyForests);
 //mainPage

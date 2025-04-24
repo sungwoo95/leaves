@@ -1,4 +1,4 @@
-import { Directory, User } from "../types";
+import { User } from "../types";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { usersCollection } from "../config/db";
@@ -10,7 +10,6 @@ const createUser = (email: string, password: string): User => {
   return {
     email,
     password,
-    directories: [],
     myForests: [],
     treeId: undefined,
     leafId: undefined,
@@ -45,62 +44,6 @@ export const parseAccessToken = (token: string, res: Response): ObjectId | void 
     } else {
       res.status(401).json({ message: "Unauthorized: No token provided" });
     }
-  }
-};
-
-export const readDirectories = async (req: Request, res: Response): Promise<void> => {
-  const cookies = req.cookies;
-  if (!cookies) {
-    res.status(401).json({ message: "Unauthorized: No token provided" });
-    return;
-  }
-  const accessToken = cookies.access_token;
-  const objectId = parseAccessToken(accessToken, res);
-  //todo: 상황별 예외처리 
-  if (!objectId) {
-    return;
-  }
-  try {
-    const user = await usersCollection.findOne({ _id: objectId });
-    if (!user) {
-      res.status(404).json({ message: "User not found" });
-      return;
-    }
-    res.json(user.directories);
-    return;
-  } catch (error) {
-    console.error("[userController][readDirectories] Error read directories:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
-
-export const updateUserDirectories = async (req: Request, res: Response): Promise<void> => {
-  console.log("[userController] updateDirectories called");
-  const newDirectories: Directory[] = req.body;
-  const cookies = req.cookies;
-  if (!cookies) {
-    res.status(401).json({ message: "Unauthorized: No token provided" });
-    return;
-  }
-  const accessToken = cookies.access_token;
-  const objectId = parseAccessToken(accessToken, res);
-  //todo: 상황별 예외처리 
-  if (!objectId) {
-    return;
-  }
-  try {
-    const result = await usersCollection.updateOne(
-      { _id: objectId },
-      { $set: { directories: newDirectories } }
-    );
-    if (result.matchedCount === 0) {
-      res.status(404).json({ message: "User not found" });
-      return;
-    }
-    res.json({ message: "Directories updated successfully" });
-  } catch (error) {
-    console.error("[userController][updateDirectories] Error updating directories:", error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 

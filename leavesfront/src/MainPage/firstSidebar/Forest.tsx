@@ -1,23 +1,23 @@
 import { useEffect, useRef, useState } from "react";
 import Button from "@mui/material/Button";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import Explorer from "./Explorer";
-import { Directory, DirectoryType, UpdateName } from "../../types";
+import { Directory, DirectoryType, MyForestInfo, UpdateName } from "../../types";
 import AddIcon from "@mui/icons-material/Add";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import axios from "axios";
 import { path } from "../../../config/config";
 
-const PrivateForest = () => {
+const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [directories, setDirectories] = useState<Directory[]>([]);
+  const [forestName, setForestName] = useState<string>("");
+  const { forestId, isOwner } = myForests;
 
   const toggleVisibility = () => {
     setIsVisible((prev) => !prev);
   };
 
-  //Directory[]에서 targetId를 가진 Directory의 children에 Directory를 추가.
-  //targetId가 null인 경우 Directory[]에 Directory를 추가
   const addDirectory = (targetId: null | string = null, type: DirectoryType, treeId?: string): void => {
     const directory: Directory = {
       id: crypto.randomUUID(),
@@ -134,23 +134,22 @@ const PrivateForest = () => {
   };
 
   const postDirectories = async (directories: Directory[]) => {
+    console.log("[PublicForest]postDirectories called");
     try {
-      await axios.post(`${path}/user/directories`, directories);
+      await axios.post(`${path}/forest/updateDirectories`, { forestId, directories });
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
-    console.log("[PrivateForest]useEffect called");
     const getData = async () => {
-      console.log("getData called");
       try {
-        const response = await axios.get(`${path}/user/directories`);
-        const newDirectories: Directory[] = response.data;
-        if (Array.isArray(newDirectories)) {
-          setDirectories(newDirectories);
-        }
+        const response = await axios.get(`${path}/forest/readForest/${forestId.toString()}`);
+        const { directories, name } = response.data;
+        console.log(response.data);
+        setDirectories(directories);
+        setForestName(name);
       } catch (error) {
         console.log(error);
       }
@@ -160,8 +159,8 @@ const PrivateForest = () => {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Button variant="text" sx={{ width: "100%", justifyContent: "space-between" }} onClick={toggleVisibility}>
-        <Box>Private Forest</Box>
+      <Button variant="text" sx={{ pl: 2, width: "100%", justifyContent: "space-between" }} onClick={toggleVisibility}>
+        <Box>{forestName}</Box>
         <Box sx={{ display: "flex" }}>
           <CreateNewFolderIcon
             onClick={(e) => {
@@ -176,15 +175,15 @@ const PrivateForest = () => {
               if (!isVisible) toggleVisibility();
               const response = await axios.post(`${path}/tree/createTree`);
               const treeId: string = response.data.treeId;
+              console.log("treeId: ", treeId);
               addDirectory(null, DirectoryType.FILE, treeId);
             }}
           />
         </Box>
       </Button>
-
       {isVisible && ( // isVisible이 true일 때만 Box 렌더링
         <Explorer
-          isPublic={false}
+          isPublic={true}
           directories={directories}
           addDirectory={addDirectory}
           updateIsNew={updateIsNew}
@@ -196,4 +195,4 @@ const PrivateForest = () => {
   );
 };
 
-export default PrivateForest;
+export default Forest;

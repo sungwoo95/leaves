@@ -38,7 +38,6 @@ export type Tree = {
 export type User = {
   password: string,
   email: string,
-  directories: Directory[],
   myForests: MyForestInfo[],
   treeId: string | undefined,
   leafId: string | undefined,
