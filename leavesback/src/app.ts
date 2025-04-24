@@ -7,7 +7,7 @@ import { connectToMongoDB } from "./config/db";
 import cookieParser from "cookie-parser";
 import forestRouter from "./routes/forestRouter";
 import { WebSocket, WebSocketServer } from "ws";
-import { handleConnection } from "./websocket/wsHandlers";
+import { registHandler } from "./websocket/wsHandlers";
 import leafRouter from "./routes/leafRouter";
 
 const App = () => {
@@ -43,7 +43,7 @@ const App = () => {
     const wsServer: WebSocketServer = new WebSocket.Server({ port: WS_PORT });
     wsServer.on("connection", (ws: WebSocket) => { //ws매개변수의 인자값은 새로 연결된 클라이언트의 WebSocket 객체임.
       console.log("New WebSocket client connected");
-      handleConnection(ws,wsGroups);
+      registHandler(ws,wsGroups);
     });
     console.log(`WebSocket server running on port ${WS_PORT}`);
   };

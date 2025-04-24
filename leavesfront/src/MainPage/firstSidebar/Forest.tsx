@@ -2,17 +2,29 @@ import { useEffect, useRef, useState } from "react";
 import Button from "@mui/material/Button";
 import { Box, Typography } from "@mui/material";
 import Explorer from "./Explorer";
-import { Directory, DirectoryType, MyForestInfo, UpdateName } from "../../types";
+import { Directory, DirectoryType, MyForestInfo, UpdateName, WsMessageType } from "../../types";
 import AddIcon from "@mui/icons-material/Add";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import axios from "axios";
 import { path } from "../../../config/config";
+import { useMainPageContext } from "../MainPageManager";
 
 const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [directories, setDirectories] = useState<Directory[]>([]);
   const [forestName, setForestName] = useState<string>("");
   const { forestId, isOwner } = myForests;
+  const mainPageContext = useMainPageContext();
+  if (!mainPageContext) {
+    return <p>mainPageContext.Provider의 하위 컴포넌트가 아님.</p>;
+  }
+  const { ws } = mainPageContext;
+  const wsMessageHandler: Record<string, (data: any) => void> = {
+    [WsMessageType.UPDATE_FOREST_DIRECTORIES]: (data) => {
+      const { directories } = data;
+      setDirectories(directories);
+    },
+  };
 
   const toggleVisibility = () => {
     setIsVisible((prev) => !prev);
@@ -134,27 +146,50 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
   };
 
   const postDirectories = async (directories: Directory[]) => {
-    console.log("[PublicForest]postDirectories called");
+    if (ws) {
+      ws.send(JSON.stringify({ type: WsMessageType.UPDATE_FOREST_DIRECTORIES, data: { forestId, directories } }));
+    }
+    // try {
+    //   await axios.post(`${path}/forest/updateDirectories`, { forestId, directories });
+    // } catch (error) {
+    //   console.log(error);
+    // }
+  };
+
+  const getForestData = async () => {
     try {
-      await axios.post(`${path}/forest/updateDirectories`, { forestId, directories });
+      const response = await axios.get(`${path}/forest/readForest/${forestId.toString()}`);
+      const { directories, name } = response.data;
+      console.log(response.data);
+      setDirectories(directories);
+      setForestName(name);
     } catch (error) {
       console.log(error);
     }
   };
 
+  const handleMessage = (event: MessageEvent) => {
+    const message = JSON.parse(event.data);
+    const { type, data } = message;
+    if (data.forestId !== forestId) return;
+    if (wsMessageHandler[type]) {
+      wsMessageHandler[type](data);
+    }
+  };
+
+  const joinForestGroup = () => {
+    if (ws) {
+      ws.send(JSON.stringify({ type: WsMessageType.JOIN_FOREST, data: { forestId } }));
+    }
+  };
+
   useEffect(() => {
-    const getData = async () => {
-      try {
-        const response = await axios.get(`${path}/forest/readForest/${forestId.toString()}`);
-        const { directories, name } = response.data;
-        console.log(response.data);
-        setDirectories(directories);
-        setForestName(name);
-      } catch (error) {
-        console.log(error);
-      }
+    getForestData();
+    joinForestGroup();
+    ws?.addEventListener("message", handleMessage);
+    return () => {
+      ws?.removeEventListener("message", handleMessage);
     };
-    getData();
   }, []);
 
   return (

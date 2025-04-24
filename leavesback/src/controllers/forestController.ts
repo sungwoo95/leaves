@@ -58,8 +58,6 @@ export const readForest = async (req: Request, res: Response): Promise<void> => 
 }
 
 export const updateForestDirectories = async (req: Request, res: Response): Promise<void> => {
-  console.log("[forestController]req.body: ",req.body);
-
   const { forestId, directories }: { forestId: string; directories: Directory[] } = req.body;
   const objectId = new ObjectId(forestId);
   try {

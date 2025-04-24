@@ -1,9 +1,9 @@
 import { WebSocket } from "ws";
-import { IsConquer, Leaf, WsMessageType } from "../types";
-import { leavesCollection, treesCollection } from "../config/db";
+import { Directory, IsConquer, Leaf, WsMessageType } from "../types";
+import { forestsCollection, leavesCollection, treesCollection } from "../config/db";
 import { ObjectId } from "mongodb";
 
-export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSocket>>) => {
+export const registHandler = (ws: WebSocket, wsGroups: Map<string, Set<WebSocket>>) => {
   const messageHandler: Partial<Record<WsMessageType, (message: any) => void>> = {
     [WsMessageType.JOIN_LEAF]: (data) => {
       const { leafId, prevLeafId }: { leafId: string; prevLeafId: string | null } = data;
@@ -28,9 +28,9 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
           { _id: new ObjectId(leafId) },
           { $set: { title } }
         );
-        if (updateLeafResult.modifiedCount === 0) {
+        if (updateLeafResult.matchedCount === 0) {
           console.log("[wsHandlers][updateLeafTitle]update leaf document error");
-          throw new Error("No leaf document updated.");
+          throw new Error("No leaf document matched");
         }
         //리프 그룹 브로드 캐스트.
         const leafClients = wsGroups.get(leafId);
@@ -287,6 +287,42 @@ export const handleConnection = (ws: WebSocket, wsGroups: Map<string, Set<WebSoc
         }
       } catch (error) {
         console.error("Error updating isConquer field:", error);
+      }
+    },
+    [WsMessageType.JOIN_FOREST]: (data) => {
+      const { forestId }: { forestId: string } = data;
+      if (!wsGroups.has(forestId)) wsGroups.set(forestId, new Set());
+      wsGroups.get(forestId)?.add(ws);
+      console.log(`success to join forestgroup: ${forestId}`);
+    },
+    [WsMessageType.UPDATE_FOREST_DIRECTORIES]: async (data) => {
+      const { forestId, directories }: { forestId: string, directories: Directory[] } = data;
+      try {
+        //forest문서 업데이트.
+        const result = await forestsCollection.updateOne(
+          { _id: new ObjectId(forestId) },
+          { $set: { directories: directories } }
+        );
+        if (result.matchedCount === 0) {
+          throw new Error("No forest document matched");
+        }
+        //forest브로드 캐스트
+        const forestClients = wsGroups.get(forestId);
+        if (forestClients) {
+          forestClients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN && client !== ws) {
+              client.send(
+                JSON.stringify({
+                  type: WsMessageType.UPDATE_FOREST_DIRECTORIES,
+                  data: { forestId, directories }
+                })
+              );
+            }
+          })
+        }
+
+      } catch (error) {
+        console.error("[WsHandlers][UPDATE_FOREST_DIRECTORIES] error: ", error);
       }
     }
   }
