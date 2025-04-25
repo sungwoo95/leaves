@@ -100,15 +100,13 @@ const ForestRegion = () => {
           </Box>
         </Box>
       </Modal>
-      {isVisible && (
-        <Box>
-          {myForests.map((item) => (
-            <Box sx={{ width: "100%" }} key={item.forestId.toString()}>
-              <Forest myForests={item} />
-            </Box>
-          ))}
-        </Box>
-      )}
+      <Box sx={{ display: isVisible ? "block" : "none" }}>
+        {myForests.map((item) => (
+          <Box sx={{ width: "100%" }} key={item.forestId.toString()}>
+            <Forest myForests={item} />
+          </Box>
+        ))}
+      </Box>
     </Box>
   );
 };
