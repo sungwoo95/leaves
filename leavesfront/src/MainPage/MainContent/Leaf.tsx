@@ -44,37 +44,51 @@ const Leaf: React.FC = () => {
     }
   };
 
+  const getLeafData = async () => {
+    try {
+      const response = await axios.get(`${path}/leaf/${leafId}`);
+      const leaf = response.data;
+      const { title, owningTreeId, parentLeafId } = leaf;
+      setTitle(title);
+      setOwningTreeId(owningTreeId);
+      setParentLeafId(parentLeafId);
+    } catch (error) {
+      console.log("[Leaf]get leaf data error");
+    }
+  };
+
+  const joinGroup = () => {
+    if (ws && leafId) {
+      ws.send(JSON.stringify({ type: WsMessageType.JOIN_GROUP, data: { groupId: leafId, prevGroupId: prevLeafId.current } }));
+      prevLeafId.current = leafId;
+    }
+  };
+
+  const handleMessage = (event: MessageEvent) => {
+    const message = JSON.parse(event.data);
+    const { type, data } = message;
+    if (data.leafId !== leafId) return;
+    if (wsMessageHandler[type]) {
+      wsMessageHandler[type](data);
+    }
+  };
+
+  const leaveGroup = (groupId: string) => {
+    if (ws) {
+      ws.send(JSON.stringify({ type: WsMessageType.LEAVE_GROUP, data: { groupId } }));
+    }
+  };
+
   useEffect(() => {
-    const getLeafData = async () => {
-      try {
-        const response = await axios.get(`${path}/leaf/${leafId}`);
-        const leaf = response.data;
-        const { title, owningTreeId, parentLeafId } = leaf;
-        setTitle(title);
-        setOwningTreeId(owningTreeId);
-        setParentLeafId(parentLeafId);
-      } catch (error) {
-        console.log("[Leaf]get leaf data error");
-      }
-    };
-    const joinLeafGroup = () => {
-      if (ws && leafId) {
-        ws.send(JSON.stringify({ type: WsMessageType.JOIN_LEAF, data: { leafId, prevLeafId: prevLeafId.current } }));
-        prevLeafId.current = leafId;
-      }
-    };
-    const handleMessage = (event: MessageEvent) => {
-      const message = JSON.parse(event.data);
-      const { type, data } = message;
-      if (data.leafId !== leafId) return;
-      if (wsMessageHandler[type]) {
-        wsMessageHandler[type](data);
-      }
-    };
     if (leafId) {
       getLeafData();
-      joinLeafGroup();
+      joinGroup();
       ws?.addEventListener("message", handleMessage);
+    }
+    //leafId가 string->null로 변경 시
+    if (prevLeafId.current && !leafId) {
+      leaveGroup(prevLeafId.current);
+      prevLeafId.current = null;
     }
     return () => {
       ws?.removeEventListener("message", handleMessage);

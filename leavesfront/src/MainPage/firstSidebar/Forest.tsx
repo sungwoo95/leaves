@@ -177,18 +177,30 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
     }
   };
 
-  const joinForestGroup = () => {
+  const joinGroup = () => {
+    if (ws && forestId) {
+      ws.send(JSON.stringify({ type: WsMessageType.JOIN_GROUP, data: { groupId: forestId, prevGroupId: null } }));
+    }
+  };
+
+  const leaveGroup = () => {
     if (ws) {
-      ws.send(JSON.stringify({ type: WsMessageType.JOIN_FOREST, data: { forestId } }));
+      ws.send(JSON.stringify({ type: WsMessageType.LEAVE_GROUP, data: { groupId: forestId } }));
     }
   };
 
   useEffect(() => {
     getForestData();
-    joinForestGroup();
+    joinGroup();
     ws?.addEventListener("message", handleMessage);
     return () => {
       ws?.removeEventListener("message", handleMessage);
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      leaveGroup();
     };
   }, []);
 

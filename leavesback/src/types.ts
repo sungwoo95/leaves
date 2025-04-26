@@ -75,17 +75,16 @@ export type Leaf = {
 }
 
 export enum WsMessageType {
-  JOIN_LEAF = "joinLeaf",
   UPDATE_LEAF_TITLE = "updateLeafTitle",
   UPDATE_LEAF_TITLE_ERROR = "updateLeafTitleError",
   UPDATE_LEAF_PARENT = "updateLeafParent",
   ADD_CHILD_LEAF = "addChildLeaf",
   ADD_PARENT_LEAF = "addParentLeaf",
-  JOIN_TREE = "joinTree",
   UPDATE_TREE_LABEL = "updateTreeLabel",
   UPDATE_TREE_ADD_CHILD_LEAF = "updateTreeAddChildLeaf",
   UPDATE_TREE_ADD_PARENT_LEAF = "updateTreeAddParentLeaf",
   UPDATE_TREE_CONQUER = "updateTreeConquer",
-  JOIN_FOREST = "joinForest",
   UPDATE_FOREST_DIRECTORIES = "updateforestdirectories",
+  LEAVE_GROUP = "leaveGroup",
+  JOIN_GROUP = "joinGroup"
 }

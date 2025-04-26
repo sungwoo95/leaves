@@ -247,26 +247,57 @@ const Tree: React.FC = () => {
     }, 2000);
   };
 
+  const joinGroup = () => {
+    if (ws && treeId) {
+      ws.send(JSON.stringify({ type: WsMessageType.JOIN_GROUP, data: { groupId: treeId, prevGroupId: prevTreeId.current } }));
+      prevTreeId.current = treeId;
+    }
+  };
+
+  const handleMessage = (event: MessageEvent) => {
+    const cy = cyRef.current;
+    if (!cy) return;
+    const message = JSON.parse(event.data);
+    const { type, data } = message;
+    if (data.treeId !== treeId) return;
+    if (wsMessageHandler[type]) {
+      wsMessageHandler[type](data, cy);
+    }
+  };
+
+  const addWsEventListener = () => {
+    if (ws) {
+      ws.addEventListener("message", handleMessage);
+    }
+  };
+
+  const getTreeData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${path}/tree/${treeId}`);
+      const treeData = response.data;
+      if (treeData) {
+        const { nodes, edges } = treeData;
+        // const layoutedNodes = await getLayoutedNodes(nodes, edges);
+        setNodes(nodes);
+        setEdges(edges);
+        setTreeDataFlag((prev) => !prev);
+      }
+    } catch (error) {
+      console.log("[Tree][getTreeData]Error fetching tree data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const leaveGroup = (groupId: string) => {
+    if (ws) {
+      ws.send(JSON.stringify({ type: WsMessageType.LEAVE_GROUP, data: { groupId } }));
+    }
+  };
+
   //노드 데이터 설정하기.
   useEffect(() => {
-    const getTreeData = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(`${path}/tree/${treeId}`);
-        const treeData = response.data;
-        if (treeData) {
-          const { nodes, edges } = treeData;
-          // const layoutedNodes = await getLayoutedNodes(nodes, edges);
-          setNodes(nodes);
-          setEdges(edges);
-          setTreeDataFlag((prev) => !prev);
-        }
-      } catch (error) {
-        console.log("[Tree][getTreeData]Error fetching tree data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     if (treeId) {
       getTreeData();
     }
@@ -274,30 +305,14 @@ const Tree: React.FC = () => {
 
   //tree그룹(websocket)에 참가하기.
   useEffect(() => {
-    const joinTreeGroup = () => {
-      if (ws && treeId) {
-        ws.send(JSON.stringify({ type: WsMessageType.JOIN_TREE, data: { treeId, prevTreeId: prevTreeId.current } }));
-        prevTreeId.current = treeId;
-      }
-    };
-    const handleMessage = (event: MessageEvent) => {
-      const cy = cyRef.current;
-      if (!cy) return;
-      const message = JSON.parse(event.data);
-      const { type, data } = message;
-      if (data.treeId !== treeId) return;
-      if (wsMessageHandler[type]) {
-        wsMessageHandler[type](data, cy);
-      }
-    };
-    const addWsEventListener = () => {
-      if (ws) {
-        ws.addEventListener("message", handleMessage);
-      }
-    };
     if (treeId) {
-      joinTreeGroup();
+      joinGroup();
       addWsEventListener();
+    }
+    //treeId가 string->null로 변경 시
+    if (prevTreeId.current && !treeId) {
+      leaveGroup(prevTreeId.current);
+      prevTreeId.current = null;
     }
     return () => {
       ws?.removeEventListener("message", handleMessage);

@@ -4,21 +4,21 @@ import { forestsCollection, leavesCollection, treesCollection } from "../config/
 import { ObjectId } from "mongodb";
 
 export const registHandler = (ws: WebSocket, wsGroups: Map<string, Set<WebSocket>>) => {
-  const messageHandler: Partial<Record<WsMessageType, (message: any) => void>> = {
-    [WsMessageType.JOIN_LEAF]: (data) => {
-      const { leafId, prevLeafId }: { leafId: string; prevLeafId: string | null } = data;
-      //새로운 그룹 참가 전, 기존의 그룹에서 삭제.
-      if (prevLeafId && wsGroups.has(prevLeafId)) {
-        const prevGroup = wsGroups.get(prevLeafId);
-        prevGroup?.delete(ws);
-        if (prevGroup && prevGroup.size === 0) {
-          wsGroups.delete(prevLeafId);
-        }
+  const leaveWsGroup = (groupId: string) => {
+    const group = wsGroups.get(groupId);
+    if (group) {
+      group.delete(ws);
+      if (group.size === 0) {
+        wsGroups.delete(groupId);
       }
-      if (!wsGroups.has(leafId)) wsGroups.set(leafId, new Set());
-      wsGroups.get(leafId)?.add(ws);
-      console.log(`success to join leafgroup: ${leafId}`);
-    },
+    }
+  }
+  const joinWsGroup = (groupId: string) => {
+    if (!wsGroups.has(groupId)) wsGroups.set(groupId, new Set());
+    wsGroups.get(groupId)?.add(ws);
+  }
+
+  const messageHandler: Partial<Record<WsMessageType, (message: any) => void>> = {
     [WsMessageType.UPDATE_LEAF_TITLE]: async (data) => {
       const { owningTreeId, leafId, title }: { owningTreeId: string; leafId: string; title: string } = data;
       console.log("[wsHandlers][updateLeafTitle]owningTreeId:", owningTreeId);
@@ -81,20 +81,6 @@ export const registHandler = (ws: WebSocket, wsGroups: Map<string, Set<WebSocket
           );
         }
       }
-    },
-    [WsMessageType.JOIN_TREE]: (data) => {
-      const { treeId, prevTreeId }: { treeId: string; prevTreeId: string | null } = data;
-      //새로운 그룹 참가 전, 기존의 그룹에서 삭제.
-      if (prevTreeId && wsGroups.has(prevTreeId)) {
-        const prevGroup = wsGroups.get(prevTreeId);
-        prevGroup?.delete(ws);
-        if (prevGroup && prevGroup.size === 0) {
-          wsGroups.delete(prevTreeId);
-        }
-      }
-      if (!wsGroups.has(treeId)) wsGroups.set(treeId, new Set());
-      wsGroups.get(treeId)?.add(ws);
-      console.log(`success to join treegroup: ${treeId}`);
     },
     [WsMessageType.ADD_CHILD_LEAF]: async (data) => {
       const { leafId, owningTreeId, title }: { leafId: string; owningTreeId: string; title: string; } = data;
@@ -289,11 +275,12 @@ export const registHandler = (ws: WebSocket, wsGroups: Map<string, Set<WebSocket
         console.error("Error updating isConquer field:", error);
       }
     },
-    [WsMessageType.JOIN_FOREST]: (data) => {
-      const { forestId }: { forestId: string } = data;
-      if (!wsGroups.has(forestId)) wsGroups.set(forestId, new Set());
-      wsGroups.get(forestId)?.add(ws);
-      console.log(`success to join forestgroup: ${forestId}`);
+    [WsMessageType.JOIN_GROUP]: (data) => {
+      const { groupId, prevGroupId }: { groupId: string, prevGroupId: string | null } = data;
+      if (prevGroupId) {
+        leaveWsGroup(prevGroupId);
+      }
+      joinWsGroup(groupId);
     },
     [WsMessageType.UPDATE_FOREST_DIRECTORIES]: async (data) => {
       const { forestId, directories }: { forestId: string, directories: Directory[] } = data;
@@ -324,7 +311,11 @@ export const registHandler = (ws: WebSocket, wsGroups: Map<string, Set<WebSocket
       } catch (error) {
         console.error("[WsHandlers][UPDATE_FOREST_DIRECTORIES] error: ", error);
       }
-    }
+    },
+    [WsMessageType.LEAVE_GROUP]: (data) => {
+      const { groupId }: { groupId: string } = data;
+      leaveWsGroup(groupId);
+    },
   }
   ws.on("message", (rawData) => {
     const message = JSON.parse(rawData.toString());
