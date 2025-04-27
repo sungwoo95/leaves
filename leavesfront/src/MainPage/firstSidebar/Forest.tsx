@@ -18,7 +18,7 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
   if (!mainPageContext) {
     return <p>mainPageContext.Provider의 하위 컴포넌트가 아님.</p>;
   }
-  const { ws } = mainPageContext;
+  const { ws, treeId, setTreeId } = mainPageContext;
   const wsMessageHandler: Record<string, (data: any) => void> = {
     [WsMessageType.UPDATE_FOREST_DIRECTORIES]: (data) => {
       const { directories } = data;
@@ -71,7 +71,7 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
     });
   };
 
-  const deleteDirectory = (targetId: string): void => {
+  const deleteDirectory = (targetId: string, targetTreeId?: string): void => {
     const newDirectories = (directories: Directory[]): Directory[] => {
       for (let i = 0; i < directories.length; i++) {
         const elem = directories[i];
@@ -89,12 +89,14 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
       }
       return directories; // 못 찾았으면 그대로 반환
     };
-
     setDirectories((prevDirectories) => {
       const result = newDirectories(prevDirectories);
       postDirectories(result);
       return result;
     });
+    if (targetTreeId === treeId) {
+      setTreeId(null);
+    }
   };
 
   const updateIsNew = (targetId: string): void => {
@@ -222,7 +224,6 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
               if (!isVisible) toggleVisibility();
               const response = await axios.post(`${path}/tree/createTree`);
               const treeId: string = response.data.treeId;
-              console.log("treeId: ", treeId);
               addDirectory(null, DirectoryType.FILE, treeId);
             }}
           />

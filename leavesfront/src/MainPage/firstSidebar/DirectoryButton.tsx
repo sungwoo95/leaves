@@ -1,5 +1,5 @@
 import { Button, Box, TextField } from "@mui/material";
-import { AddDirectory, Directory, DirectoryType, Position, UpdateIsNew, UpdateName } from "../../types";
+import { AddDirectory, DeleteDirectory, Directory, DirectoryType, Position, UpdateIsNew, UpdateName } from "../../types";
 import AddIcon from "@mui/icons-material/Add";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import { useEffect, useRef, useState } from "react";
@@ -27,7 +27,7 @@ const DirectoryButton = ({
   addDirectory: AddDirectory;
   updateIsNew: UpdateIsNew;
   updateName: UpdateName;
-  deleteDirectory: (id: string) => void;
+  deleteDirectory: DeleteDirectory;
 }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [menuPosition, setMenuPosition] = useState<Position | undefined>(undefined);
@@ -60,8 +60,7 @@ const DirectoryButton = ({
     if (item.type === DirectoryType.FOLDER) toggleVisibility(item.id);
     if (item.type === DirectoryType.FILE) {
       setIsPublicTree(isPublic);
-      console.log("[onClickHandler]treeId: ", item.treeId);
-      setTreeId(item.treeId);
+      if (item.treeId) setTreeId(item.treeId);
     }
   };
 
@@ -90,7 +89,11 @@ const DirectoryButton = ({
 
   const onClickDeleteHandler = () => {
     onCloseHandler();
-    deleteDirectory(item.id);
+    if (item.treeId) {
+      deleteDirectory(item.id, item.treeId);
+    } else {
+      deleteDirectory(item.id);
+    }
   };
 
   useEffect(() => {

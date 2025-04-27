@@ -1,5 +1,7 @@
 export type AddDirectory = (tartgetId: null | string, type: DirectoryType, treeId?: string) => void;
 
+export type DeleteDirectory = (targetId: string, targetTreeId?: string) => void;
+
 export type UpdateIsNew = (targetId: string) => void;
 
 export type UpdateName = (targetId: string, newName: string) => void;

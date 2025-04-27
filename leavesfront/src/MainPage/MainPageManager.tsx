@@ -3,10 +3,10 @@ import { path, WS_PATH } from "../../config/config";
 import axios from "axios";
 
 type MainPageContextType = {
-  treeId: string | undefined;
-  setTreeId: React.Dispatch<React.SetStateAction<string | undefined>>;
-  leafId: string | undefined;
-  setLeafId: React.Dispatch<React.SetStateAction<string | undefined>>;
+  treeId: string | null;
+  setTreeId: React.Dispatch<React.SetStateAction<string | null>>;
+  leafId: string | null;
+  setLeafId: React.Dispatch<React.SetStateAction<string | null>>;
   ws: WebSocket | undefined;
   isPublicTree: boolean | undefined;
   setIsPublicTree: React.Dispatch<React.SetStateAction<boolean | undefined>>;
@@ -21,8 +21,8 @@ type MainPageProps = {
 const MainPageContext = createContext<MainPageContextType | undefined>(undefined);
 
 export function MainPageManager({ children }: MainPageProps) {
-  const [treeId, setTreeId] = useState<string | undefined>(undefined);
-  const [leafId, setLeafId] = useState<string | undefined>(undefined);
+  const [treeId, setTreeId] = useState<string | null>(null);
+  const [leafId, setLeafId] = useState<string | null>(null);
   const [isPublicTree, setIsPublicTree] = useState<boolean | undefined>(undefined);
   const [isPublicLeaf, setIsPublicLeaf] = useState<boolean | undefined>(undefined);
   const [ws, setWs] = useState<WebSocket | undefined>(undefined);
