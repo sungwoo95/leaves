@@ -47,6 +47,7 @@ const ForestRegion = () => {
   const handleModalCreate = () => {
     postPublicForest();
     handleModalClose();
+    if (!isVisible) toggleVisibility();
   };
   useEffect(() => {
     console.log("[PublicForestRegion]useEffect called");
@@ -71,7 +72,6 @@ const ForestRegion = () => {
           <AddIcon
             onClick={(e) => {
               e.stopPropagation();
-              if (!isVisible) toggleVisibility();
               handleModalOpen();
             }}
           />
