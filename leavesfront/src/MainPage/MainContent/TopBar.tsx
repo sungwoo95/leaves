@@ -6,9 +6,8 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useTheme } from "@mui/material/styles";
 import ParkIcon from "@mui/icons-material/Park";
-import { Box } from "@mui/material";
 
-const TobBar = () => {
+const TobBar = ({ toggleFirstSidebar, toggleSecondSidebar }: { toggleFirstSidebar: () => void; toggleSecondSidebar: () => void }) => {
   const theme = useTheme();
   return (
     <AppBar position="sticky">
@@ -22,10 +21,10 @@ const TobBar = () => {
           justifyContent: "space-between", // 좌측과 우측에 요소 배치
         }}>
         <div>
-          <IconButton size="small" sx={{ mr: 1 }}>
+          <IconButton size="small" sx={{ mr: 1 }} onClick={toggleFirstSidebar}>
             <MenuIcon sx={{ color: theme.palette.mode === "dark" ? "white" : "black" }} />
           </IconButton>
-          <IconButton size="small" sx={{ mr: 1 }}>
+          <IconButton size="small" sx={{ mr: 1 }} onClick={toggleSecondSidebar}>
             <ParkIcon sx={{ color: theme.palette.mode === "dark" ? "white" : "black" }} />
           </IconButton>
           <Button>
