@@ -1,0 +1,25 @@
+/* react-resizable 핸들 스타일 */
+.custom-handle {
+  /* 부모 요소를 기준으로 위치를 지정 */
+  position: absolute;
+  /* 오른쪽 */
+  right: 0;
+  /* 상단에 배치 */
+  top: 0;
+  /* 너비 4px */
+  width: 4px;
+  /* 부모 요소 높이에 맞춤 */
+  height: 100%;
+  /* 드래그 커서 */
+  cursor: col-resize;
+  background-color: transparent;
+  transition: background-color 0.2s ease;
+}
+
+.custom-handle:hover {
+  background-color: #89dc8c ; 
+}
+
+.custom-handle:active {
+  background-color: #388e3c ;
+}
