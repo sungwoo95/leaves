@@ -1,8 +1,13 @@
+import { Box } from "@mui/material";
 import Leaf from "./Leaf";
+import TobBar from "./TopBar";
 
 const MainContent: React.FC = () => {
   return (
-    <Leaf/>
+    <Box>
+      <TobBar />
+      <Leaf />
+    </Box>
   );
 };
 
