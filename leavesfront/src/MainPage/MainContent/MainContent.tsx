@@ -4,7 +4,7 @@ import TobBar from "./TopBar";
 
 const MainContent = ({ toggleFirstSidebar, toggleSecondSidebar }: { toggleFirstSidebar: () => void; toggleSecondSidebar: () => void }) => {
   return (
-    <Box>
+    <Box sx={{ width: "100%", boxSizing: "border-box" }}>
       <TobBar toggleFirstSidebar={toggleFirstSidebar} toggleSecondSidebar={toggleSecondSidebar} />
       <Leaf />
     </Box>

@@ -100,28 +100,31 @@ const Leaf: React.FC = () => {
       sx={{
         height: "100vh",
         boxSizing: "border-box",
-        display: "flex",
-        flexDirection: "column",
+        width: "100%",
       }}>
       {leafId && owningTreeId ? (
         <Box
           sx={{
-            flex: 1,
+            height: "100%",
             bgcolor: theme.palette.mode === "dark" ? "#121212" : "white",
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
           }}>
           <TextField
             value={title}
-            fullWidth
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTitleChange(e)}
             variant="standard"
             InputProps={{
               disableUnderline: true,
             }}
             sx={{
-              mt: 2, // margin-top (위)
-              mb: 1, // margin-bottom (아래)
-              ml: 7, // margin-left (왼쪽)
-              mr: 3, // margin-right (오른쪽)
+              boxSizing: "border-box",
+              width: "100%",
+              paddingLeft: 7,
+              paddingRight: 3,
+              paddingTop: 2,
+              paddingBottom: 1,
               input: {
                 fontSize: "1.5rem",
                 fontWeight: "bold",
