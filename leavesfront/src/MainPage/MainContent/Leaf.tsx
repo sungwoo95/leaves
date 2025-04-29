@@ -115,6 +115,7 @@ const Leaf: React.FC = () => {
             value={title}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTitleChange(e)}
             variant="standard"
+            multiline
             InputProps={{
               disableUnderline: true,
             }}
@@ -125,7 +126,7 @@ const Leaf: React.FC = () => {
               paddingRight: 3,
               paddingTop: 2,
               paddingBottom: 1,
-              input: {
+              textArea: {
                 fontSize: "1.5rem",
                 fontWeight: "bold",
               },
