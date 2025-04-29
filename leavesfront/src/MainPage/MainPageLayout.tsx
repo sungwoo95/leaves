@@ -5,7 +5,7 @@ import MainContent from "./MainContent/MainContent";
 import FirstSidebar from "./firstSidebar/FirstSidebar";
 import SecondSidebar from "./SecondSidebar/SecondSidebar";
 import "../../src/styles.css";
-import { SetStateAction, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 const MainPageLayout: React.FC = () => {
   const prevFirstSidebarWidth = useRef<number>(240);

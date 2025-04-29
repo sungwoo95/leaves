@@ -7,19 +7,21 @@
   /* 상단에 배치 */
   top: 0;
   /* 너비 4px */
-  width: 4px;
+  width: 1px;
   /* 부모 요소 높이에 맞춤 */
   height: 100%;
   /* 드래그 커서 */
   cursor: col-resize;
-  background-color: transparent;
-  transition: background-color 0.2s ease;
+  background-color: #c0c2c0;
+  transition: background-color 0.5s ease;
 }
 
 .custom-handle:hover {
+  width: 3px;
   background-color: #89dc8c ; 
 }
 
 .custom-handle:active {
+  width: 3px;
   background-color: #388e3c ;
 }
