@@ -4,9 +4,11 @@ import TobBar from "./TopBar";
 
 const MainContent = ({ toggleFirstSidebar, toggleSecondSidebar }: { toggleFirstSidebar: () => void; toggleSecondSidebar: () => void }) => {
   return (
-    <Box sx={{ width: "100%", boxSizing: "border-box" }}>
+    <Box sx={{ width: "100%", boxSizing: "border-box", display: "flex", flexDirection: "column", height: "100%" }}>
       <TobBar toggleFirstSidebar={toggleFirstSidebar} toggleSecondSidebar={toggleSecondSidebar} />
-      <Leaf />
+      <Box sx={{ flex: 1 }}>
+        <Leaf />
+      </Box>
     </Box>
   );
 };

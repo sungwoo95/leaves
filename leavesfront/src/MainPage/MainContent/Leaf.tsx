@@ -98,7 +98,7 @@ const Leaf: React.FC = () => {
   return (
     <Box
       sx={{
-        height: "100vh",
+        height: "100%",
         boxSizing: "border-box",
         width: "100%",
       }}>
