@@ -109,7 +109,25 @@ const Leaf: React.FC = () => {
             flex: 1,
             bgcolor: theme.palette.mode === "dark" ? "#121212" : "white",
           }}>
-          <TextField value={title} fullWidth onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTitleChange(e)} />
+          <TextField
+            value={title}
+            fullWidth
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTitleChange(e)}
+            variant="standard"
+            InputProps={{
+              disableUnderline: true,
+            }}
+            sx={{
+              mt: 2, // margin-top (위)
+              mb: 1, // margin-bottom (아래)
+              ml: 7, // margin-left (왼쪽)
+              mr: 3, // margin-right (오른쪽)
+              input: {
+                fontSize: "1.5rem",
+                fontWeight: "bold",
+              },
+            }}
+          />
           {DEV_MODE ? (
             <DevEditor parentLeafId={parentLeafId} owningTreeId={owningTreeId} />
           ) : (
