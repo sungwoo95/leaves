@@ -1,4 +1,4 @@
-import { Button, Box, TextField } from "@mui/material";
+import { Button, Box, TextField, useTheme } from "@mui/material";
 import { AddDirectory, DeleteDirectory, Directory, DirectoryType, Position, UpdateIsNew, UpdateName } from "../../types";
 import AddIcon from "@mui/icons-material/Add";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
@@ -32,6 +32,7 @@ const DirectoryButton = ({
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [menuPosition, setMenuPosition] = useState<Position | undefined>(undefined);
   const inputRef = useRef<HTMLInputElement | undefined>(undefined);
+  const theme = useTheme();
   const mainPageContext = useMainPageContext();
   try {
     if (!mainPageContext) {
@@ -112,6 +113,7 @@ const DirectoryButton = ({
         pl: level,
         border: item.isNew || isEditing ? "2px solid green" : "none",
         justifyContent: "space-between",
+        color: theme.palette.mode === "dark" ? "white" : "black",
       }}
       onClick={onClickHandler}
       onContextMenu={onContextMenuHandler}>

@@ -66,7 +66,10 @@ const ForestRegion = () => {
 
   return (
     <Box sx={{ borderRadius: 2 }}>
-      <Button variant="text" sx={{ width: "100%", justifyContent: "space-between" }} onClick={toggleVisibility}>
+      <Button
+        variant="text"
+        sx={{ width: "100%", justifyContent: "space-between", color: theme.palette.mode === "dark" ? "white" : "black" }}
+        onClick={toggleVisibility}>
         <Box>Forest</Box>
         <Box sx={{ display: "flex" }}>
           <AddIcon

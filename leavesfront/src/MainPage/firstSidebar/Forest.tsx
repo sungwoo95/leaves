@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Button from "@mui/material/Button";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import Explorer from "./Explorer";
 import { Directory, DirectoryType, MyForestInfo, UpdateName, WsMessageType } from "../../types";
 import AddIcon from "@mui/icons-material/Add";
@@ -14,6 +14,7 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
   const [directories, setDirectories] = useState<Directory[]>([]);
   const [forestName, setForestName] = useState<string>("");
   const { forestId, isOwner } = myForests;
+  const theme = useTheme();
   const mainPageContext = useMainPageContext();
   if (!mainPageContext) {
     return <p>mainPageContext.Provider의 하위 컴포넌트가 아님.</p>;
@@ -208,7 +209,10 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Button variant="text" sx={{ pl: 2, width: "100%", justifyContent: "space-between" }} onClick={toggleVisibility}>
+      <Button
+        variant="text"
+        sx={{ pl: 2, width: "100%", justifyContent: "space-between", color: theme.palette.mode === "dark" ? "white" : "black" }}
+        onClick={toggleVisibility}>
         <Box>{forestName}</Box>
         <Box sx={{ display: "flex" }}>
           <CreateNewFolderIcon

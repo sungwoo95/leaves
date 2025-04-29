@@ -14,8 +14,7 @@ const FirstSidebar: React.FC = () => {
         flexDirection: "column",
         gap: 2,
         boxSizing: "border-box",
-        bgcolor: theme.palette.mode === "dark" ? "#001000" : "white",
-        color: theme.palette.mode === "dark" ? "white" : "black",
+        bgcolor: theme.palette.mode === "dark" ? "#171817" : "white",
       }}>
       <ForestRegion />
     </Paper>
