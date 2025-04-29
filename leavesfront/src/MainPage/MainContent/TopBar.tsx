@@ -10,7 +10,7 @@ import ParkIcon from "@mui/icons-material/Park";
 const TobBar = ({ toggleFirstSidebar, toggleSecondSidebar }: { toggleFirstSidebar: () => void; toggleSecondSidebar: () => void }) => {
   const theme = useTheme();
   return (
-    <AppBar position="sticky">
+    <AppBar position="sticky" elevation={0}>
       <Toolbar
         sx={{
           minHeight: 40,
