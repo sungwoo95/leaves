@@ -14,9 +14,13 @@ import NoLeafIsOpen from "./NoLeafIsOpen";
 import EditorFallback from "./EditorFallback";
 import DevEditor from "./DevEditor";
 
-const Leaf: React.FC = () => {
+type Props = {
+  title: string;
+  setTitle: React.Dispatch<React.SetStateAction<string>>;
+};
+
+const Leaf: React.FC<Props> = ({ title, setTitle }) => {
   const theme = useTheme();
-  const [title, setTitle] = useState<string>("");
   const [parentLeafId, setParentLeafId] = useState<string | null>(null);
   const prevLeafId = useRef<string | null>(null);
   const mainPageContext = useMainPageContext();

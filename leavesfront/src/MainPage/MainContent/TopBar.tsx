@@ -6,9 +6,24 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useTheme } from "@mui/material/styles";
 import ParkIcon from "@mui/icons-material/Park";
+import { useMainPageContext } from "../MainPageManager";
 
-const TobBar = ({ toggleFirstSidebar, toggleSecondSidebar }: { toggleFirstSidebar: () => void; toggleSecondSidebar: () => void }) => {
+type Props = {
+  toggleFirstSidebar: () => void;
+  toggleSecondSidebar: () => void;
+  title: string;
+};
+
+const TobBar: React.FC<Props> = ({ toggleFirstSidebar, toggleSecondSidebar, title }) => {
   const theme = useTheme();
+  const mainPageContext = useMainPageContext();
+  if (!mainPageContext) {
+    return <p>mainPageContext.Provider의 하위 컴포넌트가 아님.</p>;
+  }
+  const { setTreeId, owningTreeId } = mainPageContext;
+  const clickTitleHandler = () => {
+    if (owningTreeId) setTreeId(owningTreeId);
+  };
   return (
     <AppBar position="sticky" elevation={0}>
       <Toolbar
@@ -27,8 +42,17 @@ const TobBar = ({ toggleFirstSidebar, toggleSecondSidebar }: { toggleFirstSideba
           <IconButton size="small" sx={{ mr: 1 }} onClick={toggleSecondSidebar}>
             <ParkIcon sx={{ color: theme.palette.mode === "dark" ? "white" : "black" }} />
           </IconButton>
-          <Button>
-            <Typography sx={{ color: theme.palette.mode === "dark" ? "white" : "black" }}>제목 버튼(todo)</Typography>
+          <Button onClick={clickTitleHandler}>
+            <Typography
+              sx={{
+                color: theme.palette.mode === "dark" ? "white" : "black",
+                maxWidth: "150px", // 최대 표시 너비
+                whiteSpace: "nowrap", // 줄바꿈 방지
+                overflow: "hidden", // 넘친 텍스트 숨김
+                textOverflow: "ellipsis", // ...으로 표시
+              }}>
+              {title}
+            </Typography>
           </Button>
         </div>
         <div>
