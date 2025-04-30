@@ -65,7 +65,6 @@ const MainPageLayout: React.FC = () => {
       <Box
         sx={{
           flex: 1, //flex-grow의 단축 형태로, 해당 요소가 남은 공간을 채우게 함.
-          minWidth: 0,
           overflow: "auto",
         }}>
         <MainContent toggleFirstSidebar={toggleFirstSidebar} toggleSecondSidebar={toggleSecondSidebar} />
