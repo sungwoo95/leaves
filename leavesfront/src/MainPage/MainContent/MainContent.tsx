@@ -6,7 +6,7 @@ const MainContent = ({ toggleFirstSidebar, toggleSecondSidebar }: { toggleFirstS
   return (
     <Box sx={{ width: "100%", boxSizing: "border-box", display: "flex", flexDirection: "column", height: "100%" }}>
       <TobBar toggleFirstSidebar={toggleFirstSidebar} toggleSecondSidebar={toggleSecondSidebar} />
-      <Box sx={{ flex: 1 }}>
+      <Box sx={{ flex: 1, display:"block"}}>
         <Leaf />
       </Box>
     </Box>

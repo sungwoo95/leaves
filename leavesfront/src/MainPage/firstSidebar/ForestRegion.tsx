@@ -65,7 +65,7 @@ const ForestRegion = () => {
   }, []);
 
   return (
-    <Box sx={{ borderRadius: 2 }}>
+    <Box >
       <Button
         variant="text"
         sx={{ width: "100%", justifyContent: "space-between", color: theme.palette.mode === "dark" ? "white" : "black" }}
@@ -105,7 +105,7 @@ const ForestRegion = () => {
       </Modal>
       <Box sx={{ display: isVisible ? "block" : "none" }}>
         {myForests.map((item) => (
-          <Box sx={{ width: "100%" }} key={item.forestId.toString()}>
+          <Box key={item.forestId.toString()}>
             <Forest myForests={item} />
           </Box>
         ))}

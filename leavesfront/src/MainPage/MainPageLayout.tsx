@@ -41,7 +41,7 @@ const MainPageLayout: React.FC = () => {
         onResizeStop={(e: any, data: { size: { width: number } }) => {
           prevFirstSidebarWidth.current = data.size.width;
         }}>
-        <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+        <Box sx={{ display: firstSidebarWidth === 0 ? "none" : "block", height: "100%" }}>
           <FirstSidebar />
         </Box>
       </ResizableBox>
@@ -58,9 +58,7 @@ const MainPageLayout: React.FC = () => {
         onResizeStop={(e: any, data: { size: { width: number } }) => {
           prevSecondSidebarWidth.current = data.size.width;
         }}>
-        <Box sx={{ height: "100%" }}>
-          <SecondSidebar />
-        </Box>
+        <SecondSidebar />
       </ResizableBox>
 
       {/* 메인 콘텐츠 */}

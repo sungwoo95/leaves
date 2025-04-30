@@ -208,10 +208,10 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
   }, []);
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box>
       <Button
         variant="text"
-        sx={{ pl: 2, width: "100%", justifyContent: "space-between", color: theme.palette.mode === "dark" ? "white" : "black" }}
+        sx={{ pl: 2, width: "100%", justifyContent: "space-between", color: theme.palette.mode === "dark" ? "white" : "black"}}
         onClick={toggleVisibility}>
         <Box>{forestName}</Box>
         <Box sx={{ display: "flex" }}>
@@ -233,8 +233,8 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
           />
         </Box>
       </Button>
-      {isVisible && ( // isVisible이 true일 때만 Box 렌더링
-        <Explorer
+      <Box sx={{ display: isVisible ? "block" : "none" }}>
+       <Explorer
           isPublic={true}
           directories={directories}
           addDirectory={addDirectory}
@@ -242,7 +242,7 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
           updateName={updateName}
           deleteDirectory={deleteDirectory}
         />
-      )}
+      </Box>
     </Box>
   );
 };

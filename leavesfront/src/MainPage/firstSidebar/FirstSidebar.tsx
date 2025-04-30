@@ -9,10 +9,9 @@ const FirstSidebar: React.FC = () => {
       sx={{
         width: "100%",
         padding: 1,
-        height: "100vh",
+        height: "100%",
         display: "flex",
         flexDirection: "column",
-        gap: 2,
         boxSizing: "border-box",
         bgcolor: theme.palette.mode === "dark" ? "#171817" : "white",
       }}>
