@@ -6,6 +6,8 @@ type MainPageContextType = {
   treeId: string | null;
   setTreeId: React.Dispatch<React.SetStateAction<string | null>>;
   leafId: string | null;
+  owningTreeId: string | undefined;
+  setOwningTreeId: React.Dispatch<React.SetStateAction<string | undefined>>;
   setLeafId: React.Dispatch<React.SetStateAction<string | null>>;
   ws: WebSocket | undefined;
   isPublicTree: boolean | undefined;
@@ -23,6 +25,7 @@ const MainPageContext = createContext<MainPageContextType | undefined>(undefined
 export function MainPageManager({ children }: MainPageProps) {
   const [treeId, setTreeId] = useState<string | null>(null);
   const [leafId, setLeafId] = useState<string | null>(null);
+  const [owningTreeId, setOwningTreeId] = useState<string | undefined>(undefined);
   const [isPublicTree, setIsPublicTree] = useState<boolean | undefined>(undefined);
   const [isPublicLeaf, setIsPublicLeaf] = useState<boolean | undefined>(undefined);
   const [ws, setWs] = useState<WebSocket | undefined>(undefined);
@@ -111,6 +114,8 @@ export function MainPageManager({ children }: MainPageProps) {
         setTreeId,
         leafId,
         setLeafId,
+        owningTreeId,
+        setOwningTreeId,
         ws,
         isPublicTree,
         setIsPublicTree,

@@ -45,7 +45,7 @@ const Tree: React.FC = () => {
     console.error((err as Error).message);
     return <p>오류가 발생했습니다.</p>;
   }
-  const { ws, treeId, leafId, setLeafId, isPublicTree, setIsPublicLeaf } = mainPageContext;
+  const { ws, treeId, leafId, setLeafId, isPublicTree, setIsPublicLeaf, owningTreeId } = mainPageContext;
   const cyRef = useRef<cytoscape.Core | undefined>(undefined);
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
@@ -334,6 +334,9 @@ const Tree: React.FC = () => {
       spacingFactor: 1,
       nodeDimensionsIncludeLabels: true,
     }).run();
+    if (treeId === owningTreeId) {
+      focusCurrentNode();
+    }
     const nodes = cy.nodes();
     const edges = cy.edges();
     if (nodes.length > 0) {

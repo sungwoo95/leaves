@@ -17,14 +17,13 @@ import DevEditor from "./DevEditor";
 const Leaf: React.FC = () => {
   const theme = useTheme();
   const [title, setTitle] = useState<string>("");
-  const [owningTreeId, setOwningTreeId] = useState<string | undefined>(undefined);
   const [parentLeafId, setParentLeafId] = useState<string | null>(null);
   const prevLeafId = useRef<string | null>(null);
   const mainPageContext = useMainPageContext();
   if (!mainPageContext) {
     return <p>mainPageContext.Provider의 하위 컴포넌트가 아님.</p>;
   }
-  const { leafId, ws } = mainPageContext;
+  const { leafId, ws, owningTreeId, setOwningTreeId } = mainPageContext;
   const wsMessageHandler: Record<string, (data: any) => void> = {
     [WsMessageType.UPDATE_LEAF_TITLE]: (data) => {
       const { title } = data;
