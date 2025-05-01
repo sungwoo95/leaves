@@ -1,11 +1,11 @@
-import { Paper } from "@mui/material";
+import { Box, Paper } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import ForestRegion from "./ForestRegion";
 
 const FirstSidebar: React.FC = () => {
   const theme = useTheme();
   return (
-    <Paper
+    <Box
       sx={{
         width: "100%",
         padding: 1,
@@ -17,7 +17,7 @@ const FirstSidebar: React.FC = () => {
         overflow: "auto",
       }}>
       <ForestRegion />
-    </Paper>
+    </Box>
   );
 };
 
