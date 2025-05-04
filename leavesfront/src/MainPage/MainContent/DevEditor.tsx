@@ -15,9 +15,13 @@ import {
 } from "@blocknote/react";
 import CreateChildLeafFormattingToolBarButton from "./CreateChildLeafFormattingToolBarButton";
 import CreateParentLeafFormattingToolBarButton from "./CreateParentLeafFormattingToolBarButton";
+import { useEffect } from "react";
 
-const DevEditor = ({ owningTreeId, parentLeafId }: { owningTreeId: string; parentLeafId: string | null }) => {
+const DevEditor = ({ owningTreeId, parentLeafId, editorRef }: { owningTreeId: string; parentLeafId: string | null; editorRef: any }) => {
   const editor = useCreateBlockNote();
+  useEffect(() => {
+    editorRef.current = editor;
+  }, []);
   return (
     <BlockNoteView editor={editor} formattingToolbar={false} data-theming-css-variables-demo>
       <FormattingToolbarController

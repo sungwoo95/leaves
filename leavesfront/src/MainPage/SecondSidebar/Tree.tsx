@@ -1,11 +1,11 @@
 import { useRef, useEffect, useCallback, useState } from "react";
 import axios from "axios";
 import CytoscapeComponent from "react-cytoscapejs";
-import cytoscape, { CollectionReturnValue, EdgeCollection, NodeCollection } from "cytoscape";
+import cytoscape, { CollectionReturnValue, EdgeCollection, EdgeSingular, NodeCollection } from "cytoscape";
 import { useTheme } from "@mui/material/styles";
 import { path } from "../../../config/config";
 import { useMainPageContext } from "../MainPageManager";
-import { Edge, Node, WsMessageType } from "../../types";
+import { DeleteCase, DeleteLeafData, Edge, IsConquer, Node, WsMessageType } from "../../types";
 import NoTreeIsOpen from "./NoTreeIsOpen";
 import contextMenus from "cytoscape-context-menus";
 import "cytoscape-context-menus/cytoscape-context-menus.css";
@@ -72,9 +72,7 @@ const Tree: React.FC = () => {
         cy.add(newNode);
         cy.add(newEdge);
       });
-      const nodes = cy.nodes();
-      const edges = cy.edges();
-      applyForceForAddNode(nodes, edges);
+      applyForceForAddNode();
     },
     [WsMessageType.UPDATE_TREE_ADD_PARENT_LEAF]: (data, cy: cytoscape.Core) => {
       const { fromNodeId, newNode, deleteEdge, newEdgeList } = data;
@@ -91,14 +89,16 @@ const Tree: React.FC = () => {
           cy.add(elem);
         });
       });
-      const nodes = cy.nodes();
-      const edges = cy.edges();
-      applyForceForAddNode(nodes, edges);
+      applyForceForAddNode();
     },
     [WsMessageType.UPDATE_TREE_CONQUER]: (data, cy: cytoscape.Core) => {
       const { targetNodeId, newIsConquer } = data;
       const targetNode = cy.getElementById(targetNodeId);
       targetNode.data("isConquer", newIsConquer);
+    },
+    [WsMessageType.UPDATE_TREE_DELETE_LEAF]: (data) => {
+      const { leafId } = data;
+      deleteNode(leafId);
     },
   };
 
@@ -149,9 +149,17 @@ const Tree: React.FC = () => {
     ws?.send(JSON.stringify({ type: WsMessageType.UPDATE_TREE_CONQUER, data: { treeId, leafId, isConquer } }));
   };
 
-  const applyForceForAddNode = (nodes: NodeCollection, edges: EdgeCollection) => {
+  const handleDeleteClick = (event: cytoscape.EventObject) => {
+    const nodeId = event.target.id();
+    postDeleteNode(nodeId);
+    deleteNode(nodeId);
+  };
+
+  const applyForceForAddNode = () => {
     const cy = cyRef.current;
     if (!cy) return;
+    const nodes = cy.nodes();
+    const edges = cy.edges();
     if (isSimulationActivated) {
       isSimulationActivated.stop();
     }
@@ -247,6 +255,59 @@ const Tree: React.FC = () => {
     }, 2000);
   };
 
+  const applyForceForDeleteNode = () => {
+    const cy = cyRef.current;
+    if (!cy) return;
+    const nodes = cy.nodes();
+    const edges = cy.edges();
+    if (isSimulationActivated) {
+      isSimulationActivated.stop();
+    }
+    const d3Edges = edges.map((edge) => ({
+      source: edge.source().id(),
+      target: edge.target().id(),
+    }));
+    const d3Nodes = nodes.map((ele) => ({
+      id: ele.id(),
+      x: ele.position().x,
+      y: ele.position().y,
+    }));
+    const sim = forceSimulation(d3Nodes)
+      .force("charge", forceManyBody().strength(-30)) // 서로 밀어내는 힘
+      .force(
+        "link",
+        forceLink(d3Edges)
+          .id((n: any) => n.id)
+          .distance(100)
+          .strength(1)
+      ) // 서로 당기는 힘
+      .force("collision", forceCollide().radius(30)) // 충돌 방지
+      .alpha(0.1) // 초기 에너지 (애니메이션 강도)
+      .alphaDecay(0.05) // 서서히 멈추게 하는 감쇠율
+      .on("tick", () => {
+        cy.batch(() => {
+          d3Nodes.forEach((node) => {
+            const ele = cy.getElementById(node.id);
+            if (ele) {
+              ele.position({
+                x: node.x ?? 0,
+                y: node.y ?? 0,
+              });
+            }
+          });
+        });
+      });
+    isSimulationActivated = sim;
+
+    //시뮬레이션 정지
+    setTimeout(() => {
+      sim.stop();
+      if (isSimulationActivated === sim) {
+        isSimulationActivated = null;
+      }
+    }, 2000);
+  };
+
   const joinGroup = () => {
     if (ws && treeId) {
       ws.send(JSON.stringify({ type: WsMessageType.JOIN_GROUP, data: { groupId: treeId, prevGroupId: prevTreeId.current } }));
@@ -294,6 +355,99 @@ const Tree: React.FC = () => {
     if (ws) {
       ws.send(JSON.stringify({ type: WsMessageType.LEAVE_GROUP, data: { groupId } }));
     }
+  };
+
+  const deleteNode = (nodeId: string) => {
+    const cy = cyRef.current;
+    if (!cy) return;
+    const node = cy.getElementById(nodeId);
+    if (!node.length) return;
+
+    const parentEdges = node.incomers("edge"); // 부모로부터 오는 edge
+    const childEdges = node.outgoers("edge"); // 자식으로 가는 edge
+
+    const parentLeafId = parentEdges.length ? parentEdges[0].source().id() : null;
+
+    if (parentLeafId) {
+      cy.batch(() => {
+        childEdges.forEach((edge) => {
+          const childId = edge.target().id();
+          cy.add({
+            data: {
+              source: parentLeafId,
+              target: childId,
+            },
+          });
+        });
+        node.remove();
+      });
+    } else {
+      if (childEdges.length === 1) {
+        node.remove();
+      } else {
+        node.data({
+          label: "Empty Leaf",
+          isConquer: IsConquer.FALSE,
+        });
+      }
+    }
+    applyForceForDeleteNode();
+  };
+
+  const postDeleteNode = (nodeId: string) => {
+    const cy = cyRef.current;
+    if (!cy || !ws || ws.readyState !== WebSocket.OPEN || !treeId) return;
+    const node = cy.getElementById(nodeId);
+    if (!node || node.empty()) return;
+
+    const parentNodes = node.incomers("node");
+    const parentNodeId = parentNodes.length ? parentNodes[0].id() : null;
+    const childNodes = node.outgoers("node");
+    const childNodeIdList = node.outgoers("node").map((n) => n.id());
+
+    let deleteCase: DeleteCase;
+    const addEdgeList: Edge[] = [];
+    const deleteEdgeList: Edge[] = [];
+
+    if (parentNodeId) {
+      // case1: 상위 노드 있음
+      deleteCase = DeleteCase.HAS_PARENT;
+      //삭제할 엣지에 상위노드-타깃노드 엣지 추가.
+      deleteEdgeList.push({ data: { source: parentNodeId, target: nodeId } });
+      //삭제할 엣지에 타깃노드-하위노드 엣지 추가.
+      childNodes.forEach((e) => {
+        deleteEdgeList.push({ data: { source: nodeId, target: e.id() } });
+      });
+      //추가할 엣지에 상위노드-하위노드 엣지 추가.
+      childNodes.forEach((e) => {
+        addEdgeList.push({ data: { source: parentNodeId, target: e.id() } });
+      });
+    } else {
+      if (childNodes.length === 1) {
+        // case2: 상위 노드 없음 + 하위 노드 1개
+        deleteCase = DeleteCase.ROOT_WITH_SINGLE_CHILD;
+        //삭제할 엣지에 타깃노드-하위노드 엣지 추가.
+        deleteEdgeList.push({ data: { source: nodeId, target: childNodes[0].id() } });
+      } else {
+        // case3: 상위 노드 없음 + 하위 노드 0개 또는 2개 이상
+        deleteCase = DeleteCase.CHANGE_TO_EMPTY_LEAF;
+      }
+    }
+    const data: DeleteLeafData = {
+      treeId,
+      leafId: nodeId,
+      deleteCase,
+      addEdgeList,
+      deleteEdgeList,
+      parentLeafId: parentNodeId,
+      childLeafIdList: childNodeIdList,
+    };
+    ws.send(
+      JSON.stringify({
+        type: WsMessageType.DELETE_LEAF,
+        data,
+      })
+    );
   };
 
   //노드 데이터 설정하기.
@@ -361,6 +515,12 @@ const Tree: React.FC = () => {
               content: "Conquer",
               selector: "node",
               onClickFunction: handleConquerClick,
+            },
+            {
+              id: "delete",
+              content: "Delete",
+              selector: "node",
+              onClickFunction: handleDeleteClick,
             },
           ],
         });

@@ -7,7 +7,7 @@ const MainContent = ({ toggleFirstSidebar, toggleSecondSidebar }: { toggleFirstS
   const [title, setTitle] = useState<string>("");
   return (
     <Box sx={{ width: "100%", boxSizing: "border-box", display: "flex", flexDirection: "column", height: "100%" }}>
-      <TobBar toggleFirstSidebar={toggleFirstSidebar} toggleSecondSidebar={toggleSecondSidebar} title={title} />
+      <TobBar toggleFirstSidebar={toggleFirstSidebar} toggleSecondSidebar={toggleSecondSidebar} title={title} setTitle={setTitle} />
       <Box sx={{ flex: 1, display: "block" }}>
         <Leaf title={title} setTitle={setTitle} />
       </Box>

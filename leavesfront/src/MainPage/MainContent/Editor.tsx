@@ -16,10 +16,15 @@ import {
 import CreateChildLeafFormattingToolBarButton from "./CreateChildLeafFormattingToolBarButton";
 import CreateParentLeafFormattingToolBarButton from "./CreateParentLeafFormattingToolBarButton";
 import { useStorage } from "@liveblocks/react/suspense";
+import { useEffect } from "react";
 
-const Editor = ({ owningTreeId, parentLeafId }: { owningTreeId: string; parentLeafId: string | null }) => {
+const Editor = ({ owningTreeId, parentLeafId, editorRef }: { owningTreeId: string; parentLeafId: string | null; editorRef: any }) => {
   const storage = useStorage((root) => root);
   const editor = useCreateBlockNoteWithLiveblocks({});
+
+  useEffect(() => {
+    editorRef.current = editor;
+  }, []);
 
   return (
     <BlockNoteView editor={editor} formattingToolbar={false} data-theming-css-variables-demo>

@@ -7,23 +7,32 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { useTheme } from "@mui/material/styles";
 import ParkIcon from "@mui/icons-material/Park";
 import { useMainPageContext } from "../MainPageManager";
+import { useEffect } from "react";
 
 type Props = {
   toggleFirstSidebar: () => void;
   toggleSecondSidebar: () => void;
   title: string;
+  setTitle: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const TobBar: React.FC<Props> = ({ toggleFirstSidebar, toggleSecondSidebar, title }) => {
+const TobBar: React.FC<Props> = ({ toggleFirstSidebar, toggleSecondSidebar, title, setTitle }) => {
   const theme = useTheme();
   const mainPageContext = useMainPageContext();
   if (!mainPageContext) {
     return <p>mainPageContext.Provider의 하위 컴포넌트가 아님.</p>;
   }
-  const { setTreeId, owningTreeId } = mainPageContext;
+  const { setTreeId, owningTreeId, leafId } = mainPageContext;
   const clickTitleHandler = () => {
     if (owningTreeId) setTreeId(owningTreeId);
   };
+
+  useEffect(() => {
+    if (!leafId) {
+      setTitle("");
+    }
+  }, [leafId]);
+
   return (
     <AppBar position="sticky" elevation={0}>
       <Toolbar

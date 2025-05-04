@@ -23,11 +23,12 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
   const theme = useTheme();
   const [parentLeafId, setParentLeafId] = useState<string | null>(null);
   const prevLeafId = useRef<string | null>(null);
+  const editorRef = useRef<any | null>(null);
   const mainPageContext = useMainPageContext();
   if (!mainPageContext) {
     return <p>mainPageContext.Provider의 하위 컴포넌트가 아님.</p>;
   }
-  const { leafId, ws, owningTreeId, setOwningTreeId } = mainPageContext;
+  const { leafId, ws, owningTreeId, setOwningTreeId, setLeafId } = mainPageContext;
   const wsMessageHandler: Record<string, (data: any) => void> = {
     [WsMessageType.UPDATE_LEAF_TITLE]: (data) => {
       const { title } = data;
@@ -36,6 +37,16 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
     [WsMessageType.UPDATE_LEAF_PARENT]: (data) => {
       const { parentLeafId } = data;
       setParentLeafId(parentLeafId);
+    },
+    [WsMessageType.UPDATE_LEAF_DELETE_LEAF]: (data) => {
+      const { isEmptyLeaf } = data;
+      console.log("[WsMessageType.UPDATE_LEAF_DELETE_LEAF]", data);
+      if (isEmptyLeaf) {
+        setTitle("Empty Leaf");
+        clearContents();
+      } else {
+        setLeafId(null);
+      }
     },
   };
 
@@ -80,6 +91,11 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
     if (ws) {
       ws.send(JSON.stringify({ type: WsMessageType.LEAVE_GROUP, data: { groupId } }));
     }
+  };
+
+  const clearContents = () => {
+    if (!editorRef.current) return;
+    editorRef.current.removeBlocks(editorRef.current.topLevelBlocks);
   };
 
   useEffect(() => {
@@ -136,11 +152,11 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
             }}
           />
           {DEV_MODE ? (
-            <DevEditor parentLeafId={parentLeafId} owningTreeId={owningTreeId} />
+            <DevEditor parentLeafId={parentLeafId} owningTreeId={owningTreeId} editorRef={editorRef} />
           ) : (
             <RoomProvider id={`${leafId}`}>
               <ClientSideSuspense fallback={<EditorFallback />}>
-                <Editor parentLeafId={parentLeafId} owningTreeId={owningTreeId} />
+                <Editor parentLeafId={parentLeafId} owningTreeId={owningTreeId} editorRef={editorRef} />
               </ClientSideSuspense>
             </RoomProvider>
           )}

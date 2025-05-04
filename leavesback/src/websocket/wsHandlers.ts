@@ -1,5 +1,5 @@
 import { WebSocket } from "ws";
-import { Directory, IsConquer, Leaf, WsMessageType } from "../types";
+import { DeleteCase, DeleteLeafData, Directory, Edge, EdgeData, IsConquer, Leaf, WsMessageType } from "../types";
 import { forestsCollection, leavesCollection, treesCollection } from "../config/db";
 import { ObjectId } from "mongodb";
 
@@ -17,6 +17,15 @@ export const registHandler = (ws: WebSocket, wsGroups: Map<string, Set<WebSocket
     if (!wsGroups.has(groupId)) wsGroups.set(groupId, new Set());
     wsGroups.get(groupId)?.add(ws);
   }
+  const broadCast = (groupId: string, messageType: WsMessageType, data: any, exceptWs?: any) => {
+    const clients = wsGroups.get(groupId);
+    if (!clients) return;
+    clients.forEach(client => {
+      if (client !== exceptWs && client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({ type: messageType, data }));
+      }
+    });
+  };
 
   const messageHandler: Partial<Record<WsMessageType, (message: any) => void>> = {
     [WsMessageType.UPDATE_LEAF_TITLE]: async (data) => {
@@ -316,7 +325,154 @@ export const registHandler = (ws: WebSocket, wsGroups: Map<string, Set<WebSocket
       const { groupId }: { groupId: string } = data;
       leaveWsGroup(groupId);
     },
-  }
+    [WsMessageType.DELETE_LEAF]: async (data: DeleteLeafData) => {
+      const { treeId, leafId, deleteCase, addEdgeList, deleteEdgeList, parentLeafId, childLeafIdList } = data;
+      const broadCastToTreeData = {
+        treeId,
+        leafId,
+      }
+      const broadCastToLeafData = {
+        leafId,
+        isEmptyLeaf: false
+      }
+      try {
+        switch (deleteCase) {
+          case DeleteCase.CHANGE_TO_EMPTY_LEAF: {
+            broadCastToLeafData.isEmptyLeaf = true;
+
+            // 리프 문서 수정
+            const leafUpdateRes = await leavesCollection.updateOne(
+              { _id: new ObjectId(leafId) },
+              { $set: { title: "Empty Leaf", contents: "" } }
+            );
+            if (!leafUpdateRes.acknowledged) {
+              console.error(`[DeleteCase.CHANGE_TO_EMPTY_LEAF] Failed to find leaf ${leafId}:\n`, leafUpdateRes);
+            }
+
+            // 트리 문서 수정
+            const treeUpdateRes1 = await treesCollection.updateOne(
+              { _id: new ObjectId(treeId), "nodes.data.id": leafId },
+              {
+                $set: {
+                  "nodes.$.data.label": "Empty Leaf",
+                  "nodes.$.data.isConquer": IsConquer.FALSE
+                }
+              }
+            );
+            if (!treeUpdateRes1.acknowledged) {
+              console.error(`[DeleteCase.CHANGE_TO_EMPTY_LEAF] Failed to find tree node ${leafId}`, treeUpdateRes1);
+            }
+            break;
+          }
+
+          case DeleteCase.HAS_PARENT: {
+            // 리프 삭제
+            const leafDelRes = await leavesCollection.deleteOne({ _id: new ObjectId(leafId) });
+            if (!leafDelRes.acknowledged || leafDelRes.deletedCount === 0) {
+              console.error(`[DeleteCase.HAS_PARENT] Failed to delete leaf ${leafId}`, leafDelRes);
+            }
+
+            // 노드 삭제
+            const pullNodeRes = await treesCollection.updateOne(
+              { _id: new ObjectId(treeId) },
+              { $pull: { nodes: { "data.id": leafId } } } as any
+            );
+            if (!pullNodeRes.acknowledged) {
+              console.error(`[DeleteCase.HAS_PARENT] $pull nodes failed for ${leafId}`, pullNodeRes);
+            }
+
+            // 엣지 삭제
+            const pullEdgeRes = await treesCollection.updateOne(
+              { _id: new ObjectId(treeId) },
+              { $pull: { edges: { $or: deleteEdgeList } } } as any
+            );
+            if (!pullEdgeRes.acknowledged) {
+              console.error(`[DeleteCase.HAS_PARENT] $pull edges failed for ${leafId}`, pullEdgeRes);
+            }
+
+            // 엣지 추가
+            const pushEdgeRes = await treesCollection.updateOne(
+              { _id: new ObjectId(treeId) },
+              { $push: { edges: { $each: addEdgeList } } }
+            );
+            if (!pushEdgeRes.acknowledged) {
+              console.error(`[DeleteCase.HAS_PARENT] $push edges failed for ${leafId}`, pushEdgeRes);
+            }
+            // 리프의 parentLeafId 변경
+            for (const childId of childLeafIdList) {
+              const updateLeafRes =
+                await leavesCollection.updateOne(
+                  { _id: new ObjectId(childId) },
+                  { $set: { parentLeafId: parentLeafId } }
+                );
+
+              if (!updateLeafRes.acknowledged || updateLeafRes.modifiedCount === 0) {
+                console.error(`[DeleteCase.HAS_PARENT] update parentLeafId failed for ${childId}`);
+              }
+            }
+            break;
+          }
+
+          case DeleteCase.ROOT_WITH_SINGLE_CHILD: {
+            // 리프 삭제
+            const leafDelRes2 = await leavesCollection.deleteOne({ _id: new ObjectId(leafId) });
+            if (!leafDelRes2.acknowledged || leafDelRes2.deletedCount === 0) {
+              console.error(`[DeleteCase.ROOT_WITH_SINGLE_CHILD] Failed to delete leaf ${leafId}`, leafDelRes2);
+            }
+
+            // 노드 삭제
+            const pullNodeRes2 = await treesCollection.updateOne(
+              { _id: new ObjectId(treeId) },
+              { $pull: { nodes: { "data.id": leafId } } } as any
+            );
+            if (!pullNodeRes2.acknowledged) {
+              console.error(`[DeleteCase.ROOT_WITH_SINGLE_CHILD] $pull nodes failed for ${leafId}`, pullNodeRes2);
+            }
+
+            // 엣지 삭제
+            const pullEdgeRes2 = await treesCollection.updateOne(
+              { _id: new ObjectId(treeId) },
+              { $pull: { edges: { $or: deleteEdgeList } } } as any
+            );
+            if (!pullEdgeRes2.acknowledged) {
+              console.error(`[DeleteCase.ROOT_WITH_SINGLE_CHILD] $pull edges failed for ${leafId}`, pullEdgeRes2);
+            }
+            // 리프의 parentLeafId 변경
+            const childId = childLeafIdList[0]
+            const updateParentLeafRes =
+              await leavesCollection.updateOne(
+                { _id: new ObjectId(childId) },
+                { $set: { parentLeafId: parentLeafId } }
+              );
+
+            if (!updateParentLeafRes.acknowledged) {
+              console.error(`[DeleteCase.ROOT_WITH_SINGLE_CHILD] update ParentLeafId failed for ${childId}`, updateParentLeafRes);
+            }
+          }
+            break;
+        }
+
+        // 브로드 캐스트.
+        broadCast(treeId, WsMessageType.UPDATE_TREE_DELETE_LEAF, broadCastToTreeData, ws);
+        broadCast(leafId, WsMessageType.UPDATE_LEAF_DELETE_LEAF, broadCastToLeafData);
+        if (deleteCase !== DeleteCase.CHANGE_TO_EMPTY_LEAF) {
+          childLeafIdList.forEach((leafId) => {
+            const updateLeafParentData = {
+              leafId,
+              parentLeafId,
+            }
+            broadCast(leafId, WsMessageType.UPDATE_LEAF_PARENT, updateLeafParentData)
+          })
+        }
+      } catch (error) {
+        console.error("[wsHandlers][DELETE_LEAF] Error:", error);
+        // if (ws.readyState === WebSocket.OPEN) {
+        //   ws.send(JSON.stringify({ type: WsMessageType.DELETE_LEAF_ERROR, data: { message: "Failed to delete leaf", error } }));
+        // }
+      }
+    }
+  };
+
   ws.on("message", (rawData) => {
     const message = JSON.parse(rawData.toString());
     const type: WsMessageType = message.type;
