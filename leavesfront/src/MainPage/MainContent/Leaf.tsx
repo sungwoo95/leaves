@@ -138,6 +138,12 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
             InputProps={{
               disableUnderline: true,
             }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === "ArrowDown") {
+                e.preventDefault();
+                editorRef.current?.focus(); // Editor에 focus 주기
+              }
+            }}
             sx={{
               boxSizing: "border-box",
               width: "100%",
