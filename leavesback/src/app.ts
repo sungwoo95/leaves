@@ -12,7 +12,7 @@ import leafRouter from "./routes/leafRouter";
 
 const App = () => {
   const app: Application = express();
-  const REST_API_PORT = 3001;
+  const REST_API_PORT = 3000;
   const WS_PORT = 8081;
   const wsGroups = new Map<string, Set<WebSocket>>();
 

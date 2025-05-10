@@ -1,0 +1,24 @@
+version: '3'
+services:
+  node:
+    image: 95kswoo/namunibs_node
+    container_name: namunibs_node
+    ports:
+      - "3000:3000"
+      - "8081:8081"
+    networks:
+      - app-net
+
+  nginx:
+    image: 95kswoo/namunibs_nginx
+    container_name: namunibs_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - node
+    networks:
+      - app-net
+
+networks:
+  app-net:
