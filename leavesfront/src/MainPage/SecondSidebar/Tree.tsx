@@ -308,10 +308,16 @@ const Tree: React.FC = () => {
     }, 2000);
   };
 
-  const joinGroup = () => {
-    if (ws && treeId) {
+  const joinGroup = (retry: number) => {
+    if (ws && treeId && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ type: WsMessageType.JOIN_GROUP, data: { groupId: treeId, prevGroupId: prevTreeId.current } }));
       prevTreeId.current = treeId;
+    } else if (retry < 100) {
+      setTimeout(() => {
+        joinGroup(retry + 1);
+      }, 100);
+    } else {
+      console.error("[Tree][joinGroup]WebSocket not open after retries");
     }
   };
 
@@ -460,7 +466,7 @@ const Tree: React.FC = () => {
   //tree그룹(websocket)에 참가하기.
   useEffect(() => {
     if (treeId) {
-      joinGroup();
+      joinGroup(0);
       addWsEventListener();
     }
     //treeId가 string->null로 변경 시

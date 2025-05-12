@@ -180,9 +180,15 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
     }
   };
 
-  const joinGroup = () => {
-    if (ws && forestId) {
+  const joinGroup = (retry: number) => {
+    if (ws && forestId && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ type: WsMessageType.JOIN_GROUP, data: { groupId: forestId, prevGroupId: null } }));
+    } else if (retry < 100) {
+      setTimeout(() => {
+        joinGroup(retry + 1);
+      }, 100);
+    } else {
+      console.error("[Forest][joinGroup]WebSocket not open after retries");
     }
   };
 
@@ -194,7 +200,7 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
 
   useEffect(() => {
     getForestData();
-    joinGroup();
+    joinGroup(0);
     ws?.addEventListener("message", handleMessage);
     return () => {
       ws?.removeEventListener("message", handleMessage);
@@ -211,7 +217,7 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
     <Box>
       <Button
         variant="text"
-        sx={{ pl: 2, width: "100%", justifyContent: "space-between", color: theme.palette.mode === "dark" ? "white" : "black"}}
+        sx={{ pl: 2, width: "100%", justifyContent: "space-between", color: theme.palette.mode === "dark" ? "white" : "black" }}
         onClick={toggleVisibility}>
         <Box>{forestName}</Box>
         <Box sx={{ display: "flex" }}>
@@ -234,7 +240,7 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
         </Box>
       </Button>
       <Box sx={{ display: isVisible ? "block" : "none" }}>
-       <Explorer
+        <Explorer
           isPublic={true}
           directories={directories}
           addDirectory={addDirectory}

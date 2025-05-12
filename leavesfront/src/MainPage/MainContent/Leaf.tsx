@@ -70,11 +70,16 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
       console.log("[Leaf]get leaf data error");
     }
   };
-
-  const joinGroup = () => {
-    if (ws && leafId) {
+  const joinGroup = (retry: number) => {
+    if (ws && leafId && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ type: WsMessageType.JOIN_GROUP, data: { groupId: leafId, prevGroupId: prevLeafId.current } }));
       prevLeafId.current = leafId;
+    } else if (retry < 100) {
+      setTimeout(() => {
+        joinGroup(retry + 1);
+      }, 100);
+    } else {
+      console.error("[Leaf][joinGroup]WebSocket not open after retries");
     }
   };
 
@@ -101,7 +106,7 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
   useEffect(() => {
     if (leafId) {
       getLeafData();
-      joinGroup();
+      joinGroup(0);
       ws?.addEventListener("message", handleMessage);
     }
     //leafId가 string->null로 변경 시
