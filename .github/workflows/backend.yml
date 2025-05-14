@@ -1,9 +1,10 @@
 # 이 워크플로는 백엔드 코드 변경 시 실행된다.
 name: Backend CI/CD
 
-# leavesback/ 폴더에 있는 코드가 push되면 실행된다.
 on:
   push:
+    branches:
+      - main
     paths:
       - 'leavesback/**'
 

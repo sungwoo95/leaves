@@ -1,8 +1,9 @@
 name: Frontend CI/CD
 
-# leavesfront/ 폴더에 있는 코드가 push되면 실행된다.
 on:
   push:
+    branches:
+      - main
     paths:
       - 'leavesfront/**'
 
