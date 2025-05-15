@@ -8,6 +8,7 @@ node_modules
 #confidential
 .env
 *.pem
+*.json
 
 # testing
 coverage
