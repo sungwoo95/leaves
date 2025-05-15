@@ -1,4 +1,8 @@
-export type AddDirectory = (tartgetId: null | string, type: DirectoryType, treeId?: string) => void;
+export type AddDirectory = (
+  tartgetId: null | string,
+  type: DirectoryType,
+  treeId?: string,
+) => void;
 
 export type DeleteDirectory = (targetId: string, targetTreeId?: string) => void;
 

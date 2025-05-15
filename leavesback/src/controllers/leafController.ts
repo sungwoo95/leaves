@@ -6,8 +6,8 @@ export const readLeaf = async (req: Request, res: Response): Promise<void> => {
   const { leafId } = req.params;
   try {
     const leaf = await leavesCollection.findOne({
-      _id: new ObjectId(leafId)
-    })
+      _id: new ObjectId(leafId),
+    });
     res.json(leaf);
   } catch (error) {
     console.log("[leafController][readLeaf]find Leaf error");

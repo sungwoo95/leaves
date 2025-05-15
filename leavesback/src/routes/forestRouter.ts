@@ -1,6 +1,9 @@
 import { Router } from "express";
-import { createForest, readForest, updateForestDirectories } from "../controllers/forestController";
-
+import {
+  createForest,
+  readForest,
+  updateForestDirectories,
+} from "../controllers/forestController";
 
 const forestRouter: Router = Router();
 

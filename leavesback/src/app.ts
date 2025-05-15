@@ -17,33 +17,34 @@ const App = () => {
   const wsGroups = new Map<string, Set<WebSocket>>();
 
   const setUpExpress = () => {
-    app.use(express.json());//req.body를 자동으로 객체로 변환
+    app.use(express.json()); //req.body를 자동으로 객체로 변환
     app.use(cookieParser());
     app.use(
       cors({
         origin: "http://localhost:5173",
         credentials: true,
-      })
+      }),
     );
-  }
+  };
   const setUpRestApiServer = () => {
     app.use("/api/tree", treeRouter);
     app.use("/api/user", userRouter);
     app.use("/api/forest", forestRouter);
     app.use("/api/leaf", leafRouter);
-  }
+  };
   const startRestApiServer = () => {
     setUpExpress();
     setUpRestApiServer();
     app.listen(REST_API_PORT, () => {
       console.log(`Server is running on port ${REST_API_PORT}`);
     });
-  }
+  };
   const startWebSocketServer = () => {
     const wsServer: WebSocketServer = new WebSocket.Server({ port: WS_PORT });
-    wsServer.on("connection", (ws: WebSocket) => { //ws매개변수의 인자값은 새로 연결된 클라이언트의 WebSocket 객체임.
+    wsServer.on("connection", (ws: WebSocket) => {
+      //ws매개변수의 인자값은 새로 연결된 클라이언트의 WebSocket 객체임.
       console.log("New WebSocket client connected");
-      registHandler(ws,wsGroups);
+      registHandler(ws, wsGroups);
     });
     console.log(`WebSocket server running on port ${WS_PORT}`);
   };
@@ -59,7 +60,6 @@ const App = () => {
   startRestApiServer();
   startWebSocketServer();
   connectToDB();
-}
+};
 
 App();
-

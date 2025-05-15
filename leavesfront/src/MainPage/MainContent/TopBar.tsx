@@ -16,7 +16,12 @@ type Props = {
   setTitle: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const TobBar: React.FC<Props> = ({ toggleFirstSidebar, toggleSecondSidebar, title, setTitle }) => {
+const TobBar: React.FC<Props> = ({
+  toggleFirstSidebar,
+  toggleSecondSidebar,
+  title,
+  setTitle,
+}) => {
   const theme = useTheme();
   const mainPageContext = useMainPageContext();
   if (!mainPageContext) {
@@ -43,13 +48,18 @@ const TobBar: React.FC<Props> = ({ toggleFirstSidebar, toggleSecondSidebar, titl
           },
           bgcolor: theme.palette.mode === "dark" ? "#121212" : "white",
           justifyContent: "space-between", // 좌측과 우측에 요소 배치
-        }}>
+        }}
+      >
         <div>
           <IconButton size="small" sx={{ mr: 1 }} onClick={toggleFirstSidebar}>
-            <MenuIcon sx={{ color: theme.palette.mode === "dark" ? "white" : "black" }} />
+            <MenuIcon
+              sx={{ color: theme.palette.mode === "dark" ? "white" : "black" }}
+            />
           </IconButton>
           <IconButton size="small" sx={{ mr: 1 }} onClick={toggleSecondSidebar}>
-            <ParkIcon sx={{ color: theme.palette.mode === "dark" ? "white" : "black" }} />
+            <ParkIcon
+              sx={{ color: theme.palette.mode === "dark" ? "white" : "black" }}
+            />
           </IconButton>
           <Button onClick={clickTitleHandler}>
             <Typography
@@ -59,7 +69,8 @@ const TobBar: React.FC<Props> = ({ toggleFirstSidebar, toggleSecondSidebar, titl
                 whiteSpace: "nowrap", // 줄바꿈 방지
                 overflow: "hidden", // 넘친 텍스트 숨김
                 textOverflow: "ellipsis", // ...으로 표시
-              }}>
+              }}
+            >
               {title}
             </Typography>
           </Button>

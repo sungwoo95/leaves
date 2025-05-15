@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import { Box, Modal, TextField, Typography } from "@mui/material";
-import axios from "axios";
-import { path } from "../../../config/config";
 import AddIcon from "@mui/icons-material/Add";
 import { MyForestInfo } from "../../types";
 import { useTheme } from "@mui/material/styles";
 import Forest from "./Forest";
+import axiosInstance from "../../axiosInstance";
 
 const modalStyle = {
   position: "absolute",
@@ -36,7 +35,9 @@ const ForestRegion = () => {
   };
   const postPublicForest = async () => {
     try {
-      const response = await axios.post(`${path}/forest/createForest`, { forestName: inputValue });
+      const response = await axiosInstance.post(`/forest/createForest`, {
+        forestName: inputValue,
+      });
       const newMyForestInfo = response.data.newMyForestInfo;
       console.log(newMyForestInfo);
       setMyForests((prev) => [...prev, newMyForestInfo]);
@@ -53,7 +54,7 @@ const ForestRegion = () => {
     console.log("[PublicForestRegion]useEffect called");
     const setMyForestsData = async () => {
       try {
-        const response = await axios.get(`${path}/user/myForests`);
+        const response = await axiosInstance.get(`/user/myForests`);
         const newMyForests: MyForestInfo[] = response.data;
         console.log("[PublicForestRegion]response.data: ", newMyForests);
         setMyForests(newMyForests);
@@ -65,11 +66,16 @@ const ForestRegion = () => {
   }, []);
 
   return (
-    <Box >
+    <Box>
       <Button
         variant="text"
-        sx={{ width: "100%", justifyContent: "space-between", color: theme.palette.mode === "dark" ? "white" : "black" }}
-        onClick={toggleVisibility}>
+        sx={{
+          width: "100%",
+          justifyContent: "space-between",
+          color: theme.palette.mode === "dark" ? "white" : "black",
+        }}
+        onClick={toggleVisibility}
+      >
         <Box>Forest</Box>
         <Box sx={{ display: "flex" }}>
           <AddIcon
@@ -80,12 +86,26 @@ const ForestRegion = () => {
           />
         </Box>
       </Button>
-      <Modal open={isModalOpen} onClose={handleModalClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+      <Modal
+        open={isModalOpen}
+        onClose={handleModalClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
         <Box sx={modalStyle}>
-          <Typography color={theme.palette.mode === "dark" ? "white" : "black"} id="modal-modal-title" variant="h6" component="h2">
+          <Typography
+            color={theme.palette.mode === "dark" ? "white" : "black"}
+            id="modal-modal-title"
+            variant="h6"
+            component="h2"
+          >
             Create Forest
           </Typography>
-          <Typography color={theme.palette.mode === "dark" ? "white" : "black"} id="modal-modal-description" sx={{ mt: 2 }}>
+          <Typography
+            color={theme.palette.mode === "dark" ? "white" : "black"}
+            id="modal-modal-description"
+            sx={{ mt: 2 }}
+          >
             You can invite users to a forest.
           </Typography>
           <TextField

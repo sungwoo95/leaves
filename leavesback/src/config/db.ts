@@ -46,4 +46,3 @@ export const connectToMongoDB = async (): Promise<MongoClient> => {
     throw err;
   }
 };
-

@@ -1,9 +1,8 @@
 import { useRef, useState } from "react";
-import axios from "axios";
-import { TextField, Button, Box, Typography, Paper } from "@mui/material";
+import { TextField, Button, Typography, Paper } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { path } from "../../config/config";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../axiosInstance";
 
 const StartForm = () => {
   const emailRef = useRef<HTMLInputElement>(null);
@@ -21,7 +20,10 @@ const StartForm = () => {
     }
 
     try {
-      const response = await axios.post(`${path}/user/start`, { email, password });
+      const response = await axiosInstance.post(`/user/start`, {
+        email,
+        password,
+      });
       console.log("응답:", response.data);
       setError(null);
       navigate("/main");

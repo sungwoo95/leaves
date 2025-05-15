@@ -1,15 +1,14 @@
 import { useRef, useEffect, useCallback, useState } from "react";
-import axios from "axios";
 import CytoscapeComponent from "react-cytoscapejs";
-import cytoscape, { CollectionReturnValue, EdgeCollection, EdgeSingular, NodeCollection } from "cytoscape";
+import cytoscape, { CollectionReturnValue, EdgeCollection, NodeCollection } from "cytoscape";
 import { useTheme } from "@mui/material/styles";
-import { path } from "../../../config/config";
 import { useMainPageContext } from "../MainPageManager";
 import { DeleteCase, DeleteLeafData, Edge, IsConquer, Node, WsMessageType } from "../../types";
 import NoTreeIsOpen from "./NoTreeIsOpen";
 import contextMenus from "cytoscape-context-menus";
 import "cytoscape-context-menus/cytoscape-context-menus.css";
 import { forceSimulation, forceManyBody, forceCollide, Simulation, forceLink } from "d3-force";
+import axiosInstance from "../../axiosInstance";
 
 cytoscape.use(contextMenus); // 플러그인 활성화
 
@@ -146,7 +145,12 @@ const Tree: React.FC = () => {
   const handleConquerClick = (event: cytoscape.EventObject) => {
     const leafId = event.target.id();
     const isConquer = event.target.data("isConquer");
-    ws?.send(JSON.stringify({ type: WsMessageType.UPDATE_TREE_CONQUER, data: { treeId, leafId, isConquer } }));
+    ws?.send(
+      JSON.stringify({
+        type: WsMessageType.UPDATE_TREE_CONQUER,
+        data: { treeId, leafId, isConquer },
+      })
+    );
   };
 
   const handleDeleteClick = (event: cytoscape.EventObject) => {
@@ -310,7 +314,12 @@ const Tree: React.FC = () => {
 
   const joinGroup = (retry: number) => {
     if (ws && treeId && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ type: WsMessageType.JOIN_GROUP, data: { groupId: treeId, prevGroupId: prevTreeId.current } }));
+      ws.send(
+        JSON.stringify({
+          type: WsMessageType.JOIN_GROUP,
+          data: { groupId: treeId, prevGroupId: prevTreeId.current },
+        })
+      );
       prevTreeId.current = treeId;
     } else if (retry < 100) {
       setTimeout(() => {
@@ -341,11 +350,10 @@ const Tree: React.FC = () => {
   const getTreeData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${path}/tree/${treeId}`);
+      const response = await axiosInstance.get(`/tree/${treeId}`);
       const treeData = response.data;
       if (treeData) {
         const { nodes, edges } = treeData;
-        // const layoutedNodes = await getLayoutedNodes(nodes, edges);
         setNodes(nodes);
         setEdges(edges);
         setTreeDataFlag((prev) => !prev);
@@ -433,7 +441,9 @@ const Tree: React.FC = () => {
         // case2: 상위 노드 없음 + 하위 노드 1개
         deleteCase = DeleteCase.ROOT_WITH_SINGLE_CHILD;
         //삭제할 엣지에 타깃노드-하위노드 엣지 추가.
-        deleteEdgeList.push({ data: { source: nodeId, target: childNodes[0].id() } });
+        deleteEdgeList.push({
+          data: { source: nodeId, target: childNodes[0].id() },
+        });
       } else {
         // case3: 상위 노드 없음 + 하위 노드 0개 또는 2개 이상
         deleteCase = DeleteCase.CHANGE_TO_EMPTY_LEAF;

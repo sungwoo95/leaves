@@ -4,7 +4,10 @@ import { firebase } from "../firebase"; // compat 기반 firebase import
 const uiConfig = {
   signInFlow: "popup",
   signInSuccessUrl: "/main",
-  signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID, firebase.auth.EmailAuthProvider.PROVIDER_ID],
+  signInOptions: [
+    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+    firebase.auth.EmailAuthProvider.PROVIDER_ID,
+  ],
 };
 
 function SignInScreen() {

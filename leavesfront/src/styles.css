@@ -13,15 +13,17 @@
   /* 드래그 커서 */
   cursor: col-resize;
   background-color: #171817;
-  transition: background-color 0.3s ease, width 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    width 0.3s ease;
 }
 
 .custom-handle:hover {
   width: 3px;
-  background-color: #89dc8c ; 
+  background-color: #89dc8c;
 }
 
 .custom-handle:active {
   width: 3px;
-  background-color: #388e3c ;
+  background-color: #388e3c;
 }

@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect, useRef } from "react";
-import { path, WS_PATH } from "../../config/config";
-import axios from "axios";
+import { WS_PATH } from "../../config/config";
+import axiosInstance from "../axiosInstance";
 
 type MainPageContextType = {
   treeId: string | null;
@@ -29,7 +29,10 @@ export function MainPageManager({ children }: MainPageProps) {
   const [isPublicTree, setIsPublicTree] = useState<boolean | undefined>(undefined);
   const [isPublicLeaf, setIsPublicLeaf] = useState<boolean | undefined>(undefined);
   const [ws, setWs] = useState<WebSocket | undefined>(undefined);
+
+  const [token, setToken] = useState<string | null>(null); // 해당 사용자의 ID 토큰
   const isMount = useRef<boolean>(true);
+
   useEffect(() => {
     console.log("[MainPageManager] useEffect called");
     let reconnectTimeout: NodeJS.Timeout;
@@ -77,7 +80,7 @@ export function MainPageManager({ children }: MainPageProps) {
   useEffect(() => {
     const getMainPageData = async () => {
       try {
-        const response = await axios.get(`${path}/user/mainPage`);
+        const response = await axiosInstance.get(`/user/mainPage`);
         const mainPageData = response.data;
         if (mainPageData.treeId) {
           setTreeId(mainPageData.treeId);
@@ -99,7 +102,7 @@ export function MainPageManager({ children }: MainPageProps) {
     const postMainPageData = async () => {
       const postData = { treeId, leafId };
       try {
-        const response = await axios.post(`${path}/user/mainPage`, postData);
+        const response = await axiosInstance.post(`/user/mainPage`, postData);
         console.log("[MainPageManager][postMainPageData]response:", response.data.message);
       } catch (error) {
         console.log("[MainPageManager][postMainPageData]post /user/mainPage error:", error);

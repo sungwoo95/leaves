@@ -11,7 +11,8 @@ const NoTreeIsOpen = () => {
         justifyContent: "center",
         alignItems: "center",
         height: "100%",
-      }}>
+      }}
+    >
       <Typography variant="h6" color={theme.palette.text.primary}>
         No tree is open
       </Typography>

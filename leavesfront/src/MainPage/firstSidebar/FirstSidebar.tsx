@@ -15,7 +15,8 @@ const FirstSidebar: React.FC = () => {
         boxSizing: "border-box",
         bgcolor: theme.palette.mode === "dark" ? "#171817" : "white",
         overflow: "auto",
-      }}>
+      }}
+    >
       <ForestRegion />
     </Box>
   );

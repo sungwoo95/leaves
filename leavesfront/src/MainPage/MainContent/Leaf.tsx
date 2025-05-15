@@ -7,12 +7,13 @@ import "./editorStyles.css";
 import { useMainPageContext } from "../MainPageManager";
 import { WsMessageType } from "../../types";
 import axios from "axios";
-import { DEV_MODE, path } from "../../../config/config";
+import { DEV_MODE } from "../../../config/config";
 import { ClientSideSuspense, RoomProvider } from "@liveblocks/react";
 import Editor from "./Editor";
 import NoLeafIsOpen from "./NoLeafIsOpen";
 import EditorFallback from "./EditorFallback";
 import DevEditor from "./DevEditor";
+import axiosInstance from "../../axiosInstance";
 
 type Props = {
   title: string;
@@ -54,13 +55,18 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
     const newTitle = e.target.value;
     setTitle(newTitle);
     if (ws) {
-      ws.send(JSON.stringify({ type: WsMessageType.UPDATE_LEAF_TITLE, data: { owningTreeId, leafId, title: newTitle } }));
+      ws.send(
+        JSON.stringify({
+          type: WsMessageType.UPDATE_LEAF_TITLE,
+          data: { owningTreeId, leafId, title: newTitle },
+        })
+      );
     }
   };
 
   const getLeafData = async () => {
     try {
-      const response = await axios.get(`${path}/leaf/${leafId}`);
+      const response = await axiosInstance.get(`/leaf/${leafId}`);
       const leaf = response.data;
       const { title, owningTreeId, parentLeafId } = leaf;
       setTitle(title);
@@ -72,7 +78,12 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
   };
   const joinGroup = (retry: number) => {
     if (ws && leafId && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ type: WsMessageType.JOIN_GROUP, data: { groupId: leafId, prevGroupId: prevLeafId.current } }));
+      ws.send(
+        JSON.stringify({
+          type: WsMessageType.JOIN_GROUP,
+          data: { groupId: leafId, prevGroupId: prevLeafId.current },
+        })
+      );
       prevLeafId.current = leafId;
     } else if (retry < 100) {
       setTimeout(() => {

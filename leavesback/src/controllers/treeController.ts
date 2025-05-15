@@ -9,8 +9,8 @@ export const readTree = async (req: Request, res: Response): Promise<void> => {
   console.log("[treeController][readTree]treeId:", treeId);
   try {
     const tree = await treesCollection.findOne({
-      _id: new ObjectId(treeId)
-    })
+      _id: new ObjectId(treeId),
+    });
     res.json(tree);
   } catch (error) {
     console.log("[treeController][readTree]find Tree error");
@@ -19,34 +19,50 @@ export const readTree = async (req: Request, res: Response): Promise<void> => {
 };
 
 //db에 새로운 Tree inserOne하기, objectId 응답하기.
-export const createTree = async (req: Request, res: Response): Promise<void> => {
+export const createTree = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const newLeaf: Leaf = {
       parentLeafId: null,
       title: "First Leaf",
       contents: "",
-    }
+    };
     const insertLeafResult = await leavesCollection.insertOne(newLeaf);
     if (!insertLeafResult.acknowledged) {
-      console.log("[TreeController][createTree]insert new leaf error")
+      console.log("[TreeController][createTree]insert new leaf error");
       res.status(500).json({ message: "Internal server error" });
       return;
     }
     const leafId = insertLeafResult.insertedId;
     const newTree: Tree = {
-      nodes: [{ data: { id: leafId.toString(), label: "First Leaf", isConquer: IsConquer.FALSE } },],
+      nodes: [
+        {
+          data: {
+            id: leafId.toString(),
+            label: "First Leaf",
+            isConquer: IsConquer.FALSE,
+          },
+        },
+      ],
       edges: [],
-    }
+    };
     const insertTreeResult = await treesCollection.insertOne(newTree);
     if (!insertTreeResult.acknowledged) {
-      console.log("[TreeController][createTree]insert new Tree error")
+      console.log("[TreeController][createTree]insert new Tree error");
       res.status(500).json({ message: "Internal server error" });
       return;
     }
     const treeId = insertTreeResult.insertedId;
-    const updateLeafResult = await leavesCollection.updateOne({ _id: leafId }, { $set: { owningTreeId: treeId.toString() } })
+    const updateLeafResult = await leavesCollection.updateOne(
+      { _id: leafId },
+      { $set: { owningTreeId: treeId.toString() } },
+    );
     if (updateLeafResult.modifiedCount === 0) {
-      console.log("[TreeController][createTree] update leaf owningTreeId error");
+      console.log(
+        "[TreeController][createTree] update leaf owningTreeId error",
+      );
       res.status(500).json({ message: "Failed to update leaf owningTreeId" });
       return;
     }
@@ -56,4 +72,3 @@ export const createTree = async (req: Request, res: Response): Promise<void> => 
     return;
   }
 };
-

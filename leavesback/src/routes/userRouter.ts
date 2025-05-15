@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { postMainPageData, readMainPageData, readMyForests, userStart } from "../controllers/userController";
+import {
+  postMainPageData,
+  readMainPageData,
+  readMyForests,
+  userStart,
+} from "../controllers/userController";
 
 const userRouter: Router = Router();
 //auth

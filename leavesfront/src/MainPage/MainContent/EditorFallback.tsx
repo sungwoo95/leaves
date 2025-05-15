@@ -17,7 +17,8 @@ const EditorFallback = () => {
         alignItems: "center",
         justifyContent: "center",
         p: 2,
-      }}>
+      }}
+    >
       <CircularProgress color="inherit" />
       <Typography variant="body1" sx={{ mt: 2 }}>
         Loading content...
