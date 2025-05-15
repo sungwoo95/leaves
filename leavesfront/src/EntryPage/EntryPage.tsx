@@ -1,5 +1,5 @@
-import SignInScreen from "./SignInScreen";
-import StartForm from "./StartForm";
+import SignInScreen from './SignInScreen';
+import StartForm from './StartForm';
 
 const EntryPage: React.FC = () => {
   return (

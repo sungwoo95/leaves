@@ -1,5 +1,5 @@
-import { Menu, MenuItem } from "@mui/material";
-import { OnClickMenuHandler, Position } from "../../types";
+import { Menu, MenuItem } from '@mui/material';
+import { OnClickMenuHandler, Position } from '../../types';
 
 const DirectoryContextMenu = ({
   open,

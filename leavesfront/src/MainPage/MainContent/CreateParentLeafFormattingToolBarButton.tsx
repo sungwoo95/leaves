@@ -1,6 +1,6 @@
-import { useBlockNoteEditor, useComponentsContext } from "@blocknote/react";
-import { useMainPageContext } from "../MainPageManager";
-import { WsMessageType } from "../../types";
+import { useBlockNoteEditor, useComponentsContext } from '@blocknote/react';
+import { useMainPageContext } from '../MainPageManager';
+import { WsMessageType } from '../../types';
 
 const CreateParentLeafFormattingToolBarButton = ({
   owningTreeId,
@@ -18,7 +18,7 @@ const CreateParentLeafFormattingToolBarButton = ({
   const { leafId, ws } = mainPageContext;
   return (
     <Components.FormattingToolbar.Button
-      mainTooltip={"Create parent leaf"}
+      mainTooltip={'Create parent leaf'}
       onClick={() => {
         const selectedText = editor.getSelectedText();
         if (ws) {
@@ -26,14 +26,14 @@ const CreateParentLeafFormattingToolBarButton = ({
             JSON.stringify({
               type: WsMessageType.ADD_PARENT_LEAF,
               data: { leafId, owningTreeId, title: selectedText, parentLeafId },
-            }),
+            })
           );
         }
       }}
     >
       <img
-        src={"/addParentLeafIcon.png"}
-        style={{ width: "15px", height: "20px" }}
+        src={'/addParentLeafIcon.png'}
+        style={{ width: '15px', height: '20px' }}
       />
     </Components.FormattingToolbar.Button>
   );

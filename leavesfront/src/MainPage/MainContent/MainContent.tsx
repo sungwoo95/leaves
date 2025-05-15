@@ -1,7 +1,7 @@
-import { Box } from "@mui/material";
-import Leaf from "./Leaf";
-import TobBar from "./TopBar";
-import { useState } from "react";
+import { Box } from '@mui/material';
+import Leaf from './Leaf';
+import TobBar from './TopBar';
+import { useState } from 'react';
 
 const MainContent = ({
   toggleFirstSidebar,
@@ -10,15 +10,15 @@ const MainContent = ({
   toggleFirstSidebar: () => void;
   toggleSecondSidebar: () => void;
 }) => {
-  const [title, setTitle] = useState<string>("");
+  const [title, setTitle] = useState<string>('');
   return (
     <Box
       sx={{
-        width: "100%",
-        boxSizing: "border-box",
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
+        width: '100%',
+        boxSizing: 'border-box',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
       }}
     >
       <TobBar
@@ -27,7 +27,7 @@ const MainContent = ({
         title={title}
         setTitle={setTitle}
       />
-      <Box sx={{ flex: 1, display: "block" }}>
+      <Box sx={{ flex: 1, display: 'block' }}>
         <Leaf title={title} setTitle={setTitle} />
       </Box>
     </Box>

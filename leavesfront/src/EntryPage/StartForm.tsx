@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
-import { TextField, Button, Typography, Paper } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-import { useNavigate } from "react-router-dom";
-import axiosInstance from "../axiosInstance";
+import { useRef, useState } from 'react';
+import { TextField, Button, Typography, Paper } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../axiosInstance';
 
 const StartForm = () => {
   const emailRef = useRef<HTMLInputElement>(null);
@@ -15,7 +15,7 @@ const StartForm = () => {
     const password = passwordRef.current?.value;
 
     if (!email || !password) {
-      setError("이메일과 비밀번호를 입력해주세요.");
+      setError('이메일과 비밀번호를 입력해주세요.');
       return;
     }
 
@@ -24,11 +24,12 @@ const StartForm = () => {
         email,
         password,
       });
-      console.log("응답:", response.data);
+      console.log('응답:', response.data);
       setError(null);
-      navigate("/main");
+      navigate('/main');
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || "로그인 중 문제가 발생했습니다.";
+      const errorMessage =
+        err.response?.data?.message || '로그인 중 문제가 발생했습니다.';
       setError(errorMessage);
     }
   };
@@ -39,12 +40,28 @@ const StartForm = () => {
         p: 3,
         borderRadius: 2,
         boxShadow: 2,
-        bgcolor: theme.palette.mode === "dark" ? "#001000" : "white", // ✅ 다크 모드 적용
-        color: theme.palette.mode === "dark" ? "white" : "black", // ✅ 다크 모드 글자색 적용
-      }}>
-      <TextField fullWidth label="이메일" variant="outlined" margin="normal" inputRef={emailRef} placeholder="이메일을 입력하세요" />
+        bgcolor: theme.palette.mode === 'dark' ? '#001000' : 'white', // ✅ 다크 모드 적용
+        color: theme.palette.mode === 'dark' ? 'white' : 'black', // ✅ 다크 모드 글자색 적용
+      }}
+    >
+      <TextField
+        fullWidth
+        label="이메일"
+        variant="outlined"
+        margin="normal"
+        inputRef={emailRef}
+        placeholder="이메일을 입력하세요"
+      />
 
-      <TextField fullWidth label="비밀번호" type="password" variant="outlined" margin="normal" inputRef={passwordRef} placeholder="비밀번호를 입력하세요" />
+      <TextField
+        fullWidth
+        label="비밀번호"
+        type="password"
+        variant="outlined"
+        margin="normal"
+        inputRef={passwordRef}
+        placeholder="비밀번호를 입력하세요"
+      />
 
       {error && (
         <Typography color="error" variant="body2" sx={{ mt: 1 }}>
@@ -52,7 +69,13 @@ const StartForm = () => {
         </Typography>
       )}
 
-      <Button fullWidth variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleSubmit}>
+      <Button
+        fullWidth
+        variant="contained"
+        color="primary"
+        sx={{ mt: 2 }}
+        onClick={handleSubmit}
+      >
         계속
       </Button>
     </Paper>

@@ -1,19 +1,19 @@
-import { Box, TextField } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-import { useEffect, useRef, useState } from "react";
-import "@blocknote/core/fonts/inter.css";
-import "@blocknote/mantine/style.css";
-import "./editorStyles.css";
-import { useMainPageContext } from "../MainPageManager";
-import { WsMessageType } from "../../types";
-import axios from "axios";
-import { DEV_MODE } from "../../../config/config";
-import { ClientSideSuspense, RoomProvider } from "@liveblocks/react";
-import Editor from "./Editor";
-import NoLeafIsOpen from "./NoLeafIsOpen";
-import EditorFallback from "./EditorFallback";
-import DevEditor from "./DevEditor";
-import axiosInstance from "../../axiosInstance";
+import { Box, TextField } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import { useEffect, useRef, useState } from 'react';
+import '@blocknote/core/fonts/inter.css';
+import '@blocknote/mantine/style.css';
+import './editorStyles.css';
+import { useMainPageContext } from '../MainPageManager';
+import { WsMessageType } from '../../types';
+import axios from 'axios';
+import { DEV_MODE } from '../../../config/config';
+import { ClientSideSuspense, RoomProvider } from '@liveblocks/react';
+import Editor from './Editor';
+import NoLeafIsOpen from './NoLeafIsOpen';
+import EditorFallback from './EditorFallback';
+import DevEditor from './DevEditor';
+import axiosInstance from '../../axiosInstance';
 
 type Props = {
   title: string;
@@ -29,7 +29,8 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
   if (!mainPageContext) {
     return <p>mainPageContext.Provider의 하위 컴포넌트가 아님.</p>;
   }
-  const { leafId, ws, owningTreeId, setOwningTreeId, setLeafId } = mainPageContext;
+  const { leafId, ws, owningTreeId, setOwningTreeId, setLeafId } =
+    mainPageContext;
   const wsMessageHandler: Record<string, (data: any) => void> = {
     [WsMessageType.UPDATE_LEAF_TITLE]: (data) => {
       const { title } = data;
@@ -41,9 +42,9 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
     },
     [WsMessageType.UPDATE_LEAF_DELETE_LEAF]: (data) => {
       const { isEmptyLeaf } = data;
-      console.log("[WsMessageType.UPDATE_LEAF_DELETE_LEAF]", data);
+      console.log('[WsMessageType.UPDATE_LEAF_DELETE_LEAF]', data);
       if (isEmptyLeaf) {
-        setTitle("Empty Leaf");
+        setTitle('Empty Leaf');
         clearContents();
       } else {
         setLeafId(null);
@@ -73,7 +74,7 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
       setOwningTreeId(owningTreeId);
       setParentLeafId(parentLeafId);
     } catch (error) {
-      console.log("[Leaf]get leaf data error");
+      console.log('[Leaf]get leaf data error');
     }
   };
   const joinGroup = (retry: number) => {
@@ -90,7 +91,7 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
         joinGroup(retry + 1);
       }, 100);
     } else {
-      console.error("[Leaf][joinGroup]WebSocket not open after retries");
+      console.error('[Leaf][joinGroup]WebSocket not open after retries');
     }
   };
 
@@ -105,7 +106,9 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
 
   const leaveGroup = (groupId: string) => {
     if (ws) {
-      ws.send(JSON.stringify({ type: WsMessageType.LEAVE_GROUP, data: { groupId } }));
+      ws.send(
+        JSON.stringify({ type: WsMessageType.LEAVE_GROUP, data: { groupId } })
+      );
     }
   };
 
@@ -118,7 +121,7 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
     if (leafId) {
       getLeafData();
       joinGroup(0);
-      ws?.addEventListener("message", handleMessage);
+      ws?.addEventListener('message', handleMessage);
     }
     //leafId가 string->null로 변경 시
     if (prevLeafId.current && !leafId) {
@@ -126,59 +129,71 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
       prevLeafId.current = null;
     }
     return () => {
-      ws?.removeEventListener("message", handleMessage);
+      ws?.removeEventListener('message', handleMessage);
     };
   }, [leafId, ws]);
 
   return (
     <Box
       sx={{
-        height: "100%",
-        boxSizing: "border-box",
-        width: "100%",
-      }}>
+        height: '100%',
+        boxSizing: 'border-box',
+        width: '100%',
+      }}
+    >
       {leafId && owningTreeId ? (
         <Box
           sx={{
-            height: "100%",
-            bgcolor: theme.palette.mode === "dark" ? "#121212" : "white",
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-          }}>
+            height: '100%',
+            bgcolor: theme.palette.mode === 'dark' ? '#121212' : 'white',
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
           <TextField
             value={title}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTitleChange(e)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              handleTitleChange(e)
+            }
             variant="standard"
             multiline
             InputProps={{
               disableUnderline: true,
             }}
             onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === "ArrowDown") {
+              if (e.key === 'Enter' || e.key === 'ArrowDown') {
                 e.preventDefault();
                 editorRef.current?.focus(); // Editor에 focus 주기
               }
             }}
             sx={{
-              boxSizing: "border-box",
-              width: "100%",
+              boxSizing: 'border-box',
+              width: '100%',
               paddingLeft: 7,
               paddingRight: 3,
               paddingTop: 2,
               paddingBottom: 1,
               textArea: {
-                fontSize: "1.5rem",
-                fontWeight: "bold",
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
               },
             }}
           />
           {DEV_MODE ? (
-            <DevEditor parentLeafId={parentLeafId} owningTreeId={owningTreeId} editorRef={editorRef} />
+            <DevEditor
+              parentLeafId={parentLeafId}
+              owningTreeId={owningTreeId}
+              editorRef={editorRef}
+            />
           ) : (
             <RoomProvider id={`${leafId}`}>
               <ClientSideSuspense fallback={<EditorFallback />}>
-                <Editor parentLeafId={parentLeafId} owningTreeId={owningTreeId} editorRef={editorRef} />
+                <Editor
+                  parentLeafId={parentLeafId}
+                  owningTreeId={owningTreeId}
+                  editorRef={editorRef}
+                />
               </ClientSideSuspense>
             </RoomProvider>
           )}

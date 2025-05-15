@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography, useTheme } from '@mui/material';
 
 const NoLeafIsOpen = () => {
   const theme = useTheme();
@@ -6,11 +6,11 @@ const NoLeafIsOpen = () => {
     <Box
       sx={{
         flex: 1,
-        bgcolor: theme.palette.mode === "dark" ? "#121212" : "white",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100%",
+        bgcolor: theme.palette.mode === 'dark' ? '#121212' : 'white',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100%',
       }}
     >
       <Typography variant="h6" color={theme.palette.text.primary}>

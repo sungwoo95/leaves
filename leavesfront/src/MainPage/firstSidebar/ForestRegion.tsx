@@ -1,19 +1,19 @@
-import { useEffect, useState } from "react";
-import Button from "@mui/material/Button";
-import { Box, Modal, TextField, Typography } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import { MyForestInfo } from "../../types";
-import { useTheme } from "@mui/material/styles";
-import Forest from "./Forest";
-import axiosInstance from "../../axiosInstance";
+import { useEffect, useState } from 'react';
+import Button from '@mui/material/Button';
+import { Box, Modal, TextField, Typography } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import { MyForestInfo } from '../../types';
+import { useTheme } from '@mui/material/styles';
+import Forest from './Forest';
+import axiosInstance from '../../axiosInstance';
 
 const modalStyle = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
   width: 400,
-  bgcolor: "background.paper",
+  bgcolor: 'background.paper',
   boxShadow: 24,
   p: 4,
 };
@@ -23,7 +23,7 @@ const ForestRegion = () => {
   const [myForests, setMyForests] = useState<MyForestInfo[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const theme = useTheme();
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState('');
   const handleModalOpen = () => {
     setIsModalOpen(true);
   };
@@ -42,7 +42,7 @@ const ForestRegion = () => {
       console.log(newMyForestInfo);
       setMyForests((prev) => [...prev, newMyForestInfo]);
     } catch (error) {
-      console.log("[PublicForestRegion]postPublicForest error");
+      console.log('[PublicForestRegion]postPublicForest error');
     }
   };
   const handleModalCreate = () => {
@@ -51,12 +51,12 @@ const ForestRegion = () => {
     if (!isVisible) toggleVisibility();
   };
   useEffect(() => {
-    console.log("[PublicForestRegion]useEffect called");
+    console.log('[PublicForestRegion]useEffect called');
     const setMyForestsData = async () => {
       try {
         const response = await axiosInstance.get(`/user/myForests`);
         const newMyForests: MyForestInfo[] = response.data;
-        console.log("[PublicForestRegion]response.data: ", newMyForests);
+        console.log('[PublicForestRegion]response.data: ', newMyForests);
         setMyForests(newMyForests);
       } catch (error) {
         console.log(error);
@@ -70,14 +70,14 @@ const ForestRegion = () => {
       <Button
         variant="text"
         sx={{
-          width: "100%",
-          justifyContent: "space-between",
-          color: theme.palette.mode === "dark" ? "white" : "black",
+          width: '100%',
+          justifyContent: 'space-between',
+          color: theme.palette.mode === 'dark' ? 'white' : 'black',
         }}
         onClick={toggleVisibility}
       >
         <Box>Forest</Box>
-        <Box sx={{ display: "flex" }}>
+        <Box sx={{ display: 'flex' }}>
           <AddIcon
             onClick={(e) => {
               e.stopPropagation();
@@ -94,7 +94,7 @@ const ForestRegion = () => {
       >
         <Box sx={modalStyle}>
           <Typography
-            color={theme.palette.mode === "dark" ? "white" : "black"}
+            color={theme.palette.mode === 'dark' ? 'white' : 'black'}
             id="modal-modal-title"
             variant="h6"
             component="h2"
@@ -102,7 +102,7 @@ const ForestRegion = () => {
             Create Forest
           </Typography>
           <Typography
-            color={theme.palette.mode === "dark" ? "white" : "black"}
+            color={theme.palette.mode === 'dark' ? 'white' : 'black'}
             id="modal-modal-description"
             sx={{ mt: 2 }}
           >
@@ -116,14 +116,14 @@ const ForestRegion = () => {
             onChange={(e) => setInputValue(e.target.value)}
             sx={{ mt: 2 }}
           />
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
             <Button onClick={handleModalCreate} variant="contained">
               Create
             </Button>
           </Box>
         </Box>
       </Modal>
-      <Box sx={{ display: isVisible ? "block" : "none" }}>
+      <Box sx={{ display: isVisible ? 'block' : 'none' }}>
         {myForests.map((item) => (
           <Box key={item.forestId.toString()}>
             <Forest myForests={item} />

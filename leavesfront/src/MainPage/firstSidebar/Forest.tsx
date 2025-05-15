@@ -1,23 +1,23 @@
-import { useEffect, useState } from "react";
-import Button from "@mui/material/Button";
-import { Box, useTheme } from "@mui/material";
-import Explorer from "./Explorer";
+import { useEffect, useState } from 'react';
+import Button from '@mui/material/Button';
+import { Box, useTheme } from '@mui/material';
+import Explorer from './Explorer';
 import {
   Directory,
   DirectoryType,
   MyForestInfo,
   UpdateName,
   WsMessageType,
-} from "../../types";
-import AddIcon from "@mui/icons-material/Add";
-import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
-import { useMainPageContext } from "../MainPageManager";
-import axiosInstance from "../../axiosInstance";
+} from '../../types';
+import AddIcon from '@mui/icons-material/Add';
+import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
+import { useMainPageContext } from '../MainPageManager';
+import axiosInstance from '../../axiosInstance';
 
 const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [directories, setDirectories] = useState<Directory[]>([]);
-  const [forestName, setForestName] = useState<string>("");
+  const [forestName, setForestName] = useState<string>('');
   const { forestId, isOwner } = myForests;
   const theme = useTheme();
   const mainPageContext = useMainPageContext();
@@ -39,14 +39,14 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
   const addDirectory = (
     targetId: null | string = null,
     type: DirectoryType,
-    treeId?: string,
+    treeId?: string
   ): void => {
     const directory: Directory = {
       id: crypto.randomUUID(),
       treeId,
       type: type,
       isNew: true,
-      name: type === DirectoryType.FILE ? "Untitled Tree" : "Untitled Folder",
+      name: type === DirectoryType.FILE ? 'Untitled Tree' : 'Untitled Folder',
       children: [],
     };
     const newDirectories = (directories: Directory[]): Directory[] => {
@@ -191,7 +191,7 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
         JSON.stringify({
           type: WsMessageType.UPDATE_FOREST_DIRECTORIES,
           data: { forestId, directories },
-        }),
+        })
       );
     }
   };
@@ -199,7 +199,7 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
   const getForestData = async () => {
     try {
       const response = await axiosInstance.get(
-        `/forest/readForest/${forestId.toString()}`,
+        `/forest/readForest/${forestId.toString()}`
       );
       const { directories, name } = response.data;
       console.log(response.data);
@@ -225,14 +225,14 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
         JSON.stringify({
           type: WsMessageType.JOIN_GROUP,
           data: { groupId: forestId, prevGroupId: null },
-        }),
+        })
       );
     } else if (retry < 100) {
       setTimeout(() => {
         joinGroup(retry + 1);
       }, 100);
     } else {
-      console.error("[Forest][joinGroup]WebSocket not open after retries");
+      console.error('[Forest][joinGroup]WebSocket not open after retries');
     }
   };
 
@@ -242,7 +242,7 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
         JSON.stringify({
           type: WsMessageType.LEAVE_GROUP,
           data: { groupId: forestId },
-        }),
+        })
       );
     }
   };
@@ -250,9 +250,9 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
   useEffect(() => {
     getForestData();
     joinGroup(0);
-    ws?.addEventListener("message", handleMessage);
+    ws?.addEventListener('message', handleMessage);
     return () => {
-      ws?.removeEventListener("message", handleMessage);
+      ws?.removeEventListener('message', handleMessage);
     };
   }, []);
 
@@ -268,14 +268,14 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
         variant="text"
         sx={{
           pl: 2,
-          width: "100%",
-          justifyContent: "space-between",
-          color: theme.palette.mode === "dark" ? "white" : "black",
+          width: '100%',
+          justifyContent: 'space-between',
+          color: theme.palette.mode === 'dark' ? 'white' : 'black',
         }}
         onClick={toggleVisibility}
       >
         <Box>{forestName}</Box>
-        <Box sx={{ display: "flex" }}>
+        <Box sx={{ display: 'flex' }}>
           <CreateNewFolderIcon
             onClick={(e) => {
               e.stopPropagation();
@@ -294,7 +294,7 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
           />
         </Box>
       </Button>
-      <Box sx={{ display: isVisible ? "block" : "none" }}>
+      <Box sx={{ display: isVisible ? 'block' : 'none' }}>
         <Explorer
           isPublic={true}
           directories={directories}

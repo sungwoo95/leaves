@@ -1,10 +1,10 @@
-import { MongoClient, ServerApiVersion } from "mongodb";
-import { Forest, Leaf, Tree, User } from "../types";
+import { MongoClient, ServerApiVersion } from 'mongodb';
+import { Forest, Leaf, Tree, User } from '../types';
 
 const uri: string | undefined = process.env.MONGO_URI;
 
 if (!uri) {
-  throw new Error("MONGO_URI is not defined in the environment variables");
+  throw new Error('MONGO_URI is not defined in the environment variables');
 }
 
 //MongoDB 클라이언트 인스턴스 생성
@@ -17,14 +17,14 @@ export const client = new MongoClient(uri, {
 });
 
 enum Database {
-  NAMUNIBS = "namunibs",
+  NAMUNIBS = 'namunibs',
 }
 
 enum Collection {
-  USERS = "users",
-  FORESTS = "forests",
-  TREES = "trees",
-  Leaves = "leaves",
+  USERS = 'users',
+  FORESTS = 'forests',
+  TREES = 'trees',
+  Leaves = 'leaves',
 }
 
 const db = client.db(Database.NAMUNIBS);
@@ -38,11 +38,11 @@ export const connectToMongoDB = async (): Promise<MongoClient> => {
   try {
     await client.connect();
     // 연결 테스트: admin 데이터베이스에 ping 명령 실행
-    await client.db("admin").command({ ping: 1 });
-    console.log("✅ Successfully connected to MongoDB!");
+    await client.db('admin').command({ ping: 1 });
+    console.log('✅ Successfully connected to MongoDB!');
     return client;
   } catch (err) {
-    console.error("❌ Error connecting to MongoDB:", err);
+    console.error('❌ Error connecting to MongoDB:', err);
     throw err;
   }
 };

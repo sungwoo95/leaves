@@ -1,7 +1,7 @@
 export type AddDirectory = (
   tartgetId: null | string,
   type: DirectoryType,
-  treeId?: string,
+  treeId?: string
 ) => void;
 
 export type DeleteDirectory = (targetId: string, targetTreeId?: string) => void;
@@ -13,8 +13,8 @@ export type UpdateName = (targetId: string, newName: string) => void;
 export type OnClickMenuHandler = (e: React.MouseEvent) => void;
 
 export enum DirectoryType {
-  FOLDER = "folder",
-  FILE = "file",
+  FOLDER = 'folder',
+  FILE = 'file',
 }
 
 export type Directory = {
@@ -37,26 +37,26 @@ export type MyForestInfo = {
 };
 
 export enum WsMessageType {
-  UPDATE_LEAF_TITLE = "updateLeafTitle",
-  UPDATE_LEAF_TITLE_ERROR = "updateLeafTitleError",
-  UPDATE_LEAF_PARENT = "updateLeafParent",
-  UPDATE_LEAF_DELETE_LEAF = "UPDATE_LEAF_DELETE_LEAF",
-  ADD_CHILD_LEAF = "addChildLeaf",
-  ADD_PARENT_LEAF = "addParentLeaf",
-  DELETE_LEAF = "deleteLeaf",
-  UPDATE_TREE_LABEL = "updateTreeLabel",
-  UPDATE_TREE_ADD_CHILD_LEAF = "updateTreeAddChildLeaf",
-  UPDATE_TREE_ADD_PARENT_LEAF = "updateTreeAddParentLeaf",
-  UPDATE_TREE_CONQUER = "updateTreeConquer",
-  UPDATE_TREE_DELETE_LEAF = "UPDATE_TREE_DELETE_LEAF",
-  UPDATE_FOREST_DIRECTORIES = "updateforestdirectories",
-  LEAVE_GROUP = "leaveGroup",
-  JOIN_GROUP = "joinGroup",
+  UPDATE_LEAF_TITLE = 'updateLeafTitle',
+  UPDATE_LEAF_TITLE_ERROR = 'updateLeafTitleError',
+  UPDATE_LEAF_PARENT = 'updateLeafParent',
+  UPDATE_LEAF_DELETE_LEAF = 'UPDATE_LEAF_DELETE_LEAF',
+  ADD_CHILD_LEAF = 'addChildLeaf',
+  ADD_PARENT_LEAF = 'addParentLeaf',
+  DELETE_LEAF = 'deleteLeaf',
+  UPDATE_TREE_LABEL = 'updateTreeLabel',
+  UPDATE_TREE_ADD_CHILD_LEAF = 'updateTreeAddChildLeaf',
+  UPDATE_TREE_ADD_PARENT_LEAF = 'updateTreeAddParentLeaf',
+  UPDATE_TREE_CONQUER = 'updateTreeConquer',
+  UPDATE_TREE_DELETE_LEAF = 'UPDATE_TREE_DELETE_LEAF',
+  UPDATE_FOREST_DIRECTORIES = 'updateforestdirectories',
+  LEAVE_GROUP = 'leaveGroup',
+  JOIN_GROUP = 'joinGroup',
 }
 
 export enum IsConquer {
-  TRUE = "true",
-  FALSE = "false",
+  TRUE = 'true',
+  FALSE = 'false',
 }
 export type NodeData = {
   id: string;
@@ -85,9 +85,9 @@ export type Edge = {
 };
 
 export enum DeleteCase {
-  HAS_PARENT = "HAS_PARENT",
-  ROOT_WITH_SINGLE_CHILD = "ROOT_WITH_SINGLE_CHILD",
-  CHANGE_TO_EMPTY_LEAF = "CHANGE_TO_EMPTY_LEAF",
+  HAS_PARENT = 'HAS_PARENT',
+  ROOT_WITH_SINGLE_CHILD = 'ROOT_WITH_SINGLE_CHILD',
+  CHANGE_TO_EMPTY_LEAF = 'CHANGE_TO_EMPTY_LEAF',
 }
 
 export type DeleteLeafData = {

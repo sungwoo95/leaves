@@ -1,9 +1,9 @@
 // axiosInstance.ts
-import axios from "axios";
-import { auth } from "./firebase";
+import axios from 'axios';
+import { auth } from './firebase';
 
 const axiosInstance = axios.create({
-  baseURL: "/api",
+  baseURL: '/api',
 });
 
 axiosInstance.interceptors.request.use(async (config) => {

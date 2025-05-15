@@ -1,14 +1,14 @@
-import "dotenv/config";
-import express, { Application } from "express";
-import cors from "cors";
-import treeRouter from "./routes/treeRouter";
-import userRouter from "./routes/userRouter";
-import { connectToMongoDB } from "./config/db";
-import cookieParser from "cookie-parser";
-import forestRouter from "./routes/forestRouter";
-import { WebSocket, WebSocketServer } from "ws";
-import { registHandler } from "./websocket/wsHandlers";
-import leafRouter from "./routes/leafRouter";
+import 'dotenv/config';
+import express, { Application } from 'express';
+import cors from 'cors';
+import treeRouter from './routes/treeRouter';
+import userRouter from './routes/userRouter';
+import { connectToMongoDB } from './config/db';
+import cookieParser from 'cookie-parser';
+import forestRouter from './routes/forestRouter';
+import { WebSocket, WebSocketServer } from 'ws';
+import { registHandler } from './websocket/wsHandlers';
+import leafRouter from './routes/leafRouter';
 
 const App = () => {
   const app: Application = express();
@@ -21,16 +21,16 @@ const App = () => {
     app.use(cookieParser());
     app.use(
       cors({
-        origin: "http://localhost:5173",
+        origin: 'http://localhost:5173',
         credentials: true,
-      }),
+      })
     );
   };
   const setUpRestApiServer = () => {
-    app.use("/api/tree", treeRouter);
-    app.use("/api/user", userRouter);
-    app.use("/api/forest", forestRouter);
-    app.use("/api/leaf", leafRouter);
+    app.use('/api/tree', treeRouter);
+    app.use('/api/user', userRouter);
+    app.use('/api/forest', forestRouter);
+    app.use('/api/leaf', leafRouter);
   };
   const startRestApiServer = () => {
     setUpExpress();
@@ -41,9 +41,9 @@ const App = () => {
   };
   const startWebSocketServer = () => {
     const wsServer: WebSocketServer = new WebSocket.Server({ port: WS_PORT });
-    wsServer.on("connection", (ws: WebSocket) => {
+    wsServer.on('connection', (ws: WebSocket) => {
       //ws매개변수의 인자값은 새로 연결된 클라이언트의 WebSocket 객체임.
-      console.log("New WebSocket client connected");
+      console.log('New WebSocket client connected');
       registHandler(ws, wsGroups);
     });
     console.log(`WebSocket server running on port ${WS_PORT}`);
@@ -52,7 +52,7 @@ const App = () => {
     try {
       await connectToMongoDB();
     } catch (err: unknown) {
-      console.error("Failed to connect to db :", err);
+      console.error('Failed to connect to db :', err);
     }
   };
 

@@ -1,7 +1,7 @@
-import { AddDirectory, Directory, UpdateIsNew, UpdateName } from "../../types";
-import { useState } from "react";
-import { Box } from "@mui/material";
-import DirectoryButton from "./DirectoryButton";
+import { AddDirectory, Directory, UpdateIsNew, UpdateName } from '../../types';
+import { useState } from 'react';
+import { Box } from '@mui/material';
+import DirectoryButton from './DirectoryButton';
 
 const Explorer = ({
   isPublic,
@@ -26,9 +26,9 @@ const Explorer = ({
     setOpenState((prev) => ({ ...prev, [id]: !prev[id] }));
   };
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box sx={{ width: '100%' }}>
       {directories.map((item) => (
-        <Box sx={{ width: "100%" }} key={item.id}>
+        <Box sx={{ width: '100%' }} key={item.id}>
           <DirectoryButton
             isPublic={isPublic}
             item={item}
@@ -40,7 +40,7 @@ const Explorer = ({
             updateName={updateName}
             deleteDirectory={deleteDirectory}
           />
-          {openState[item.id] && item.type === "folder" && item.children && (
+          {openState[item.id] && item.type === 'folder' && item.children && (
             <Explorer
               isPublic={isPublic}
               directories={item.children}

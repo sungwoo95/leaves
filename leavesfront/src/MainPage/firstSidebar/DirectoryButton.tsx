@@ -1,11 +1,19 @@
-import { Button, Box, TextField, useTheme } from "@mui/material";
-import { AddDirectory, DeleteDirectory, Directory, DirectoryType, Position, UpdateIsNew, UpdateName } from "../../types";
-import AddIcon from "@mui/icons-material/Add";
-import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
-import { useEffect, useRef, useState } from "react";
-import DirectoryContextMenu from "./DirectoryContextMenu";
-import { useMainPageContext } from "../MainPageManager";
-import axiosInstance from "../../axiosInstance";
+import { Button, Box, TextField, useTheme } from '@mui/material';
+import {
+  AddDirectory,
+  DeleteDirectory,
+  Directory,
+  DirectoryType,
+  Position,
+  UpdateIsNew,
+  UpdateName,
+} from '../../types';
+import AddIcon from '@mui/icons-material/Add';
+import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
+import { useEffect, useRef, useState } from 'react';
+import DirectoryContextMenu from './DirectoryContextMenu';
+import { useMainPageContext } from '../MainPageManager';
+import axiosInstance from '../../axiosInstance';
 
 const DirectoryButton = ({
   isPublic,
@@ -29,14 +37,16 @@ const DirectoryButton = ({
   deleteDirectory: DeleteDirectory;
 }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [menuPosition, setMenuPosition] = useState<Position | undefined>(undefined);
+  const [menuPosition, setMenuPosition] = useState<Position | undefined>(
+    undefined
+  );
   const inputRef = useRef<HTMLInputElement | undefined>(undefined);
   const theme = useTheme();
   const mainPageContext = useMainPageContext();
   try {
     if (!mainPageContext) {
       //mainPageContext.Provider의 하위 컴포넌트가 아닐 경우
-      throw new Error("//mainPageContext.Provider의 하위 컴포넌트가 아님");
+      throw new Error('//mainPageContext.Provider의 하위 컴포넌트가 아님');
     }
   } catch (err) {
     console.error((err as Error).message);
@@ -44,7 +54,7 @@ const DirectoryButton = ({
   }
   const { setTreeId, setIsPublicTree } = mainPageContext;
   const exitEditMode = (): void => {
-    console.log("[DirectoryButton]exitEditMode called");
+    console.log('[DirectoryButton]exitEditMode called');
     //편집 내용 업데이트.
     if (inputRef.current) {
       const newName = inputRef.current.value;
@@ -56,7 +66,7 @@ const DirectoryButton = ({
   };
 
   const onClickHandler = () => {
-    console.log("[DirectoryButton][Button]onClick called");
+    console.log('[DirectoryButton][Button]onClick called');
     if (item.type === DirectoryType.FOLDER) toggleVisibility(item.id);
     if (item.type === DirectoryType.FILE) {
       setIsPublicTree(isPublic);
@@ -74,7 +84,7 @@ const DirectoryButton = ({
   };
 
   const onCloseHandler = () => {
-    console.log("[DirectoryButton]handleContextMenuClose called");
+    console.log('[DirectoryButton]handleContextMenuClose called');
     setMenuPosition(undefined);
   };
 
@@ -108,14 +118,15 @@ const DirectoryButton = ({
       disabled={isEditing || item.isNew}
       variant="text"
       sx={{
-        width: "100%",
+        width: '100%',
         pl: level,
-        border: item.isNew || isEditing ? "2px solid green" : "none",
-        justifyContent: "space-between",
-        color: theme.palette.mode === "dark" ? "white" : "black",
+        border: item.isNew || isEditing ? '2px solid green' : 'none',
+        justifyContent: 'space-between',
+        color: theme.palette.mode === 'dark' ? 'white' : 'black',
       }}
       onClick={onClickHandler}
-      onContextMenu={onContextMenuHandler}>
+      onContextMenu={onContextMenuHandler}
+    >
       <DirectoryContextMenu
         open={!!menuPosition}
         menuPosition={menuPosition}
@@ -126,12 +137,13 @@ const DirectoryButton = ({
       />
       <Box
         sx={{
-          width: "100%",
-          textAlign: "left",
-          whiteSpace: "nowrap", // 텍스트 줄바꿈 방지
-          overflow: "hidden", // 넘친 내용 숨김
-          textOverflow: "ellipsis", //...처리
-        }}>
+          width: '100%',
+          textAlign: 'left',
+          whiteSpace: 'nowrap', // 텍스트 줄바꿈 방지
+          overflow: 'hidden', // 넘친 내용 숨김
+          textOverflow: 'ellipsis', //...처리
+        }}
+      >
         {item.isNew || isEditing ? (
           <TextField
             inputRef={inputRef} //focus,select를 위함.
@@ -139,17 +151,17 @@ const DirectoryButton = ({
             variant="standard"
             onBlur={exitEditMode}
             onKeyDown={(e) => {
-              if (e.key === "Enter") {
+              if (e.key === 'Enter') {
                 exitEditMode();
               }
             }}
           />
         ) : (
-          `${item.type === "folder" ? "📁" : "📄"} ${item.name}`
+          `${item.type === 'folder' ? '📁' : '📄'} ${item.name}`
         )}
       </Box>
       {item.type === DirectoryType.FOLDER && (
-        <Box sx={{ display: "flex" }}>
+        <Box sx={{ display: 'flex' }}>
           <CreateNewFolderIcon
             onClick={(e) => {
               e.stopPropagation();
@@ -164,7 +176,7 @@ const DirectoryButton = ({
               //여기서 트리 생성 요청 보내고, 트리의 objectId받아서 addDirectory에 보내기.
               const response = await axiosInstance.post(`/tree/createTree`);
               const treeId: string = response.data.treeId;
-              console.log("treeId: ", treeId); //ok
+              console.log('treeId: ', treeId); //ok
               addDirectory(item.id, DirectoryType.FILE, treeId);
             }}
           />

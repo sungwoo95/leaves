@@ -1,4 +1,4 @@
-import { BlockNoteView } from "@blocknote/mantine";
+import { BlockNoteView } from '@blocknote/mantine';
 import {
   BasicTextStyleButton,
   BlockTypeSelect,
@@ -12,10 +12,10 @@ import {
   TextAlignButton,
   UnnestBlockButton,
   useCreateBlockNote,
-} from "@blocknote/react";
-import CreateChildLeafFormattingToolBarButton from "./CreateChildLeafFormattingToolBarButton";
-import CreateParentLeafFormattingToolBarButton from "./CreateParentLeafFormattingToolBarButton";
-import { useEffect } from "react";
+} from '@blocknote/react';
+import CreateChildLeafFormattingToolBarButton from './CreateChildLeafFormattingToolBarButton';
+import CreateParentLeafFormattingToolBarButton from './CreateParentLeafFormattingToolBarButton';
+import { useEffect } from 'react';
 
 const DevEditor = ({
   owningTreeId,
@@ -39,60 +39,60 @@ const DevEditor = ({
       <FormattingToolbarController
         formattingToolbar={() => (
           <FormattingToolbar>
-            <BlockTypeSelect key={"blockTypeSelect"} />
+            <BlockTypeSelect key={'blockTypeSelect'} />
             <CreateParentLeafFormattingToolBarButton
               parentLeafId={parentLeafId}
               owningTreeId={owningTreeId}
-              key={"CreateParentLeafButton"}
+              key={'CreateParentLeafButton'}
             />
             <CreateChildLeafFormattingToolBarButton
               owningTreeId={owningTreeId}
-              key={"CreateChildLeafButton"}
+              key={'CreateChildLeafButton'}
             />
-            <FileCaptionButton key={"fileCaptionButton"} />
-            <FileReplaceButton key={"replaceFileButton"} />
+            <FileCaptionButton key={'fileCaptionButton'} />
+            <FileReplaceButton key={'replaceFileButton'} />
 
             <BasicTextStyleButton
-              basicTextStyle={"bold"}
-              key={"boldStyleButton"}
+              basicTextStyle={'bold'}
+              key={'boldStyleButton'}
             />
             <BasicTextStyleButton
-              basicTextStyle={"italic"}
-              key={"italicStyleButton"}
+              basicTextStyle={'italic'}
+              key={'italicStyleButton'}
             />
             <BasicTextStyleButton
-              basicTextStyle={"underline"}
-              key={"underlineStyleButton"}
+              basicTextStyle={'underline'}
+              key={'underlineStyleButton'}
             />
             <BasicTextStyleButton
-              basicTextStyle={"strike"}
-              key={"strikeStyleButton"}
+              basicTextStyle={'strike'}
+              key={'strikeStyleButton'}
             />
             {/* Extra button to toggle code styles */}
             <BasicTextStyleButton
-              key={"codeStyleButton"}
-              basicTextStyle={"code"}
+              key={'codeStyleButton'}
+              basicTextStyle={'code'}
             />
 
             <TextAlignButton
-              textAlignment={"left"}
-              key={"textAlignLeftButton"}
+              textAlignment={'left'}
+              key={'textAlignLeftButton'}
             />
             <TextAlignButton
-              textAlignment={"center"}
-              key={"textAlignCenterButton"}
+              textAlignment={'center'}
+              key={'textAlignCenterButton'}
             />
             <TextAlignButton
-              textAlignment={"right"}
-              key={"textAlignRightButton"}
+              textAlignment={'right'}
+              key={'textAlignRightButton'}
             />
 
-            <ColorStyleButton key={"colorStyleButton"} />
+            <ColorStyleButton key={'colorStyleButton'} />
 
-            <NestBlockButton key={"nestBlockButton"} />
-            <UnnestBlockButton key={"unnestBlockButton"} />
+            <NestBlockButton key={'nestBlockButton'} />
+            <UnnestBlockButton key={'unnestBlockButton'} />
 
-            <CreateLinkButton key={"createLinkButton"} />
+            <CreateLinkButton key={'createLinkButton'} />
           </FormattingToolbar>
         )}
       />
