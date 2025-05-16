@@ -9,6 +9,7 @@ import forestRouter from './routes/forestRouter';
 import { WebSocket, WebSocketServer } from 'ws';
 import { registHandler } from './websocket/wsHandlers';
 import leafRouter from './routes/leafRouter';
+import { verifyFirebaseToken } from './authMiddleware';
 
 const App = () => {
   const app: Application = express();
@@ -27,6 +28,7 @@ const App = () => {
     );
   };
   const setUpRestApiServer = () => {
+    app.use('/api', verifyFirebaseToken);
     app.use('/api/tree', treeRouter);
     app.use('/api/user', userRouter);
     app.use('/api/forest', forestRouter);
