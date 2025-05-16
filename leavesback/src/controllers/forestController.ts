@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { parseAccessToken } from './userController';
 import { forestsCollection, usersCollection } from '../config/db';
 import { Directory, Forest, MyForestInfo } from '../types';
 import { ObjectId } from 'mongodb';
@@ -9,16 +8,8 @@ export const createForest = async (
   res: Response
 ): Promise<void> => {
   const forestName = req.body.forestName;
-  const cookies = req.cookies;
-  if (!cookies) {
-    res.status(401).json({ message: 'Unauthorized: No token provided' });
-    return;
-  }
-  const accessToken = cookies.access_token;
-  const userObjectId = parseAccessToken(accessToken, res);
-  if (!userObjectId) {
-    return;
-  }
+  if (!req.user) { res.status(401).json({ message: '[userController][readMainPageData]Unauthorized' }); return; }
+  const sub = req.user.sub;
   try {
     const newForest: Forest = {
       name: forestName,
@@ -33,7 +24,7 @@ export const createForest = async (
       isOwner: true,
     };
     await usersCollection.updateOne(
-      { _id: userObjectId },
+      { sub },
       { $push: { myForests: newMyForestInfo } }
     );
     res.status(201).json({

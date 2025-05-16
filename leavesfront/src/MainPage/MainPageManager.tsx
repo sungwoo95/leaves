@@ -8,8 +8,11 @@ import React, {
 } from 'react';
 import { WS_PATH } from '../../config/config';
 import axiosInstance from '../axiosInstance';
+import { MyForestInfo } from '../types';
 
 type MainPageContextType = {
+  myForests: MyForestInfo[];
+  setMyForests: React.Dispatch<React.SetStateAction<MyForestInfo[]>>;
   treeId: string | null;
   setTreeId: React.Dispatch<React.SetStateAction<string | null>>;
   leafId: string | null;
@@ -32,6 +35,7 @@ const MainPageContext = createContext<MainPageContextType | undefined>(
 );
 
 export function MainPageManager({ children }: MainPageProps) {
+  const [myForests, setMyForests] = useState<MyForestInfo[]>([]);
   const [treeId, setTreeId] = useState<string | null>(null);
   const [leafId, setLeafId] = useState<string | null>(null);
   const [owningTreeId, setOwningTreeId] = useState<string | undefined>(
@@ -45,7 +49,6 @@ export function MainPageManager({ children }: MainPageProps) {
   );
   const [ws, setWs] = useState<WebSocket | undefined>(undefined);
 
-  const [token, setToken] = useState<string | null>(null); // 해당 사용자의 ID 토큰
   const isMount = useRef<boolean>(true);
 
   useEffect(() => {
@@ -101,11 +104,15 @@ export function MainPageManager({ children }: MainPageProps) {
       try {
         const response = await axiosInstance.get(`/user/mainPage`);
         const mainPageData = response.data;
+        console.log('mainPageData:', mainPageData);
         if (mainPageData.treeId) {
           setTreeId(mainPageData.treeId);
         }
         if (mainPageData.leafId) {
           setLeafId(mainPageData.leafId);
+        }
+        if (mainPageData.myForests) {
+          setMyForests(mainPageData.myForests);
         }
       } catch (error) {
         console.log(
@@ -140,6 +147,8 @@ export function MainPageManager({ children }: MainPageProps) {
   return (
     <MainPageContext.Provider
       value={{
+        myForests,
+        setMyForests,
         treeId,
         setTreeId,
         leafId,

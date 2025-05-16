@@ -43,8 +43,7 @@ export type Tree = {
 };
 
 export type User = {
-  password: string;
-  email: string;
+  sub: string;
   myForests: MyForestInfo[];
   treeId: string | undefined;
   leafId: string | undefined;

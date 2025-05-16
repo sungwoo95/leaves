@@ -6,6 +6,7 @@ import { MyForestInfo } from '../../types';
 import { useTheme } from '@mui/material/styles';
 import Forest from './Forest';
 import axiosInstance from '../../axiosInstance';
+import { useMainPageContext } from '../MainPageManager';
 
 const modalStyle = {
   position: 'absolute',
@@ -20,10 +21,14 @@ const modalStyle = {
 
 const ForestRegion = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const [myForests, setMyForests] = useState<MyForestInfo[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const theme = useTheme();
   const [inputValue, setInputValue] = useState('');
+  const mainPageContext = useMainPageContext();
+  if (!mainPageContext) {
+    return <p>mainPageContext.Provider의 하위 컴포넌트가 아님.</p>;
+  }
+  const { myForests, setMyForests } = mainPageContext;
   const handleModalOpen = () => {
     setIsModalOpen(true);
   };
@@ -50,20 +55,6 @@ const ForestRegion = () => {
     handleModalClose();
     if (!isVisible) toggleVisibility();
   };
-  useEffect(() => {
-    console.log('[PublicForestRegion]useEffect called');
-    const setMyForestsData = async () => {
-      try {
-        const response = await axiosInstance.get(`/user/myForests`);
-        const newMyForests: MyForestInfo[] = response.data;
-        console.log('[PublicForestRegion]response.data: ', newMyForests);
-        setMyForests(newMyForests);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    setMyForestsData();
-  }, []);
 
   return (
     <Box>
