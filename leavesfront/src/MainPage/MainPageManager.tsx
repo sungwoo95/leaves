@@ -101,7 +101,7 @@ export function MainPageManager({ children }: MainPageProps) {
       clearTimeout(reconnectTimeout);
     };
   }, []);
-  //auth초기화 완료 시, auth상태 변경, mainPageData불러오기.
+  //auth초기화 완료 시, mainPageData불러오기, isReady 설정.
   useEffect(() => {
     const getMainPageData = async () => {
       try {

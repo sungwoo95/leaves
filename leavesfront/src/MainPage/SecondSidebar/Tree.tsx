@@ -81,7 +81,7 @@ const Tree: React.FC = () => {
   const cyRef = useRef<cytoscape.Core | undefined>(undefined);
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const prevTreeId = useRef<string | null>(null);
   const theme = useTheme();
   const [treeDataFlag, setTreeDataFlag] = useState<boolean>(false);

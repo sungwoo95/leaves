@@ -24,7 +24,7 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
   if (!mainPageContext) {
     return <p>mainPageContext.Provider의 하위 컴포넌트가 아님.</p>;
   }
-  const { ws, treeId, setTreeId } = mainPageContext;
+  const { ws, treeId, setTreeId, owningTreeId, setLeafId } = mainPageContext;
   const wsMessageHandler: Record<string, (data: any) => void> = {
     [WsMessageType.UPDATE_FOREST_DIRECTORIES]: (data) => {
       const { directories } = data;
@@ -118,6 +118,9 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
     });
     if (targetTreeId === treeId) {
       setTreeId(null);
+    }
+    if (targetTreeId === owningTreeId) {
+      setLeafId(null);
     }
   };
 
