@@ -15,7 +15,6 @@ export const readMainPageData = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  console.log("[readMainPageData]", req.user);
   if (!req.user) { res.status(401).json({ message: '[userController][readMainPageData]Unauthorized' }); return; }
   const sub = req.user.sub;
   try {

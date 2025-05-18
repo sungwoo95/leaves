@@ -10,6 +10,7 @@ import { WS_PATH } from '../../config/config';
 import axiosInstance from '../axiosInstance';
 import { MyForestInfo } from '../types';
 import { auth } from '../firebase';
+import { useNavigate } from 'react-router-dom';
 
 type MainPageContextType = {
   myForests: MyForestInfo[];
@@ -52,9 +53,9 @@ export function MainPageManager({ children }: MainPageProps) {
   const [ws, setWs] = useState<WebSocket | undefined>(undefined);
   const isMount = useRef<boolean>(true);
   const [isReady, setIsReady] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    console.log('[MainPageManager] useEffect called');
     let reconnectTimeout: NodeJS.Timeout;
     let webSocketInstance: WebSocket | undefined = undefined;
     const connectWebSocket = () => {
@@ -62,9 +63,6 @@ export function MainPageManager({ children }: MainPageProps) {
         webSocketInstance.close();
       }
       webSocketInstance = new WebSocket(WS_PATH);
-      webSocketInstance.onopen = () => {
-        console.log('WebSocket 연결 성공');
-      };
       webSocketInstance.onerror = (error) => {
         console.error('WebSocket 오류 발생:', error);
       };
@@ -107,7 +105,6 @@ export function MainPageManager({ children }: MainPageProps) {
       try {
         const response = await axiosInstance.get(`/user/mainPage`);
         const mainPageData = response.data;
-        console.log('mainPageData:', mainPageData);
         if (mainPageData.treeId) {
           setTreeId(mainPageData.treeId);
         }
@@ -129,6 +126,7 @@ export function MainPageManager({ children }: MainPageProps) {
         getMainPageData();
       } else {
         setIsReady(false);
+        navigate('/');
       }
     });
     return () => unregister();
@@ -141,11 +139,7 @@ export function MainPageManager({ children }: MainPageProps) {
     const postMainPageData = async () => {
       const postData = { treeId, leafId };
       try {
-        const response = await axiosInstance.post(`/user/mainPage`, postData);
-        console.log(
-          '[MainPageManager][postMainPageData]response:',
-          response.data.message
-        );
+        await axiosInstance.post(`/user/mainPage`, postData);
       } catch (error) {
         console.log(
           '[MainPageManager][postMainPageData]post /user/mainPage error:',
