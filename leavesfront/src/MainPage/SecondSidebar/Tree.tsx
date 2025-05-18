@@ -26,6 +26,7 @@ import {
   forceLink,
 } from 'd3-force';
 import axiosInstance from '../../axiosInstance';
+import LoadingSpinner from '../LoadingSpinner';
 
 cytoscape.use(contextMenus); // 플러그인 활성화
 
@@ -75,6 +76,7 @@ const Tree: React.FC = () => {
     isPublicTree,
     setIsPublicLeaf,
     owningTreeId,
+    isReady,
   } = mainPageContext;
   const cyRef = useRef<cytoscape.Core | undefined>(undefined);
   const [nodes, setNodes] = useState<Node[]>([]);
@@ -557,66 +559,70 @@ const Tree: React.FC = () => {
     }
   }, [treeDataFlag]);
 
-  if (loading && treeId) {
-    return <p>Loading tree data...</p>;
+  if (!isReady || loading) {
+    return <LoadingSpinner />;
   }
 
-  return treeId ? (
-    <CytoscapeComponent
-      cy={(cy) => {
-        cyRef.current = cy;
-        cy.on('tap', 'node', handleLeafClick);
-        //우클릭 메뉴 추가.
-        cy.contextMenus({
-          menuItems: [
-            {
-              id: 'conquer',
-              content: 'Conquer',
-              selector: 'node',
-              onClickFunction: handleConquerClick,
+  if (!treeId) {
+    return <NoTreeIsOpen />;
+  }
+
+  if (treeId) {
+    return (
+      <CytoscapeComponent
+        cy={(cy) => {
+          cyRef.current = cy;
+          cy.on('tap', 'node', handleLeafClick);
+          //우클릭 메뉴 추가.
+          cy.contextMenus({
+            menuItems: [
+              {
+                id: 'conquer',
+                content: 'Conquer',
+                selector: 'node',
+                onClickFunction: handleConquerClick,
+              },
+              {
+                id: 'delete',
+                content: 'Delete',
+                selector: 'node',
+                onClickFunction: handleDeleteClick,
+              },
+            ],
+          });
+        }}
+        elements={CytoscapeComponent.normalizeElements({ nodes, edges })}
+        style={{ width: '100%', height: '100%' }}
+        stylesheet={[
+          {
+            selector: 'node',
+            style: {
+              'background-color': 'green',
+              label: 'data(label)',
+              width: '10px',
+              height: '10px',
+              color: theme.palette.mode === 'dark' ? 'white' : 'black',
+              'text-margin-y': -2, // 여백
+              'font-size': '10px',
             },
-            {
-              id: 'delete',
-              content: 'Delete',
-              selector: 'node',
-              onClickFunction: handleDeleteClick,
+          },
+          {
+            selector: "node[isConquer='true']", //isConquer가 true인 노드는 다음 style이 overwright.
+            style: {
+              'background-color': 'red',
             },
-          ],
-        });
-      }}
-      elements={CytoscapeComponent.normalizeElements({ nodes, edges })}
-      style={{ width: '100%', height: '100%' }}
-      stylesheet={[
-        {
-          selector: 'node',
-          style: {
-            'background-color': 'green',
-            label: 'data(label)',
-            width: '10px',
-            height: '10px',
-            color: theme.palette.mode === 'dark' ? 'white' : 'black',
-            'text-margin-y': -2, // 여백
-            'font-size': '10px',
           },
-        },
-        {
-          selector: "node[isConquer='true']", //isConquer가 true인 노드는 다음 style이 overwright.
-          style: {
-            'background-color': 'red',
+          {
+            selector: 'edge',
+            style: {
+              width: 2,
+              'line-color': '#ccc',
+            },
           },
-        },
-        {
-          selector: 'edge',
-          style: {
-            width: 2,
-            'line-color': '#ccc',
-          },
-        },
-      ]}
-    />
-  ) : (
-    <NoTreeIsOpen />
-  );
+        ]}
+      />
+    );
+  }
 };
 
 export default Tree;

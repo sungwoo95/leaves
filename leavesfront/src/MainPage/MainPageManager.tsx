@@ -9,6 +9,7 @@ import React, {
 import { WS_PATH } from '../../config/config';
 import axiosInstance from '../axiosInstance';
 import { MyForestInfo } from '../types';
+import { auth } from '../firebase';
 
 type MainPageContextType = {
   myForests: MyForestInfo[];
@@ -24,6 +25,7 @@ type MainPageContextType = {
   setIsPublicTree: React.Dispatch<React.SetStateAction<boolean | undefined>>;
   isPublicLeaf: boolean | undefined;
   setIsPublicLeaf: React.Dispatch<React.SetStateAction<boolean | undefined>>;
+  isReady: boolean;
 };
 
 type MainPageProps = {
@@ -48,8 +50,8 @@ export function MainPageManager({ children }: MainPageProps) {
     undefined
   );
   const [ws, setWs] = useState<WebSocket | undefined>(undefined);
-
   const isMount = useRef<boolean>(true);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     console.log('[MainPageManager] useEffect called');
@@ -99,6 +101,7 @@ export function MainPageManager({ children }: MainPageProps) {
       clearTimeout(reconnectTimeout);
     };
   }, []);
+  //auth초기화 완료 시, auth상태 변경, mainPageData불러오기.
   useEffect(() => {
     const getMainPageData = async () => {
       try {
@@ -114,13 +117,21 @@ export function MainPageManager({ children }: MainPageProps) {
         if (mainPageData.myForests) {
           setMyForests(mainPageData.myForests);
         }
+        setIsReady(true);
       } catch (error) {
         console.log(
           '[MainPageManager][getMainPageData]get /user/mainPage error'
         );
       }
     };
-    getMainPageData();
+    const unregister = auth.onAuthStateChanged((user) => {
+      if (user) {
+        getMainPageData();
+      } else {
+        setIsReady(false);
+      }
+    });
+    return () => unregister();
   }, []);
   useEffect(() => {
     if (isMount.current) {
@@ -160,6 +171,7 @@ export function MainPageManager({ children }: MainPageProps) {
         setIsPublicTree,
         isPublicLeaf,
         setIsPublicLeaf,
+        isReady,
       }}
     >
       {children}

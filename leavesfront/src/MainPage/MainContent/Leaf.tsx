@@ -6,7 +6,6 @@ import '@blocknote/mantine/style.css';
 import './editorStyles.css';
 import { useMainPageContext } from '../MainPageManager';
 import { WsMessageType } from '../../types';
-import axios from 'axios';
 import { DEV_MODE } from '../../../config/config';
 import { ClientSideSuspense, RoomProvider } from '@liveblocks/react';
 import Editor from './Editor';
@@ -14,6 +13,7 @@ import NoLeafIsOpen from './NoLeafIsOpen';
 import EditorFallback from './EditorFallback';
 import DevEditor from './DevEditor';
 import axiosInstance from '../../axiosInstance';
+import LoadingSpinner from '../LoadingSpinner';
 
 type Props = {
   title: string;
@@ -29,7 +29,7 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
   if (!mainPageContext) {
     return <p>mainPageContext.Provider의 하위 컴포넌트가 아님.</p>;
   }
-  const { leafId, ws, owningTreeId, setOwningTreeId, setLeafId } =
+  const { leafId, ws, owningTreeId, setOwningTreeId, setLeafId, isReady } =
     mainPageContext;
   const wsMessageHandler: Record<string, (data: any) => void> = {
     [WsMessageType.UPDATE_LEAF_TITLE]: (data) => {
@@ -77,6 +77,7 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
       console.log('[Leaf]get leaf data error');
     }
   };
+
   const joinGroup = (retry: number) => {
     if (ws && leafId && ws.readyState === WebSocket.OPEN) {
       ws.send(
@@ -133,15 +134,21 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
     };
   }, [leafId, ws]);
 
-  return (
-    <Box
-      sx={{
-        height: '100%',
-        boxSizing: 'border-box',
-        width: '100%',
-      }}
-    >
-      {leafId && owningTreeId ? (
+  if (!isReady) {
+    return <LoadingSpinner />;
+  }
+  if (!leafId) {
+    return <NoLeafIsOpen />;
+  }
+  if (leafId && owningTreeId) {
+    return (
+      <Box
+        sx={{
+          height: '100%',
+          boxSizing: 'border-box',
+          width: '100%',
+        }}
+      >
         <Box
           sx={{
             height: '100%',
@@ -198,11 +205,9 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
             </RoomProvider>
           )}
         </Box>
-      ) : (
-        <NoLeafIsOpen />
-      )}
-    </Box>
-  );
+      </Box>
+    );
+  }
 };
 
 export default Leaf;
