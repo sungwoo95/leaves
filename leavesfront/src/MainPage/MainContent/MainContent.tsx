@@ -1,4 +1,4 @@
-import { Box } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 import Leaf from './Leaf';
 import TobBar from './TopBar';
 import { useState } from 'react';
@@ -11,6 +11,7 @@ const MainContent = ({
   toggleSecondSidebar: () => void;
 }) => {
   const [title, setTitle] = useState<string>('');
+  const theme = useTheme();
   return (
     <Box
       sx={{
@@ -27,7 +28,13 @@ const MainContent = ({
         title={title}
         setTitle={setTitle}
       />
-      <Box sx={{ flex: 1, display: 'block' }}>
+      <Box
+        sx={{
+          flex: 1,
+          display: 'block',
+          bgcolor: theme.palette.mode === 'dark' ? '#121212' : 'white',
+        }}
+      >
         <Leaf title={title} setTitle={setTitle} />
       </Box>
     </Box>

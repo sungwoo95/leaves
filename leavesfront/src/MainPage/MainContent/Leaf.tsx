@@ -1,5 +1,4 @@
 import { Box, TextField } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 import { useEffect, useRef, useState } from 'react';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/mantine/style.css';
@@ -21,7 +20,6 @@ type Props = {
 };
 
 const Leaf: React.FC<Props> = ({ title, setTitle }) => {
-  const theme = useTheme();
   const [parentLeafId, setParentLeafId] = useState<string | null>(null);
   const prevLeafId = useRef<string | null>(null);
   const editorRef = useRef<any | null>(null);
@@ -152,7 +150,6 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
         <Box
           sx={{
             height: '100%',
-            bgcolor: theme.palette.mode === 'dark' ? '#121212' : 'white',
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
