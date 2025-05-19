@@ -26,7 +26,6 @@ const DirectoryContextMenu = ({
     >
       <MenuItem onClick={onClickRenameHandler}>Rename</MenuItem>
       <MenuItem onClick={onClickDeleteHandler}>Delete</MenuItem>
-      <MenuItem>Properties</MenuItem>
     </Menu>
   );
 };

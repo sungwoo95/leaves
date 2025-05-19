@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Button from '@mui/material/Button';
 import { Box, Modal, TextField, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { MyForestInfo } from '../../types';
 import { useTheme } from '@mui/material/styles';
 import Forest from './Forest';
 import axiosInstance from '../../axiosInstance';
@@ -10,7 +9,7 @@ import { useMainPageContext } from '../MainPageManager';
 
 const modalStyle = {
   position: 'absolute',
-  top: '50%',
+  top: '30%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: 400,

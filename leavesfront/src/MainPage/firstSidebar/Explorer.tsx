@@ -6,7 +6,7 @@ import DirectoryButton from './DirectoryButton';
 const Explorer = ({
   isPublic,
   directories,
-  level = 2,
+  level = 3,
   addDirectory,
   updateIsNew,
   updateName,

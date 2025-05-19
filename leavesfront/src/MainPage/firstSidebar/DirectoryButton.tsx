@@ -157,7 +157,7 @@ const DirectoryButton = ({
             }}
           />
         ) : (
-          `${item.type === 'folder' ? '📁' : '📄'} ${item.name}`
+          `${item.name}`
         )}
       </Box>
       {item.type === DirectoryType.FOLDER && (

@@ -6,6 +6,7 @@ import {
   Directory,
   DirectoryType,
   MyForestInfo,
+  Position,
   UpdateName,
   WsMessageType,
 } from '../../types';
@@ -13,6 +14,7 @@ import AddIcon from '@mui/icons-material/Add';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import { useMainPageContext } from '../MainPageManager';
 import axiosInstance from '../../axiosInstance';
+import ForestContextMenu from './ForestContextMenu';
 
 const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -20,6 +22,9 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
   const [forestName, setForestName] = useState<string>('');
   const { forestId, isOwner } = myForests;
   const theme = useTheme();
+  const [menuPosition, setMenuPosition] = useState<Position | undefined>(
+    undefined
+  );
   const mainPageContext = useMainPageContext();
   if (!mainPageContext) {
     return <p>mainPageContext.Provider의 하위 컴포넌트가 아님.</p>;
@@ -250,6 +255,23 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
     }
   };
 
+  const onCloseHandler = () => {
+    setMenuPosition(undefined);
+  };
+
+  const onClickMenuHandler = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
+  const onClickRenameHandler = () => {};
+
+  const onClickDeleteHandler = () => {};
+
+  const onContextMenuHandler = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setMenuPosition({ top: e.clientY, left: e.clientX });
+  };
+
   useEffect(() => {
     getForestData();
     joinGroup(0);
@@ -276,7 +298,16 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
           color: theme.palette.mode === 'dark' ? 'white' : 'black',
         }}
         onClick={toggleVisibility}
+        onContextMenu={onContextMenuHandler}
       >
+        <ForestContextMenu
+          open={!!menuPosition}
+          menuPosition={menuPosition}
+          onCloseHandler={onCloseHandler}
+          onClickMenuHandler={onClickMenuHandler}
+          onClickRenameHandler={onClickRenameHandler}
+          onClickDeleteHandler={onClickDeleteHandler}
+        />
         <Box>{forestName}</Box>
         <Box sx={{ display: 'flex' }}>
           <CreateNewFolderIcon
