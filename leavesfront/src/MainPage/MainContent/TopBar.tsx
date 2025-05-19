@@ -8,6 +8,7 @@ import { useTheme } from '@mui/material/styles';
 import ParkIcon from '@mui/icons-material/Park';
 import { useMainPageContext } from '../MainPageManager';
 import { useEffect } from 'react';
+import UserAvatar from './UserAvatar';
 
 type Props = {
   toggleFirstSidebar: () => void;
@@ -27,7 +28,7 @@ const TobBar: React.FC<Props> = ({
   if (!mainPageContext) {
     return <p>mainPageContext.Provider의 하위 컴포넌트가 아님.</p>;
   }
-  const { setTreeId, owningTreeId, leafId } = mainPageContext;
+  const { setTreeId, owningTreeId, leafId, user } = mainPageContext;
   const clickTitleHandler = () => {
     if (owningTreeId) setTreeId(owningTreeId);
   };
@@ -75,11 +76,12 @@ const TobBar: React.FC<Props> = ({
             </Typography>
           </Button>
         </div>
-        <div>
-          <IconButton size="small" sx={{ mr: 1 }}>
-            유저 (todo)
-          </IconButton>
-        </div>
+        <UserAvatar
+          photoURL={user?.photoURL === null ? undefined : user?.photoURL}
+          displayName={
+            user?.displayName === null ? undefined : user?.displayName
+          }
+        />
       </Toolbar>
     </AppBar>
   );

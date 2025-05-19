@@ -11,6 +11,7 @@ import axiosInstance from '../axiosInstance';
 import { MyForestInfo } from '../types';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
+import type { User } from 'firebase/auth';
 
 type MainPageContextType = {
   myForests: MyForestInfo[];
@@ -27,6 +28,7 @@ type MainPageContextType = {
   isPublicLeaf: boolean | undefined;
   setIsPublicLeaf: React.Dispatch<React.SetStateAction<boolean | undefined>>;
   isReady: boolean;
+  user: User | undefined;
 };
 
 type MainPageProps = {
@@ -52,7 +54,8 @@ export function MainPageManager({ children }: MainPageProps) {
   );
   const [ws, setWs] = useState<WebSocket | undefined>(undefined);
   const isMount = useRef<boolean>(true);
-  const [isReady, setIsReady] = useState(false);
+  const [isReady, setIsReady] = useState<boolean>(false);
+  const [user, setUser] = useState<User | undefined>(undefined);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -124,6 +127,8 @@ export function MainPageManager({ children }: MainPageProps) {
     const unregister = auth.onAuthStateChanged((user) => {
       if (user) {
         getMainPageData();
+        setUser(user);
+        console.log('user:', user);
       } else {
         setIsReady(false);
         navigate('/');
@@ -166,6 +171,7 @@ export function MainPageManager({ children }: MainPageProps) {
         isPublicLeaf,
         setIsPublicLeaf,
         isReady,
+        user,
       }}
     >
       {children}
