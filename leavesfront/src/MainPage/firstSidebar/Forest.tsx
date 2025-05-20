@@ -307,6 +307,8 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
           onClickMenuHandler={onClickMenuHandler}
           onClickRenameHandler={onClickRenameHandler}
           onClickDeleteHandler={onClickDeleteHandler}
+          forestId={forestId}
+          isOwner={isOwner}
         />
         <Box>{forestName}</Box>
         <Box sx={{ display: 'flex' }}>

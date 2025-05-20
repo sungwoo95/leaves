@@ -10,6 +10,8 @@ const ForestContextMenu = ({
   onClickMenuHandler,
   onClickRenameHandler,
   onClickDeleteHandler,
+  forestId,
+  isOwner,
 }: {
   open: boolean;
   menuPosition: Position | undefined;
@@ -17,6 +19,8 @@ const ForestContextMenu = ({
   onClickMenuHandler: OnClickMenuHandler;
   onClickRenameHandler: () => void;
   onClickDeleteHandler: () => void;
+  forestId: string;
+  isOwner: boolean;
 }) => {
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
 
@@ -36,12 +40,13 @@ const ForestContextMenu = ({
       >
         <MenuItem onClick={onClickRenameHandler}>Rename</MenuItem>
         <MenuItem onClick={onClickDeleteHandler}>Delete</MenuItem>
-        <MenuItem onClick={handleInviteClick}>Add Member</MenuItem>
+        {isOwner && <MenuItem onClick={handleInviteClick}>Add Member</MenuItem>}
       </Menu>
 
       <InviteModal
         open={inviteModalOpen}
         onClose={() => setInviteModalOpen(false)}
+        forestId={forestId}
       />
     </>
   );

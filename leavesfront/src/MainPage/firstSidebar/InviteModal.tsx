@@ -8,19 +8,30 @@ import {
   useTheme,
 } from '@mui/material';
 import axiosInstance from '../../axiosInstance';
+import { useMainPageContext } from '../MainPageManager';
 
 type InviteModalProps = {
   open: boolean;
   onClose: () => void;
+  forestId: string;
 };
 
-const InviteModal: React.FC<InviteModalProps> = ({ open, onClose }) => {
+const InviteModal: React.FC<InviteModalProps> = ({
+  open,
+  onClose,
+  forestId,
+}) => {
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
   const [statusMessage, setStatusMessage] = useState('');
   const [statusColor, setStatusColor] = useState<'red' | 'green'>('red');
   const [loading, setLoading] = useState(false);
   const theme = useTheme();
+  const mainPageContext = useMainPageContext();
+  if (!mainPageContext) {
+    return <p>mainPageContext.Provider의 하위 컴포넌트가 아님.</p>;
+  }
+  const { user } = mainPageContext;
   const style = {
     position: 'absolute',
     top: '30%',
@@ -35,8 +46,9 @@ const InviteModal: React.FC<InviteModalProps> = ({ open, onClose }) => {
   };
 
   const validateEmail = (value: string) => {
-    const isValid = /^\S+@\S+\.\S+$/.test(value);
-    setEmailError(isValid ? '' : '올바른 이메일 형식이 아닙니다.');
+    let isValid = /^\S+@\S+\.\S+$/.test(value);
+    if (value === user!.email) isValid = false; //자기 초대 방지.
+    setEmailError(isValid ? '' : 'The email format is invalid.');
     return isValid;
   };
 
@@ -52,21 +64,15 @@ const InviteModal: React.FC<InviteModalProps> = ({ open, onClose }) => {
 
     setLoading(true);
     try {
-      const res = await axiosInstance.post('/api/invite', { email });
-
+      await axiosInstance.post('/forest/addMemberToForest', {
+        email,
+        forestId,
+      });
       setStatusMessage('초대가 완료되었습니다.');
       setStatusColor('green');
     } catch (error: any) {
-      if (error.response?.status === 404) {
-        setStatusMessage('존재하지 않는 유저입니다.');
-        setStatusColor('red');
-      } else if (error.response?.status === 409) {
-        setStatusMessage('이미 초대된 유저입니다.');
-        setStatusColor('red');
-      } else {
-        setStatusMessage('서버 오류가 발생했습니다.');
-        setStatusColor('red');
-      }
+      setStatusColor('red');
+      setStatusMessage(error.response.data.message);
     } finally {
       setLoading(false);
     }

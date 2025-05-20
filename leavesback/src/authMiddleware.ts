@@ -1,6 +1,6 @@
 // middlewares/authMiddleware.ts
 import { Request, Response, NextFunction } from 'express';
-import admin from './firebase';
+import { auth } from './firebase';
 
 export const verifyFirebaseToken = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const authHeader = req.headers.authorization;
@@ -11,7 +11,7 @@ export const verifyFirebaseToken = async (req: Request, res: Response, next: Nex
   const token = authHeader.split(' ')[1];
 
   try {
-    const decoded = await admin.auth().verifyIdToken(token);
+    const decoded = await auth.verifyIdToken(token);
     req.user = decoded; // 이후 req.user.sub로 유저 식별.
     console.log("[authMiddleware]req.user:", req.user);
     next();

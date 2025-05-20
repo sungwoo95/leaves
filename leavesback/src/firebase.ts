@@ -7,7 +7,9 @@ if (!admin.apps.length) {
       require(process.env.SERVICE_ACCOUNT_KEY as string)
     ),
   });
-
 }
 
+const auth = admin.auth();
+
+export { auth };
 export default admin;

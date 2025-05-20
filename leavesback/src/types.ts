@@ -57,7 +57,7 @@ export type MyForestInfo = {
 export type Forest = {
   name: string;
   directories: Directory[];
-  participants: ObjectId[];
+  participants: string[];
 };
 
 export enum DirectoryType {
