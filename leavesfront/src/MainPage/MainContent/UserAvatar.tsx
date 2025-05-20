@@ -4,7 +4,7 @@ import { Avatar, IconButton } from '@mui/material';
 type UserAvatarProps = {
   photoURL?: string;
   displayName?: string;
-  onClick?: () => void;
+  onClick?: (event: React.MouseEvent<HTMLElement>) => void;
   onContextMenu?: (e: React.MouseEvent) => void;
 };
 
