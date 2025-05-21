@@ -14,12 +14,14 @@ type InviteModalProps = {
   open: boolean;
   onClose: () => void;
   forestId: string;
+  forestName: string;
 };
 
 const InviteModal: React.FC<InviteModalProps> = ({
   open,
   onClose,
   forestId,
+  forestName,
 }) => {
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -85,11 +87,15 @@ const InviteModal: React.FC<InviteModalProps> = ({
     onClose();
   };
 
+  const handleModalClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   return (
-    <Modal open={open} onClose={handleClose}>
+    <Modal open={open} onClose={handleClose} onClick={handleModalClick}>
       <Box sx={style}>
         <Typography variant="h6" component="h2">
-          Invite User
+          {`Add member to ${forestName}`}
         </Typography>
 
         <TextField

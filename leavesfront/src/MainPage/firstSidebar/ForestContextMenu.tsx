@@ -12,6 +12,7 @@ const ForestContextMenu = ({
   onClickDeleteHandler,
   forestId,
   isOwner,
+  forestName,
 }: {
   open: boolean;
   menuPosition: Position | undefined;
@@ -21,6 +22,7 @@ const ForestContextMenu = ({
   onClickDeleteHandler: () => void;
   forestId: string;
   isOwner: boolean;
+  forestName: string;
 }) => {
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
 
@@ -47,6 +49,7 @@ const ForestContextMenu = ({
         open={inviteModalOpen}
         onClose={() => setInviteModalOpen(false)}
         forestId={forestId}
+        forestName={forestName}
       />
     </>
   );
