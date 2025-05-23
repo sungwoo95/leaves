@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { readLeaf } from '../controllers/leafController';
+import { liveblocksAuth, readLeaf } from '../controllers/leafController';
 
 const leafRouter: Router = Router();
 
 leafRouter.get('/:leafId', readLeaf);
-//leafRouter.post("/createleaf", createleaf);
+leafRouter.post('/liveblocks-auth', liveblocksAuth);
 
 export default leafRouter;

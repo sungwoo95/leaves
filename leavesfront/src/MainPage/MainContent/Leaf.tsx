@@ -6,7 +6,11 @@ import './editorStyles.css';
 import { useMainPageContext } from '../MainPageManager';
 import { WsMessageType } from '../../types';
 import { DEV_MODE } from '../../../config/config';
-import { ClientSideSuspense, RoomProvider } from '@liveblocks/react';
+import {
+  ClientSideSuspense,
+  LiveblocksProvider,
+  RoomProvider,
+} from '@liveblocks/react';
 import Editor from './Editor';
 import NoLeafIsOpen from './NoLeafIsOpen';
 import EditorFallback from './EditorFallback';
@@ -72,7 +76,7 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
       setOwningTreeId(owningTreeId);
       setParentLeafId(parentLeafId);
     } catch (error) {
-      console.log('[Leaf]get leaf data error');
+      console.log('[Leaf][getLeafData]error:', error);
     }
   };
 
@@ -191,15 +195,24 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
               editorRef={editorRef}
             />
           ) : (
-            <RoomProvider id={`${leafId}`}>
-              <ClientSideSuspense fallback={<EditorFallback />}>
-                <Editor
-                  parentLeafId={parentLeafId}
-                  owningTreeId={owningTreeId}
-                  editorRef={editorRef}
-                />
-              </ClientSideSuspense>
-            </RoomProvider>
+            <LiveblocksProvider
+              authEndpoint={async () => {
+                const response = await axiosInstance.post(
+                  '/leaf/liveblocks-auth'
+                );
+                return response.data;
+              }}
+            >
+              <RoomProvider id={`${leafId}`}>
+                <ClientSideSuspense fallback={<EditorFallback />}>
+                  <Editor
+                    parentLeafId={parentLeafId}
+                    owningTreeId={owningTreeId}
+                    editorRef={editorRef}
+                  />
+                </ClientSideSuspense>
+              </RoomProvider>
+            </LiveblocksProvider>
           )}
         </Box>
       </Box>

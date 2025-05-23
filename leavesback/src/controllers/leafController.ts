@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { leavesCollection } from '../config/db';
 import { ObjectId } from 'mongodb';
+import liveblocks from '../liveblocks';
 
 export const readLeaf = async (req: Request, res: Response): Promise<void> => {
   const { leafId } = req.params;
@@ -14,3 +15,18 @@ export const readLeaf = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ message: 'internal server error' });
   }
 };
+
+export const liveblocksAuth = async (req: Request, res: Response): Promise<void> => {
+  const user = req.user
+  if (!user) { res.status(401).json({ message: '[userController][readMainPageData]Unauthorized' }); return; }
+  // Start an auth session inside your endpoint
+  const session = liveblocks.prepareSession(
+    user.sub, { userInfo: { name: user.name, avatar: user.picture } }
+  );
+  session.allow("*", session.FULL_ACCESS)
+  // Authorize the user and return the result
+  const { status, body } = await session.authorize();
+  res.status(status).end(body);
+  return
+};
+
