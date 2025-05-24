@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Button from '@mui/material/Button';
-import { Box, useTheme } from '@mui/material';
+import { Box, TextField, useTheme } from '@mui/material';
 import Explorer from './Explorer';
 import {
   Directory,
@@ -25,6 +25,8 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
   const [menuPosition, setMenuPosition] = useState<Position | undefined>(
     undefined
   );
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const inputRef = useRef<HTMLInputElement | undefined>(undefined);
   const mainPageContext = useMainPageContext();
   if (!mainPageContext) {
     return <p>mainPageContext.Provider의 하위 컴포넌트가 아님.</p>;
@@ -34,6 +36,10 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
     [WsMessageType.UPDATE_FOREST_DIRECTORIES]: (data) => {
       const { directories } = data;
       setDirectories(directories);
+    },
+    [WsMessageType.UPDATE_FOREST_NAME]: (data) => {
+      const { newName } = data;
+      setDirectories(newName);
     },
   };
 
@@ -263,13 +269,36 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
     e.stopPropagation();
   };
 
-  const onClickRenameHandler = () => {};
+  const onClickRenameHandler = () => {
+    setIsEditing(true);
+    onCloseHandler();
+  };
 
   const onClickDeleteHandler = () => {};
 
   const onContextMenuHandler = (e: React.MouseEvent) => {
     e.preventDefault();
     setMenuPosition({ top: e.clientY, left: e.clientX });
+  };
+
+  const updateForestName = (newName: string) => {
+    if (ws) {
+      ws.send(
+        JSON.stringify({
+          type: WsMessageType.UPDATE_FOREST_NAME,
+          data: { forestId, newName },
+        })
+      );
+    }
+    setForestName(newName);
+  };
+
+  const exitEditMode = (): void => {
+    if (inputRef.current) {
+      const newName = inputRef.current.value;
+      if (forestName !== newName) updateForestName(newName);
+    }
+    setIsEditing(false);
   };
 
   useEffect(() => {
@@ -287,15 +316,24 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
+
   return (
     <Box>
       <Button
+        disabled={isEditing}
         variant="text"
         sx={{
           pl: 2,
           width: '100%',
           justifyContent: 'space-between',
           color: theme.palette.mode === 'dark' ? 'white' : 'black',
+          border: isEditing ? '2px solid green' : 'none',
         }}
         onClick={toggleVisibility}
         onContextMenu={onContextMenuHandler}
@@ -311,7 +349,31 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
           isOwner={isOwner}
           forestName={forestName}
         />
-        <Box>{forestName}</Box>
+        <Box
+          sx={{
+            width: '100%',
+            textAlign: 'left',
+            whiteSpace: 'nowrap', // 텍스트 줄바꿈 방지
+            overflow: 'hidden', // 넘친 내용 숨김
+            textOverflow: 'ellipsis', //...처리
+          }}
+        >
+          {isEditing ? (
+            <TextField
+              inputRef={inputRef}
+              defaultValue={forestName}
+              variant="standard"
+              onBlur={exitEditMode}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === 'Escape') {
+                  exitEditMode();
+                }
+              }}
+            />
+          ) : (
+            `${forestName}`
+          )}
+        </Box>
         <Box sx={{ display: 'flex' }}>
           <CreateNewFolderIcon
             onClick={(e) => {

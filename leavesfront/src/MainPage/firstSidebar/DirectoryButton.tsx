@@ -151,7 +151,7 @@ const DirectoryButton = ({
             variant="standard"
             onBlur={exitEditMode}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === 'Enter' || e.key === 'Escape') {
                 exitEditMode();
               }
             }}
