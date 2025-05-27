@@ -77,6 +77,7 @@ const Tree: React.FC = () => {
     setIsPublicLeaf,
     owningTreeId,
     isReady,
+    setTreeForestId,
   } = mainPageContext;
   const cyRef = useRef<cytoscape.Core | undefined>(undefined);
   const [nodes, setNodes] = useState<Node[]>([]);
@@ -394,9 +395,11 @@ const Tree: React.FC = () => {
       const response = await axiosInstance.get(`/tree/${treeId}`);
       const treeData = response.data;
       if (treeData) {
-        const { nodes, edges } = treeData;
+        const { nodes, edges, forestId } = treeData;
+        console.log('[Tree]forestId:', forestId);
         setNodes(nodes);
         setEdges(edges);
+        setTreeForestId(forestId);
         setTreeDataFlag((prev) => !prev);
       }
     } catch (error) {

@@ -29,6 +29,9 @@ type MainPageContextType = {
   setIsPublicLeaf: React.Dispatch<React.SetStateAction<boolean | undefined>>;
   isReady: boolean;
   user: User | undefined;
+  setTreeForestId: React.Dispatch<React.SetStateAction<string | null>>;
+  leafForestId: string | null;
+  setLeafForestId: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 type MainPageProps = {
@@ -56,8 +59,9 @@ export function MainPageManager({ children }: MainPageProps) {
   const isMount = useRef<boolean>(true);
   const [isReady, setIsReady] = useState<boolean>(false);
   const [user, setUser] = useState<User | undefined>(undefined);
+  const [treeForestId, setTreeForestId] = useState<string | null>(null);
+  const [leafForestId, setLeafForestId] = useState<string | null>(null);
   const navigate = useNavigate();
-
   useEffect(() => {
     let reconnectTimeout: NodeJS.Timeout;
     let webSocketInstance: WebSocket | undefined = undefined;
@@ -172,6 +176,9 @@ export function MainPageManager({ children }: MainPageProps) {
         setIsPublicLeaf,
         isReady,
         user,
+        setTreeForestId,
+        leafForestId,
+        setLeafForestId,
       }}
     >
       {children}

@@ -11,6 +11,7 @@ import {
   forestsCollection,
   leavesCollection,
   treesCollection,
+  usersCollection,
 } from '../config/db';
 import { ObjectId } from 'mongodb';
 
@@ -124,8 +125,10 @@ export const registHandler = (
         leafId,
         owningTreeId,
         title,
-      }: { leafId: string; owningTreeId: string; title: string } = data;
+        forestId,
+      }: { leafId: string; owningTreeId: string; title: string; forestId: string } = data;
       const newLeaf: Leaf = {
+        forestId,
         parentLeafId: leafId,
         owningTreeId,
         title,
@@ -204,15 +207,18 @@ export const registHandler = (
         owningTreeId,
         title,
         parentLeafId,
+        forestId,
       }: {
         leafId: string;
         owningTreeId: string;
         title: string;
         parentLeafId: string | null;
+        forestId: string;
       } = data;
       let deleteEdge: any = null;
       const newEdgeList: any[] = [];
       const newLeaf: Leaf = {
+        forestId,
         parentLeafId,
         owningTreeId,
         title,
@@ -675,6 +681,43 @@ export const registHandler = (
         );
       }
     },
+    [WsMessageType.DELETE_FOREST]: async (data) => {
+      const { forestId, sub }: { forestId: string; sub: string } = data;
+      console.log("[wsHandlers][DELETE_FOREST]sub:", sub)
+      const forestObjectId = new ObjectId(forestId);
+      try {
+        // Forest 문서 조회
+        const forest = await forestsCollection.findOne({ _id: forestObjectId });
+        if (!forest) {
+          throw new Error('Forest not found');
+        }
+        // 소유자 일치 여부 확인
+        if (forest.owner !== sub) {
+          throw new Error('Unauthorized: sub does not match forest owner');
+        }
+        // Forest 문서 삭제
+        const result = await forestsCollection.deleteOne({ _id: forestObjectId });
+        if (result.deletedCount === 0) {
+          throw new Error('Failed to delete forest');
+        }
+        // Forest 참가자들의 User 문서 업데이트
+        for (const participantSub of forest.participants) {
+          await usersCollection.updateOne(
+            { sub: participantSub },
+            {
+              $pull: {
+                myForests: { forestId },
+              },
+            }
+          );
+        }
+        // 브로드캐스트
+        broadCast(forestId, WsMessageType.DELETE_FOREST, { forestId }, ws);
+      } catch (error) {
+        console.error('[WsHandlers][DELETE_FOREST]', error);
+      }
+    },
+
   };
 
   ws.on('message', (rawData) => {

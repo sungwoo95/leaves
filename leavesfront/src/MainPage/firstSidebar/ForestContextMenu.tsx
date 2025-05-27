@@ -41,8 +41,12 @@ const ForestContextMenu = ({
         onClick={onClickMenuHandler}
       >
         <MenuItem onClick={onClickRenameHandler}>Rename</MenuItem>
-        <MenuItem onClick={onClickDeleteHandler}>Delete</MenuItem>
-        {isOwner && <MenuItem onClick={handleInviteClick}>Add Member</MenuItem>}
+        {isOwner && (
+          <div>
+            <MenuItem onClick={onClickDeleteHandler}>Delete</MenuItem>
+            <MenuItem onClick={handleInviteClick}>Add Member</MenuItem>
+          </div>
+        )}
       </Menu>
 
       <InviteModal

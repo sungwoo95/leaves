@@ -51,6 +51,7 @@ export enum WsMessageType {
   UPDATE_TREE_DELETE_LEAF = 'UPDATE_TREE_DELETE_LEAF',
   UPDATE_FOREST_DIRECTORIES = 'updateforestdirectories',
   UPDATE_FOREST_NAME = 'updateforestname',
+  DELETE_FOREST = 'deleteforest',
   LEAVE_GROUP = 'leaveGroup',
   JOIN_GROUP = 'joinGroup',
 }

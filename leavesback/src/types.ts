@@ -38,6 +38,7 @@ export type Edge = {
 };
 
 export type Tree = {
+  forestId: string;
   nodes: Node[];
   edges: Edge[];
 };
@@ -50,11 +51,12 @@ export type User = {
 };
 
 export type MyForestInfo = {
-  forestId: ObjectId;
+  forestId: string;
   isOwner: boolean;
 };
 
 export type Forest = {
+  owner: string;
   name: string;
   directories: Directory[];
   participants: string[];
@@ -74,6 +76,7 @@ export type Directory = {
 };
 
 export type Leaf = {
+  forestId: string;
   parentLeafId: string | null;
   owningTreeId?: string;
   title: string;
@@ -95,6 +98,7 @@ export enum WsMessageType {
   UPDATE_TREE_DELETE_LEAF = 'UPDATE_TREE_DELETE_LEAF',
   UPDATE_FOREST_DIRECTORIES = 'updateforestdirectories',
   UPDATE_FOREST_NAME = 'updateforestname',
+  DELETE_FOREST = 'deleteforest',
   LEAVE_GROUP = 'leaveGroup',
   JOIN_GROUP = 'joinGroup',
 }

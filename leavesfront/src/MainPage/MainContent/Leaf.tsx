@@ -31,8 +31,15 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
   if (!mainPageContext) {
     return <p>mainPageContext.Provider의 하위 컴포넌트가 아님.</p>;
   }
-  const { leafId, ws, owningTreeId, setOwningTreeId, setLeafId, isReady } =
-    mainPageContext;
+  const {
+    leafId,
+    ws,
+    owningTreeId,
+    setOwningTreeId,
+    setLeafId,
+    isReady,
+    setLeafForestId,
+  } = mainPageContext;
   const wsMessageHandler: Record<string, (data: any) => void> = {
     [WsMessageType.UPDATE_LEAF_TITLE]: (data) => {
       const { title } = data;
@@ -71,10 +78,11 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
     try {
       const response = await axiosInstance.get(`/leaf/${leafId}`);
       const leaf = response.data;
-      const { title, owningTreeId, parentLeafId } = leaf;
+      const { title, owningTreeId, parentLeafId, forestId } = leaf;
       setTitle(title);
       setOwningTreeId(owningTreeId);
       setParentLeafId(parentLeafId);
+      setLeafForestId(forestId);
     } catch (error) {
       console.log('[Leaf][getLeafData]error:', error);
     }

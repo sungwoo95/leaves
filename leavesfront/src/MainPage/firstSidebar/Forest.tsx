@@ -31,7 +31,17 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
   if (!mainPageContext) {
     return <p>mainPageContext.Provider의 하위 컴포넌트가 아님.</p>;
   }
-  const { ws, treeId, setTreeId, owningTreeId, setLeafId } = mainPageContext;
+  const {
+    ws,
+    treeId,
+    setTreeId,
+    owningTreeId,
+    setLeafId,
+    user,
+    setMyForests,
+    setTreeForestId,
+    setLeafForestId,
+  } = mainPageContext;
   const wsMessageHandler: Record<string, (data: any) => void> = {
     [WsMessageType.UPDATE_FOREST_DIRECTORIES]: (data) => {
       const { directories } = data;
@@ -40,6 +50,11 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
     [WsMessageType.UPDATE_FOREST_NAME]: (data) => {
       const { newName } = data;
       setDirectories(newName);
+    },
+    [WsMessageType.DELETE_FOREST]: (data) => {
+      const { forestId } = data;
+      setMyForestsDeleteForest(forestId);
+      changeLeafTreeDeleteForest(forestId);
     },
   };
 
@@ -274,7 +289,35 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
     onCloseHandler();
   };
 
-  const onClickDeleteHandler = () => {};
+  const changeLeafTreeDeleteForest = (targetId: string) => {
+    setTreeForestId((prev) => {
+      if (prev === targetId) {
+        setTreeId(null);
+        return null;
+      }
+      return prev;
+    });
+
+    setLeafForestId((prev) => {
+      if (prev === targetId) {
+        setLeafId(null);
+        return null;
+      }
+      return prev;
+    });
+  };
+
+  const onClickDeleteHandler = () => {
+    wsSendDeleteForest();
+    setMyForestsDeleteForest(forestId);
+    changeLeafTreeDeleteForest(forestId);
+  };
+
+  const setMyForestsDeleteForest = (targetId: string) => {
+    setMyForests((prev) =>
+      prev.filter((forest) => forest.forestId !== targetId)
+    );
+  };
 
   const onContextMenuHandler = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -299,6 +342,20 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
       if (forestName !== newName) updateForestName(newName);
     }
     setIsEditing(false);
+  };
+
+  const wsSendDeleteForest = () => {
+    if (!user || !ws) {
+      alert('Delete failed');
+      return;
+    }
+    const sub = user.uid;
+    ws.send(
+      JSON.stringify({
+        type: WsMessageType.DELETE_FOREST,
+        data: { forestId, sub },
+      })
+    );
   };
 
   useEffect(() => {
@@ -386,7 +443,9 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
             onClick={async (e) => {
               e.stopPropagation();
               if (!isVisible) toggleVisibility();
-              const response = await axiosInstance.post(`/tree/createTree`);
+              const response = await axiosInstance.post(`/tree/createTree`, {
+                forestId,
+              });
               const treeId: string = response.data.treeId;
               addDirectory(null, DirectoryType.FILE, treeId);
             }}

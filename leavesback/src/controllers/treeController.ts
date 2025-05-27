@@ -23,8 +23,10 @@ export const createTree = async (
   req: Request,
   res: Response
 ): Promise<void> => {
+  const forestId = req.body.forestId;
   try {
     const newLeaf: Leaf = {
+      forestId,
       parentLeafId: null,
       title: 'First Leaf',
       contents: '',
@@ -37,6 +39,7 @@ export const createTree = async (
     }
     const leafId = insertLeafResult.insertedId;
     const newTree: Tree = {
+      forestId,
       nodes: [
         {
           data: {

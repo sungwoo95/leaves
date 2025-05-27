@@ -13,7 +13,7 @@ const CreateChildLeafFormattingToolBarButton = ({
   if (!mainPageContext) {
     return <p>mainPageContext.Provider의 하위 컴포넌트가 아님.</p>;
   }
-  const { leafId, ws } = mainPageContext;
+  const { leafId, ws, leafForestId } = mainPageContext;
   return (
     <Components.FormattingToolbar.Button
       mainTooltip={'Create child leaf'}
@@ -27,7 +27,12 @@ const CreateChildLeafFormattingToolBarButton = ({
           ws.send(
             JSON.stringify({
               type: WsMessageType.ADD_CHILD_LEAF,
-              data: { leafId, owningTreeId, title: selectedText },
+              data: {
+                leafId,
+                owningTreeId,
+                title: selectedText,
+                forestId: leafForestId,
+              },
             })
           );
         }
