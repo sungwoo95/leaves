@@ -17,6 +17,7 @@ const EditorFallback = () => {
         alignItems: 'center',
         justifyContent: 'center',
         p: 2,
+        boxSizing: 'border-box',
       }}
     >
       <CircularProgress color="inherit" />
