@@ -2,18 +2,22 @@
 .bn-container[data-theming-css-variables-demo][data-color-scheme] {
   --bn-colors-editor-text: #222222;
   --bn-colors-editor-background: #ffffff;
+
   --bn-colors-menu-text: #ffffff;
-  --bn-colors-menu-background: #9b0000;
+  --bn-colors-menu-background: #cec7c7; /* 툴바 배경 회색 */
   --bn-colors-tooltip-text: #ffffff;
-  --bn-colors-tooltip-background: #b00000;
+  --bn-colors-tooltip-background: #cec7c7; /* 툴팁 배경 회색 */
+
   --bn-colors-hovered-text: #ffffff;
-  --bn-colors-hovered-background: #b00000;
+  --bn-colors-hovered-background: #888888; /* hover 시 회색 */
+
   --bn-colors-selected-text: #ffffff;
-  --bn-colors-selected-background: #c50000;
-  --bn-colors-disabled-text: #9b0000;
-  --bn-colors-disabled-background: #7d0000;
-  --bn-colors-shadow: #640000;
-  --bn-colors-border: #870000;
+  --bn-colors-selected-background: #888888; /* 선택 시 회색 */
+
+  --bn-colors-disabled-text: #ffffff;
+  --bn-colors-disabled-background: #cec7c7;
+  --bn-colors-shadow: #888888;
+  --bn-colors-border: #cec7c7;
   --bn-colors-side-menu: #bababa;
   --bn-color-highlight-colors: #ffffff;
   --bn-border-radius: 4px;
