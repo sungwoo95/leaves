@@ -167,8 +167,8 @@ const Tree: React.FC = () => {
         cy.style()
           .selector(`node[id = "${leafId}"]`)
           .style({
-            width: '20px',
-            height: '20px',
+            width: '10px',
+            height: '10px',
           })
           .update();
       }
@@ -600,10 +600,10 @@ const Tree: React.FC = () => {
           {
             selector: 'node',
             style: {
-              'background-color': 'green',
+              'background-color': 'rgb(48, 154, 48)',
               label: 'data(label)',
-              width: '10px',
-              height: '10px',
+              width: '5px',
+              height: '5px',
               color: theme.palette.mode === 'dark' ? 'white' : 'black',
               'text-margin-y': -2, // 여백
               'font-size': '10px',
@@ -612,14 +612,14 @@ const Tree: React.FC = () => {
           {
             selector: "node[isConquer='true']", //isConquer가 true인 노드는 다음 style이 overwright.
             style: {
-              'background-color': 'red',
+              'background-color': 'rgb(213, 71, 71)',
             },
           },
           {
             selector: 'edge',
             style: {
-              width: 2,
-              'line-color': '#ccc',
+              width: 1,
+              'line-color': 'rgb(200, 208, 200)',
             },
           },
         ]}
