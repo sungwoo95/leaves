@@ -39,6 +39,7 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
     setLeafId,
     isReady,
     setLeafForestId,
+    user,
   } = mainPageContext;
   const wsMessageHandler: Record<string, (data: any) => void> = {
     [WsMessageType.UPDATE_LEAF_TITLE]: (data) => {
@@ -206,7 +207,8 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
             <LiveblocksProvider
               authEndpoint={async () => {
                 const response = await axiosInstance.post(
-                  '/leaf/liveblocks-auth'
+                  '/leaf/liveblocks-auth',
+                  { displayName: user?.displayName }
                 );
                 return response.data;
               }}

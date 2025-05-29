@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { leavesCollection } from '../config/db';
 import { ObjectId } from 'mongodb';
 import liveblocks from '../liveblocks';
+import { UserInfo } from '../types';
 
 export const readLeaf = async (req: Request, res: Response): Promise<void> => {
   const { leafId } = req.params;
@@ -19,9 +20,14 @@ export const readLeaf = async (req: Request, res: Response): Promise<void> => {
 export const liveblocksAuth = async (req: Request, res: Response): Promise<void> => {
   const user = req.user
   if (!user) { res.status(401).json({ message: '[userController][readMainPageData]Unauthorized' }); return; }
+  const { displayName } = req.body;
   // Start an auth session inside your endpoint
+  const userInfo: UserInfo = { name: displayName };
+  if (user.picture) {
+    userInfo.avatar = user.picture;
+  }
   const session = liveblocks.prepareSession(
-    user.sub, { userInfo: { name: user.name, avatar: user.picture } }
+    user.sub, { userInfo }
   );
   session.allow("*", session.FULL_ACCESS)
   // Authorize the user and return the result

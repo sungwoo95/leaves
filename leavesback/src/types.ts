@@ -112,3 +112,8 @@ export type DeleteLeafData = {
   parentLeafId: string | null;
   childLeafIdList: string[];
 };
+
+export type UserInfo = {
+  name: string;
+  avatar?: string;
+};
