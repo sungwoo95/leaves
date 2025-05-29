@@ -208,7 +208,7 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
               authEndpoint={async () => {
                 const response = await axiosInstance.post(
                   '/leaf/liveblocks-auth',
-                  { displayName: user?.displayName }
+                  { displayName: user?.providerData[0].displayName }
                 );
                 return response.data;
               }}
