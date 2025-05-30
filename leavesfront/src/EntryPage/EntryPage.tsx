@@ -1,10 +1,13 @@
+import IntroduceApp from './IntroduceApp';
+import IntroduceDivideConquer from './IntroduceDivideConquer';
 import SignInScreen from './SignInScreen';
-import StartForm from './StartForm';
 
 const EntryPage: React.FC = () => {
   return (
     <div>
+      <IntroduceApp />
       <SignInScreen />
+      <IntroduceDivideConquer videoSrc="../../public/introduceDivideConquer.mp4" />
     </div>
   );
 };
