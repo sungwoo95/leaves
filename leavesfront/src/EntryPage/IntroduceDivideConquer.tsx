@@ -20,7 +20,7 @@ const IntroduceDivideConquer: React.FC<IntroduceDivideConquerProps> = ({
       <Typography variant="h4" fontWeight="bold" gutterBottom>
         Divide and conquer the problem with your team.
       </Typography>
-      <Box mt={2} width="100%" maxWidth="800px">
+      <Box mt={2} width="100%" maxWidth="1300px">
         <video
           src={videoSrc}
           autoPlay
