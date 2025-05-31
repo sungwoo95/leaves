@@ -110,6 +110,9 @@ const DirectoryButton = ({
     if ((item.isNew || isEditing) && inputRef.current) {
       inputRef.current.focus();
       inputRef.current.select();
+      if (inputRef.current !== document.activeElement) {
+        updateIsNew(item.id);
+      }
     }
   }, [isEditing]);
 
