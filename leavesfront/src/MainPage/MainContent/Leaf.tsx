@@ -84,8 +84,13 @@ const Leaf: React.FC<Props> = ({ title, setTitle }) => {
       setOwningTreeId(owningTreeId);
       setParentLeafId(parentLeafId);
       setLeafForestId(forestId);
-    } catch (error) {
-      console.log('[Leaf][getLeafData]error:', error);
+    } catch (error: any) {
+      if (error.response && error.response.status === 404) {
+        console.log('[Leaf][getLeafData] Leaf not found');
+        setLeafId(null);
+      } else {
+        console.log('[Leaf][getLeafData] error:', error);
+      }
     }
   };
 

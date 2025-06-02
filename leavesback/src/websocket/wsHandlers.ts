@@ -26,6 +26,19 @@ const deleteLeaf = async (targetId: string) => {
   await liveblocks.deleteRoom(targetId);
 }
 
+const deleteTree = async (deleteTreeId: string) => {
+  const tree = await treesCollection.findOneAndDelete({
+    _id: new ObjectId(deleteTreeId),
+  })
+  if (!tree) {
+    throw new Error('Tree of deleteTreeId not found');
+  }
+  for (const node of tree.nodes) {
+    const nodeId = node.data.id;
+    await deleteLeaf(nodeId);
+  }
+}
+
 export const registHandler = (
   ws: WebSocket,
   wsGroups: Map<string, Set<WebSocket>>
@@ -425,7 +438,8 @@ export const registHandler = (
       const {
         forestId,
         directories,
-      }: { forestId: string; directories: Directory[] } = data;
+        deleteTreeId,
+      }: { forestId: string; directories: Directory[]; deleteTreeId?: string } = data;
       try {
         //forest문서 업데이트.
         const result = await forestsCollection.updateOne(
@@ -435,6 +449,10 @@ export const registHandler = (
         if (result.matchedCount === 0) {
           throw new Error('No forest document matched');
         }
+        //트리 삭제.
+        if (deleteTreeId) {
+          deleteTree(deleteTreeId);
+        }
         //forest브로드 캐스트
         const forestClients = wsGroups.get(forestId);
         if (forestClients) {
@@ -443,7 +461,7 @@ export const registHandler = (
               client.send(
                 JSON.stringify({
                   type: WsMessageType.UPDATE_FOREST_DIRECTORIES,
-                  data: { forestId, directories },
+                  data: { forestId, directories, deleteTreeId },
                 })
               );
             }
@@ -451,7 +469,7 @@ export const registHandler = (
         }
       } catch (error) {
         console.error(
-          '[WsHandlers][UPDATE_FOREST_DIRECTORIES] error: ',
+          '[WsHandlers][UPDATE_FOREST_DIRECTORIES]',
           error
         );
       }

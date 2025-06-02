@@ -78,6 +78,7 @@ const Tree: React.FC = () => {
     owningTreeId,
     isReady,
     setTreeForestId,
+    setTreeId,
   } = mainPageContext;
   const cyRef = useRef<cytoscape.Core | undefined>(undefined);
   const [nodes, setNodes] = useState<Node[]>([]);
@@ -402,8 +403,13 @@ const Tree: React.FC = () => {
         setTreeForestId(forestId);
         setTreeDataFlag((prev) => !prev);
       }
-    } catch (error) {
-      console.log('[Tree][getTreeData]Error fetching tree data:', error);
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        console.log('[Tree][getTreeData] Tree not found, clearing treeId.');
+        setTreeId(null);
+      } else {
+        console.log('[Tree][getTreeData] Error fetching tree data:', error);
+      }
     } finally {
       setLoading(false);
     }

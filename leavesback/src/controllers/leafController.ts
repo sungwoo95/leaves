@@ -10,6 +10,10 @@ export const readLeaf = async (req: Request, res: Response): Promise<void> => {
     const leaf = await leavesCollection.findOne({
       _id: new ObjectId(leafId),
     });
+    if (!leaf) {
+      res.status(404).json({ message: 'Leaf not found' });
+      return;
+    }
     res.json(leaf);
   } catch (error) {
     console.log('[leafController][readLeaf]find Leaf error');

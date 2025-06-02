@@ -11,6 +11,10 @@ export const readTree = async (req: Request, res: Response): Promise<void> => {
     const tree = await treesCollection.findOne({
       _id: new ObjectId(treeId),
     });
+    if (!tree) {
+      res.status(404).json({ message: 'Tree not found' });
+      return;
+    }
     res.json(tree);
   } catch (error) {
     console.log('[treeController][readTree]find Tree error');

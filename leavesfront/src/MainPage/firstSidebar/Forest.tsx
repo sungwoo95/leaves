@@ -33,9 +33,8 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
   }
   const {
     ws,
-    treeId,
     setTreeId,
-    owningTreeId,
+    setOwningTreeId,
     setLeafId,
     user,
     setMyForests,
@@ -44,8 +43,11 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
   } = mainPageContext;
   const wsMessageHandler: Record<string, (data: any) => void> = {
     [WsMessageType.UPDATE_FOREST_DIRECTORIES]: (data) => {
-      const { directories } = data;
+      const { directories, deleteTreeId } = data;
       setDirectories(directories);
+      if (deleteTreeId) {
+        changeLeafTreeDeleteTree(deleteTreeId);
+      }
     },
     [WsMessageType.UPDATE_FOREST_NAME]: (data) => {
       const { newName } = data;
@@ -115,7 +117,7 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
     });
   };
 
-  const deleteDirectory = (targetId: string, targetTreeId?: string): void => {
+  const deleteDirectory = (targetId: string, deleteTreeId?: string): void => {
     const newDirectories = (directories: Directory[]): Directory[] => {
       for (let i = 0; i < directories.length; i++) {
         const elem = directories[i];
@@ -139,14 +141,11 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
     };
     setDirectories((prevDirectories) => {
       const result = newDirectories(prevDirectories);
-      postDirectories(result);
+      postDirectories(result, deleteTreeId);
       return result;
     });
-    if (targetTreeId === treeId) {
-      setTreeId(null);
-    }
-    if (targetTreeId === owningTreeId) {
-      setLeafId(null);
+    if (deleteTreeId) {
+      changeLeafTreeDeleteTree(deleteTreeId);
     }
   };
 
@@ -214,12 +213,15 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
     });
   };
 
-  const postDirectories = async (directories: Directory[]) => {
+  const postDirectories = async (
+    directories: Directory[],
+    deleteTreeId?: string
+  ) => {
     if (ws) {
       ws.send(
         JSON.stringify({
           type: WsMessageType.UPDATE_FOREST_DIRECTORIES,
-          data: { forestId, directories },
+          data: { forestId, directories, deleteTreeId },
         })
       );
     }
@@ -302,6 +304,22 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
       if (prev === targetId) {
         setLeafId(null);
         return null;
+      }
+      return prev;
+    });
+  };
+
+  const changeLeafTreeDeleteTree = (targetId: string) => {
+    setTreeId((prev) => {
+      if (prev === targetId) {
+        return null;
+      }
+      return prev;
+    });
+    setOwningTreeId((prev) => {
+      if (prev === targetId) {
+        setLeafId(null);
+        return prev;
       }
       return prev;
     });
