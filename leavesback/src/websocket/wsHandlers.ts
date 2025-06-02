@@ -14,6 +14,17 @@ import {
   usersCollection,
 } from '../config/db';
 import { ObjectId } from 'mongodb';
+import liveblocks from '../liveblocks';
+
+const deleteLeaf = async (targetId: string) => {
+  const leafDelRes = await leavesCollection.deleteOne({
+    _id: new ObjectId(targetId),
+  });
+  if (!leafDelRes.acknowledged || leafDelRes.deletedCount === 0) {
+    throw new Error(`[DeleteCase.HAS_PARENT] Failed to delete leaf`)
+  }
+  await liveblocks.deleteRoom(targetId);
+}
 
 export const registHandler = (
   ws: WebSocket,
@@ -505,16 +516,7 @@ export const registHandler = (
 
           case DeleteCase.HAS_PARENT: {
             // 리프 삭제
-            const leafDelRes = await leavesCollection.deleteOne({
-              _id: new ObjectId(leafId),
-            });
-            if (!leafDelRes.acknowledged || leafDelRes.deletedCount === 0) {
-              console.error(
-                `[DeleteCase.HAS_PARENT] Failed to delete leaf ${leafId}`,
-                leafDelRes
-              );
-            }
-
+            deleteLeaf(leafId);
             // 노드 삭제
             const pullNodeRes = await treesCollection.updateOne(
               { _id: new ObjectId(treeId) },
@@ -526,7 +528,6 @@ export const registHandler = (
                 pullNodeRes
               );
             }
-
             // 엣지 삭제
             const pullEdgeRes = await treesCollection.updateOne(
               { _id: new ObjectId(treeId) },
@@ -538,7 +539,6 @@ export const registHandler = (
                 pullEdgeRes
               );
             }
-
             // 엣지 추가
             const pushEdgeRes = await treesCollection.updateOne(
               { _id: new ObjectId(treeId) },
@@ -571,20 +571,7 @@ export const registHandler = (
 
           case DeleteCase.ROOT_WITH_SINGLE_CHILD:
             {
-              // 리프 삭제
-              const leafDelRes2 = await leavesCollection.deleteOne({
-                _id: new ObjectId(leafId),
-              });
-              if (
-                !leafDelRes2.acknowledged ||
-                leafDelRes2.deletedCount === 0
-              ) {
-                console.error(
-                  `[DeleteCase.ROOT_WITH_SINGLE_CHILD] Failed to delete leaf ${leafId}`,
-                  leafDelRes2
-                );
-              }
-
+              deleteLeaf(leafId);
               // 노드 삭제
               const pullNodeRes2 = await treesCollection.updateOne(
                 { _id: new ObjectId(treeId) },
@@ -657,6 +644,7 @@ export const registHandler = (
         // }
       }
     },
+
     [WsMessageType.UPDATE_FOREST_NAME]: async (data) => {
       const {
         forestId,
