@@ -67,6 +67,7 @@ export enum DirectoryType {
 
 export type Directory = {
   id: string;
+  treeId?: string;
   type: DirectoryType;
   isNew: boolean;
   name: string;

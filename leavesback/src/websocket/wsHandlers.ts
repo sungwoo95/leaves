@@ -3,6 +3,7 @@ import {
   DeleteCase,
   DeleteLeafData,
   Directory,
+  DirectoryType,
   IsConquer,
   Leaf,
   WsMessageType,
@@ -15,6 +16,21 @@ import {
 } from '../config/db';
 import { ObjectId } from 'mongodb';
 import liveblocks from '../liveblocks';
+
+async function deleteAllRooms() {
+  while (true) {
+    const roomsPage = await liveblocks.getRooms();
+    const rooms = roomsPage.data;
+
+    if (rooms.length === 0) {
+      break; // 더 이상 삭제할 room이 없음
+    }
+
+    for (const room of rooms) {
+      await liveblocks.deleteRoom(room.id);
+    }
+  }
+}
 
 const deleteLeaf = async (targetId: string) => {
   const leafDelRes = await leavesCollection.deleteOne({
@@ -38,6 +54,33 @@ const deleteTree = async (deleteTreeId: string) => {
     await deleteLeaf(nodeId);
   }
 }
+
+const deleteDirectories = async (
+  directories: Directory[] // 삭제 대상이 될 디렉토리 배열
+): Promise<string[]> => {  // 삭제한 treeId들을 배열로 반환
+  const deletedTreeIds: string[] = []; // 삭제된 treeId를 저장할 배열
+
+  // 디렉토리 트리를 순회하며 삭제 처리하는 재귀 함수
+  const traverse = async (dir: Directory) => {
+    // 현재 노드가 파일 타입이고 treeId가 존재하면 삭제
+    if (dir.type === DirectoryType.FILE && dir.treeId) {
+      await deleteTree(dir.treeId);  // 외부 deleteTree 함수 직접 호출
+      deletedTreeIds.push(dir.treeId);  // 삭제된 treeId 배열에 추가
+    }
+
+    // 자식 디렉토리들도 재귀적으로 순회
+    for (const child of dir.children) {
+      await traverse(child);
+    }
+  };
+
+  // 최상위 directories 배열을 순회하며 traverse 호출
+  for (const directory of directories) {
+    await traverse(directory);
+  }
+
+  return deletedTreeIds; // 삭제 완료한 모든 treeId 반환
+};
 
 export const registHandler = (
   ws: WebSocket,
@@ -689,7 +732,6 @@ export const registHandler = (
     },
     [WsMessageType.DELETE_FOREST]: async (data) => {
       const { forestId, sub }: { forestId: string; sub: string } = data;
-      console.log("[wsHandlers][DELETE_FOREST]sub:", sub)
       const forestObjectId = new ObjectId(forestId);
       try {
         // Forest 문서 조회
@@ -706,6 +748,8 @@ export const registHandler = (
         if (result.deletedCount === 0) {
           throw new Error('Failed to delete forest');
         }
+        //directories 소속 tree제거.
+        deleteDirectories(forest.directories);
         // Forest 참가자들의 User 문서 업데이트
         for (const participantSub of forest.participants) {
           await usersCollection.updateOne(
