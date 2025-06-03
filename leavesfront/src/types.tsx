@@ -101,3 +101,12 @@ export type DeleteLeafData = {
   parentLeafId: string | null;
   childLeafIdList: string[];
 };
+
+export type updateForestDirectoriesData = {
+  forestId: string;
+  directories: Directory[];
+  deleteInfo: {
+    deleteTreeId: string | null;
+    deleteDirectories: Directory[] | null;
+  } | null;
+};

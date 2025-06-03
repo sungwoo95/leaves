@@ -7,6 +7,7 @@ import {
   DirectoryType,
   MyForestInfo,
   Position,
+  updateForestDirectoriesData,
   UpdateName,
   WsMessageType,
 } from '../../types';
@@ -43,10 +44,12 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
   } = mainPageContext;
   const wsMessageHandler: Record<string, (data: any) => void> = {
     [WsMessageType.UPDATE_FOREST_DIRECTORIES]: (data) => {
-      const { directories, deleteTreeId } = data;
+      const { directories, deleteTreeIds } = data;
       setDirectories(directories);
-      if (deleteTreeId) {
-        changeLeafTreeDeleteTree(deleteTreeId);
+      if (deleteTreeIds) {
+        for (const elem of deleteTreeIds) {
+          changeLeafTreeDeleteTree(elem);
+        }
       }
     },
     [WsMessageType.UPDATE_FOREST_NAME]: (data) => {
@@ -107,21 +110,34 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
     setDirectories((prevDirectories) => {
       if (targetId) {
         const result = newDirectories(prevDirectories);
-        postDirectories(result);
+        postDirectories(result, null);
         return result;
       } else {
         const result = [...prevDirectories, directory];
-        postDirectories(result);
+        postDirectories(result, null);
         return result;
       }
     });
   };
 
   const deleteDirectory = (targetId: string, deleteTreeId?: string): void => {
+    let deleteInfo: {
+      deleteTreeId: string | null;
+      deleteDirectories: Directory[] | null;
+    } = {
+      deleteTreeId: null,
+      deleteDirectories: null,
+    };
+    if (deleteTreeId) {
+      deleteInfo.deleteTreeId = deleteTreeId;
+    }
     const newDirectories = (directories: Directory[]): Directory[] => {
       for (let i = 0; i < directories.length; i++) {
         const elem = directories[i];
         if (elem.id === targetId) {
+          if (elem.type === DirectoryType.FOLDER) {
+            deleteInfo.deleteDirectories = elem.children;
+          }
           //targetId 찾았을 경우 새로운 Directory[]반환.
           return [...directories.slice(0, i), ...directories.slice(i + 1)];
         }
@@ -139,16 +155,38 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
       }
       return directories; // 못 찾았으면 그대로 반환
     };
+
     setDirectories((prevDirectories) => {
       const result = newDirectories(prevDirectories);
-      postDirectories(result, deleteTreeId);
+      postDirectories(result, deleteInfo);
       return result;
     });
-    if (deleteTreeId) {
-      changeLeafTreeDeleteTree(deleteTreeId);
+    if (deleteInfo) {
+      const { deleteTreeId, deleteDirectories } = deleteInfo;
+      if (deleteTreeId) changeLeafTreeDeleteTree(deleteTreeId);
+      if (deleteDirectories) {
+        const treeIds = treeIdsFromDirectories(deleteDirectories);
+        for (const elem of treeIds) {
+          changeLeafTreeDeleteTree(elem);
+        }
+      }
     }
   };
-
+  const treeIdsFromDirectories = (directories: Directory[]): string[] => {
+    const treeIds: string[] = [];
+    const traverse = (dir: Directory) => {
+      if (dir.type === DirectoryType.FILE && dir.treeId) {
+        treeIds.push(dir.treeId);
+      }
+      for (const child of dir.children) {
+        traverse(child);
+      }
+    };
+    for (const directory of directories) {
+      traverse(directory);
+    }
+    return treeIds; // 삭제 완료한 모든 treeId 반환
+  };
   const updateIsNew = (targetId: string): void => {
     const newDirectories = (directories: Directory[]): Directory[] => {
       for (let i = 0; i < directories.length; i++) {
@@ -176,7 +214,7 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
     };
     setDirectories((prevDirectories) => {
       const result = newDirectories(prevDirectories);
-      postDirectories(result);
+      postDirectories(result, null);
       return result;
     });
   };
@@ -208,20 +246,28 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
     };
     setDirectories((prevDirectories) => {
       const result = newDirectories(prevDirectories);
-      postDirectories(result);
+      postDirectories(result, null);
       return result;
     });
   };
 
   const postDirectories = async (
     directories: Directory[],
-    deleteTreeId?: string
+    deleteInfo: {
+      deleteTreeId: string | null;
+      deleteDirectories: Directory[] | null;
+    } | null
   ) => {
+    const data: updateForestDirectoriesData = {
+      forestId,
+      directories,
+      deleteInfo,
+    };
     if (ws) {
       ws.send(
         JSON.stringify({
           type: WsMessageType.UPDATE_FOREST_DIRECTORIES,
-          data: { forestId, directories, deleteTreeId },
+          data,
         })
       );
     }

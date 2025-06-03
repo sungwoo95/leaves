@@ -6,6 +6,7 @@ import {
   DirectoryType,
   IsConquer,
   Leaf,
+  updateForestDirectoriesData,
   WsMessageType,
 } from '../types';
 import {
@@ -55,7 +56,7 @@ const deleteTree = async (deleteTreeId: string) => {
   }
 }
 
-const deleteDirectories = async (
+const deleteTreeFromDirectories = async (
   directories: Directory[] // 삭제 대상이 될 디렉토리 배열
 ): Promise<string[]> => {  // 삭제한 treeId들을 배열로 반환
   const deletedTreeIds: string[] = []; // 삭제된 treeId를 저장할 배열
@@ -477,13 +478,16 @@ export const registHandler = (
       }
       joinWsGroup(groupId);
     },
-    [WsMessageType.UPDATE_FOREST_DIRECTORIES]: async (data) => {
+    [WsMessageType.UPDATE_FOREST_DIRECTORIES]: async (data: updateForestDirectoriesData) => {
       const {
         forestId,
         directories,
-        deleteTreeId,
-      }: { forestId: string; directories: Directory[]; deleteTreeId?: string } = data;
+        deleteInfo
+      } = data;
       try {
+        const deleteTreeId = deleteInfo?.deleteTreeId;
+        const deleteDirectories = deleteInfo?.deleteDirectories;
+        let deleteTreeIds = null;
         //forest문서 업데이트.
         const result = await forestsCollection.updateOne(
           { _id: new ObjectId(forestId) },
@@ -495,6 +499,10 @@ export const registHandler = (
         //트리 삭제.
         if (deleteTreeId) {
           deleteTree(deleteTreeId);
+          deleteTreeIds = [deleteTreeId]
+        }
+        if (deleteDirectories) {
+          deleteTreeIds = await deleteTreeFromDirectories(deleteDirectories)
         }
         //forest브로드 캐스트
         const forestClients = wsGroups.get(forestId);
@@ -504,7 +512,7 @@ export const registHandler = (
               client.send(
                 JSON.stringify({
                   type: WsMessageType.UPDATE_FOREST_DIRECTORIES,
-                  data: { forestId, directories, deleteTreeId },
+                  data: { forestId, directories, deleteTreeIds },
                 })
               );
             }
@@ -749,7 +757,7 @@ export const registHandler = (
           throw new Error('Failed to delete forest');
         }
         //directories 소속 tree제거.
-        deleteDirectories(forest.directories);
+        deleteTreeFromDirectories(forest.directories);
         // Forest 참가자들의 User 문서 업데이트
         for (const participantSub of forest.participants) {
           await usersCollection.updateOne(

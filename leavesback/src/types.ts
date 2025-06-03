@@ -1,3 +1,4 @@
+import { updateForestDirectories } from './controllers/forestController';
 export enum IsConquer {
   TRUE = 'true',
   FALSE = 'false',
@@ -116,3 +117,13 @@ export type UserInfo = {
   name: string;
   avatar?: string;
 };
+
+export type updateForestDirectoriesData = {
+  forestId: string;
+  directories: Directory[];
+  deleteInfo: {
+    deleteTreeId: string | null;
+    deleteDirectories: Directory[] | null;
+  } | null;
+};
+
