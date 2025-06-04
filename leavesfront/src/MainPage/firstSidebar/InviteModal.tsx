@@ -87,13 +87,14 @@ const InviteModal: React.FC<InviteModalProps> = ({
     onClose();
   };
 
-  const handleModalClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
   return (
-    <Modal open={open} onClose={handleClose} onClick={handleModalClick}>
-      <Box sx={style}>
+    <Modal open={open} onClose={handleClose}>
+      <Box
+        sx={style}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      >
         <Typography variant="h6" component="h2">
           {`Add member to ${forestName}`}
         </Typography>
@@ -117,14 +118,14 @@ const InviteModal: React.FC<InviteModalProps> = ({
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
           <Button onClick={handleClose} disabled={loading} sx={{ mr: 1 }}>
-            취소
+            Close
           </Button>
           <Button
             onClick={handleInvite}
             disabled={loading || !!emailError || !email}
             variant="contained"
           >
-            초대
+            Invite
           </Button>
         </Box>
       </Box>

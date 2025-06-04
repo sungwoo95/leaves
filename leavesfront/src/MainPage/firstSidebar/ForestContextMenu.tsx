@@ -13,6 +13,7 @@ const ForestContextMenu = ({
   forestId,
   isOwner,
   forestName,
+  setButtonDisabled,
 }: {
   open: boolean;
   menuPosition: Position | undefined;
@@ -23,12 +24,19 @@ const ForestContextMenu = ({
   forestId: string;
   isOwner: boolean;
   forestName: string;
+  setButtonDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
 
   const handleInviteClick = () => {
     onCloseHandler(); // 메뉴 먼저 닫고
     setInviteModalOpen(true); // 모달 열기
+    setButtonDisabled(true); //모달에서 클릭 시 Forest버튼 ripple 방지.
+  };
+
+  const hanledCloseModal = () => {
+    setInviteModalOpen(false);
+    setButtonDisabled(false);
   };
 
   return (
@@ -48,10 +56,9 @@ const ForestContextMenu = ({
           </div>
         )}
       </Menu>
-
       <InviteModal
         open={inviteModalOpen}
-        onClose={() => setInviteModalOpen(false)}
+        onClose={hanledCloseModal}
         forestId={forestId}
         forestName={forestName}
       />

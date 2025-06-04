@@ -28,6 +28,7 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
   );
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement | undefined>(undefined);
+  const [buttonDisabled, setButtonDisabled] = useState<boolean>(false);
   const mainPageContext = useMainPageContext();
   if (!mainPageContext) {
     return <p>mainPageContext.Provider의 하위 컴포넌트가 아님.</p>;
@@ -447,7 +448,7 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
   return (
     <Box>
       <Button
-        disabled={isEditing}
+        disabled={isEditing || buttonDisabled}
         variant="text"
         sx={{
           pl: 2,
@@ -469,6 +470,7 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
           forestId={forestId}
           isOwner={isOwner}
           forestName={forestName}
+          setButtonDisabled={setButtonDisabled}
         />
         <Box
           sx={{
