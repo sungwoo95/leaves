@@ -14,7 +14,7 @@ const IntroduceApp: React.FC = () => {
         Grow the tree.
       </Typography>
       <Typography variant="h3" fontWeight="bold" gutterBottom>
-        Burn the leaves.
+        Burn the leaf.
       </Typography>
       <Typography variant="h5" color="text.secondary">
         Enjoy the journey of solving.
