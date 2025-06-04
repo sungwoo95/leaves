@@ -325,7 +325,11 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
     }
   };
 
-  const onCloseHandler = () => {
+  const handleMenuClose = () => {
+    setMenuPosition(undefined);
+  };
+
+  const menuClose = () => {
     setMenuPosition(undefined);
   };
 
@@ -335,7 +339,7 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
 
   const onClickRenameHandler = () => {
     setIsEditing(true);
-    onCloseHandler();
+    handleMenuClose();
   };
 
   const changeLeafTreeDeleteForest = (targetId: string) => {
@@ -372,7 +376,7 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
     });
   };
 
-  const onClickDeleteHandler = () => {
+  const deleteForest = () => {
     wsSendDeleteForest();
     setMyForestsDeleteForest(forestId);
     changeLeafTreeDeleteForest(forestId);
@@ -463,13 +467,14 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
         <ForestContextMenu
           open={!!menuPosition}
           menuPosition={menuPosition}
-          onCloseHandler={onCloseHandler}
+          handleMenuClose={handleMenuClose}
           onClickMenuHandler={onClickMenuHandler}
           onClickRenameHandler={onClickRenameHandler}
-          onClickDeleteHandler={onClickDeleteHandler}
+          deleteForest={deleteForest}
           forestId={forestId}
           forestName={forestName}
           setButtonDisabled={setButtonDisabled}
+          menuClose={menuClose}
         />
         <Box
           sx={{
