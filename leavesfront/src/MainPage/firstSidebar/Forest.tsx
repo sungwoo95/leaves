@@ -21,7 +21,7 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [directories, setDirectories] = useState<Directory[]>([]);
   const [forestName, setForestName] = useState<string>('');
-  const { forestId, isOwner } = myForests;
+  const { forestId } = myForests;
   const theme = useTheme();
   const [menuPosition, setMenuPosition] = useState<Position | undefined>(
     undefined
@@ -468,7 +468,6 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
           onClickRenameHandler={onClickRenameHandler}
           onClickDeleteHandler={onClickDeleteHandler}
           forestId={forestId}
-          isOwner={isOwner}
           forestName={forestName}
           setButtonDisabled={setButtonDisabled}
         />

@@ -51,11 +51,9 @@ export type User = {
 
 export type MyForestInfo = {
   forestId: string;
-  isOwner: boolean;
 };
 
 export type Forest = {
-  owner: string;
   name: string;
   directories: Directory[];
   participants: string[];

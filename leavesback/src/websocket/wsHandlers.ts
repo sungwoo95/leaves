@@ -747,10 +747,6 @@ export const registHandler = (
         if (!forest) {
           throw new Error('Forest not found');
         }
-        // 소유자 일치 여부 확인
-        if (forest.owner !== sub) {
-          throw new Error('Unauthorized: sub does not match forest owner');
-        }
         // Forest 문서 삭제
         const result = await forestsCollection.deleteOne({ _id: forestObjectId });
         if (result.deletedCount === 0) {

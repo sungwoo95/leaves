@@ -11,7 +11,6 @@ const ForestContextMenu = ({
   onClickRenameHandler,
   onClickDeleteHandler,
   forestId,
-  isOwner,
   forestName,
   setButtonDisabled,
 }: {
@@ -22,7 +21,6 @@ const ForestContextMenu = ({
   onClickRenameHandler: () => void;
   onClickDeleteHandler: () => void;
   forestId: string;
-  isOwner: boolean;
   forestName: string;
   setButtonDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
@@ -49,12 +47,8 @@ const ForestContextMenu = ({
         onClick={onClickMenuHandler}
       >
         <MenuItem onClick={onClickRenameHandler}>Rename</MenuItem>
-        {isOwner && (
-          <div>
-            <MenuItem onClick={onClickDeleteHandler}>Delete</MenuItem>
-            <MenuItem onClick={handleInviteClick}>Add Member</MenuItem>
-          </div>
-        )}
+        <MenuItem onClick={onClickDeleteHandler}>Delete</MenuItem>
+        <MenuItem onClick={handleInviteClick}>Add Member</MenuItem>
       </Menu>
       <InviteModal
         open={inviteModalOpen}

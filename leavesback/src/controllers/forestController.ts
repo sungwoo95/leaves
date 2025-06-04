@@ -13,7 +13,6 @@ export const createForest = async (
   const sub = req.user.sub;
   try {
     const newForest: Forest = {
-      owner: sub,
       name: forestName,
       directories: [],
       participants: [sub],
@@ -23,7 +22,6 @@ export const createForest = async (
     ).insertedId;
     const newMyForestInfo: MyForestInfo = {
       forestId: newForestObjectId.toString(),
-      isOwner: true,
     };
     await usersCollection.updateOne(
       { sub },
@@ -129,7 +127,6 @@ export const addMemberToForest = async (
     // 7. 유저의 myForests에 추가
     const newMyForestInfo: MyForestInfo = {
       forestId: forestObjectId.toString(),
-      isOwner: false,
     };
 
     await usersCollection.updateOne(
