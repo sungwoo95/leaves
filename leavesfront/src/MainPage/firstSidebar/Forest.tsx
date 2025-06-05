@@ -21,6 +21,7 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [directories, setDirectories] = useState<Directory[]>([]);
   const [forestName, setForestName] = useState<string>('');
+  const [participants, setParticipants] = useState<string[]>([]);
   const { forestId } = myForests;
   const theme = useTheme();
   const [menuPosition, setMenuPosition] = useState<Position | undefined>(
@@ -59,8 +60,12 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
     },
     [WsMessageType.DELETE_FOREST]: (data) => {
       const { forestId } = data;
-      setMyForestsDeleteForest(forestId);
+      pullForestFromMyForests(forestId);
       changeLeafTreeDeleteForest(forestId);
+    },
+    [WsMessageType.LEAVE_FOREST]: (data) => {
+      const { sub } = data;
+      pullUserFromParticipants(sub);
     },
   };
 
@@ -279,10 +284,10 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
       const response = await axiosInstance.get(
         `/forest/readForest/${forestId.toString()}`
       );
-      const { directories, name } = response.data;
-      console.log(response.data);
+      const { directories, name, participants } = response.data;
       setDirectories(directories);
       setForestName(name);
+      setParticipants(participants);
     } catch (error) {
       console.log(error);
     }
@@ -378,11 +383,11 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
 
   const deleteForest = () => {
     wsSendDeleteForest();
-    setMyForestsDeleteForest(forestId);
+    pullForestFromMyForests(forestId);
     changeLeafTreeDeleteForest(forestId);
   };
 
-  const setMyForestsDeleteForest = (targetId: string) => {
+  const pullForestFromMyForests = (targetId: string) => {
     setMyForests((prev) =>
       prev.filter((forest) => forest.forestId !== targetId)
     );
@@ -414,17 +419,40 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
   };
 
   const wsSendDeleteForest = () => {
-    if (!user || !ws) {
+    if (!ws) {
       alert('Delete failed');
+      return;
+    }
+    ws.send(
+      JSON.stringify({
+        type: WsMessageType.DELETE_FOREST,
+        data: { forestId },
+      })
+    );
+  };
+
+  const wsSendLeaveForest = () => {
+    if (!user || !ws) {
+      alert('Leave failed');
       return;
     }
     const sub = user.uid;
     ws.send(
       JSON.stringify({
-        type: WsMessageType.DELETE_FOREST,
+        type: WsMessageType.LEAVE_FOREST,
         data: { forestId, sub },
       })
     );
+  };
+
+  const pullUserFromParticipants = (targetSub: string) => {
+    setParticipants((prev) => prev.filter((sub) => sub !== targetSub));
+  };
+
+  const handleLeaveClick = () => {
+    wsSendLeaveForest();
+    pullForestFromMyForests(forestId);
+    changeLeafTreeDeleteForest(forestId);
   };
 
   useEffect(() => {
@@ -475,6 +503,8 @@ const Forest = ({ myForests }: { myForests: MyForestInfo }) => {
           forestName={forestName}
           setButtonDisabled={setButtonDisabled}
           menuClose={menuClose}
+          participants={participants}
+          handleLeaveClick={handleLeaveClick}
         />
         <Box
           sx={{

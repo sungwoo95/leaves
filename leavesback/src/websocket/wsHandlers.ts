@@ -713,7 +713,6 @@ export const registHandler = (
         // }
       }
     },
-
     [WsMessageType.UPDATE_FOREST_NAME]: async (data) => {
       const {
         forestId,
@@ -739,7 +738,7 @@ export const registHandler = (
       }
     },
     [WsMessageType.DELETE_FOREST]: async (data) => {
-      const { forestId, sub }: { forestId: string; sub: string } = data;
+      const { forestId }: { forestId: string; } = data;
       const forestObjectId = new ObjectId(forestId);
       try {
         // Forest 문서 조회
@@ -771,7 +770,31 @@ export const registHandler = (
         console.error('[WsHandlers][DELETE_FOREST]', error);
       }
     },
-
+    [WsMessageType.LEAVE_FOREST]: async (data) => {
+      const { forestId, sub }: { forestId: string; sub: string } = data;
+      const forestObjectId = new ObjectId(forestId);
+      try {
+        await usersCollection.updateOne(
+          { sub },
+          {
+            $pull: {
+              myForests: { forestId },
+            },
+          }
+        );
+        await forestsCollection.updateOne(
+          { _id: forestObjectId },
+          {
+            $pull: {
+              participants: sub,
+            },
+          }
+        );
+        broadCast(forestId, WsMessageType.LEAVE_FOREST, { forestId, sub }, ws);
+      } catch (error) {
+        console.error('[WsHandlers][LEAVE_FOREST]', error);
+      }
+    }
   };
 
   ws.on('message', (rawData) => {

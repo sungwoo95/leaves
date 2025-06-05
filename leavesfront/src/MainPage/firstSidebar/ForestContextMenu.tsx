@@ -15,6 +15,8 @@ const ForestContextMenu = ({
   forestName,
   setButtonDisabled,
   menuClose,
+  participants,
+  handleLeaveClick,
 }: {
   open: boolean;
   menuPosition: Position | undefined;
@@ -26,6 +28,8 @@ const ForestContextMenu = ({
   forestName: string;
   setButtonDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   menuClose: () => void;
+  participants: string[];
+  handleLeaveClick: () => void;
 }) => {
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -83,8 +87,11 @@ const ForestContextMenu = ({
         onClick={onClickMenuHandler}
       >
         <MenuItem onClick={onClickRenameHandler}>Rename</MenuItem>
-        <MenuItem onClick={handleDeleteClick}>Delete</MenuItem>
         <MenuItem onClick={handleInviteClick}>Add Member</MenuItem>
+        {participants.length > 1 && (
+          <MenuItem onClick={handleLeaveClick}>Leave</MenuItem>
+        )}
+        <MenuItem onClick={handleDeleteClick}>Delete</MenuItem>
       </Menu>
       <InviteModal
         open={inviteModalOpen}
