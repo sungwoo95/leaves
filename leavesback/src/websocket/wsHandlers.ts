@@ -2,8 +2,6 @@ import { WebSocket } from 'ws';
 import {
   DeleteCase,
   DeleteLeafData,
-  Directory,
-  DirectoryType,
   IsConquer,
   Leaf,
   updateForestDirectoriesData,
@@ -16,76 +14,13 @@ import {
   usersCollection,
 } from '../config/db';
 import { ObjectId } from 'mongodb';
-import liveblocks from '../liveblocks';
-
-async function deleteAllRooms() {
-  while (true) {
-    const roomsPage = await liveblocks.getRooms();
-    const rooms = roomsPage.data;
-
-    if (rooms.length === 0) {
-      break; // 더 이상 삭제할 room이 없음
-    }
-
-    for (const room of rooms) {
-      await liveblocks.deleteRoom(room.id);
-    }
-  }
-}
-
-const deleteLeaf = async (targetId: string) => {
-  const leafDelRes = await leavesCollection.deleteOne({
-    _id: new ObjectId(targetId),
-  });
-  if (!leafDelRes.acknowledged || leafDelRes.deletedCount === 0) {
-    throw new Error(`[DeleteCase.HAS_PARENT] Failed to delete leaf`)
-  }
-  await liveblocks.deleteRoom(targetId);
-}
-
-const deleteTree = async (deleteTreeId: string) => {
-  const tree = await treesCollection.findOneAndDelete({
-    _id: new ObjectId(deleteTreeId),
-  })
-  if (!tree) {
-    throw new Error('Tree of deleteTreeId not found');
-  }
-  for (const node of tree.nodes) {
-    const nodeId = node.data.id;
-    await deleteLeaf(nodeId);
-  }
-}
-
-const deleteTreeFromDirectories = async (
-  directories: Directory[] // 삭제 대상이 될 디렉토리 배열
-): Promise<string[]> => {  // 삭제한 treeId들을 배열로 반환
-  const deletedTreeIds: string[] = []; // 삭제된 treeId를 저장할 배열
-
-  // 디렉토리 트리를 순회하며 삭제 처리하는 재귀 함수
-  const traverse = async (dir: Directory) => {
-    // 현재 노드가 파일 타입이고 treeId가 존재하면 삭제
-    if (dir.type === DirectoryType.FILE && dir.treeId) {
-      await deleteTree(dir.treeId);  // 외부 deleteTree 함수 직접 호출
-      deletedTreeIds.push(dir.treeId);  // 삭제된 treeId 배열에 추가
-    }
-
-    // 자식 디렉토리들도 재귀적으로 순회
-    for (const child of dir.children) {
-      await traverse(child);
-    }
-  };
-
-  // 최상위 directories 배열을 순회하며 traverse 호출
-  for (const directory of directories) {
-    await traverse(directory);
-  }
-
-  return deletedTreeIds; // 삭제 완료한 모든 treeId 반환
-};
+import { broadCast, wsGroups } from '../services/Common';
+import { deleteTree, deleteTreeFromDirectories } from '../services/Tree';
+import { deleteLeaf } from '../services/Leaf';
+import { deleteForest, leaveForest } from '../services/Forest';
 
 export const registHandler = (
   ws: WebSocket,
-  wsGroups: Map<string, Set<WebSocket>>
 ) => {
   const leaveWsGroup = (groupId: string) => {
     const group = wsGroups.get(groupId);
@@ -99,20 +34,6 @@ export const registHandler = (
   const joinWsGroup = (groupId: string) => {
     if (!wsGroups.has(groupId)) wsGroups.set(groupId, new Set());
     wsGroups.get(groupId)?.add(ws);
-  };
-  const broadCast = (
-    groupId: string,
-    messageType: WsMessageType,
-    data: any,
-    exceptWs?: any
-  ) => {
-    const clients = wsGroups.get(groupId);
-    if (!clients) return;
-    clients.forEach((client) => {
-      if (client !== exceptWs && client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({ type: messageType, data }));
-      }
-    });
   };
 
   const messageHandler: Partial<Record<WsMessageType, (message: any) => void>> =
@@ -739,60 +660,19 @@ export const registHandler = (
     },
     [WsMessageType.DELETE_FOREST]: async (data) => {
       const { forestId }: { forestId: string; } = data;
-      const forestObjectId = new ObjectId(forestId);
       try {
-        // Forest 문서 조회
-        const forest = await forestsCollection.findOne({ _id: forestObjectId });
-        if (!forest) {
-          throw new Error('Forest not found');
-        }
-        // Forest 문서 삭제
-        const result = await forestsCollection.deleteOne({ _id: forestObjectId });
-        if (result.deletedCount === 0) {
-          throw new Error('Failed to delete forest');
-        }
-        //directories 소속 tree제거.
-        deleteTreeFromDirectories(forest.directories);
-        // Forest 참가자들의 User 문서 업데이트
-        for (const participantSub of forest.participants) {
-          await usersCollection.updateOne(
-            { sub: participantSub },
-            {
-              $pull: {
-                myForests: { forestId },
-              },
-            }
-          );
-        }
-        // 브로드캐스트
-        broadCast(forestId, WsMessageType.DELETE_FOREST, { forestId }, ws);
+        deleteForest(forestId, ws)
       } catch (error) {
-        console.error('[WsHandlers][DELETE_FOREST]', error);
+        console.error('[DELETE_FOREST]', error);
       }
+
     },
     [WsMessageType.LEAVE_FOREST]: async (data) => {
       const { forestId, sub }: { forestId: string; sub: string } = data;
-      const forestObjectId = new ObjectId(forestId);
       try {
-        await usersCollection.updateOne(
-          { sub },
-          {
-            $pull: {
-              myForests: { forestId },
-            },
-          }
-        );
-        await forestsCollection.updateOne(
-          { _id: forestObjectId },
-          {
-            $pull: {
-              participants: sub,
-            },
-          }
-        );
-        broadCast(forestId, WsMessageType.LEAVE_FOREST, { forestId, sub }, ws);
+        leaveForest(forestId, sub, ws);
       } catch (error) {
-        console.error('[WsHandlers][LEAVE_FOREST]', error);
+        console.error('[LEAVE_FOREST]', error);
       }
     }
   };

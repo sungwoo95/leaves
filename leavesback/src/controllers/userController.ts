@@ -1,8 +1,9 @@
 import { User } from '../types';
 import { Request, Response } from 'express';
 import { usersCollection } from '../config/db';
+import { deleteFirebaseUser, deleteUserData } from '../services/User';
 
-const createUser = (sub: string): User => {
+const createUserDocument = (sub: string): User => {
   return {
     sub,
     myForests: [],
@@ -20,7 +21,7 @@ export const readMainPageData = async (
   try {
     const mainPageData = await usersCollection.findOne({ sub }, { projection: { _id: 0, sub: 0 } });
     if (!mainPageData) {
-      const newUser = createUser(sub);
+      const newUser = createUserDocument(sub);
       await usersCollection.insertOne(newUser);
       // sub 필드 제거
       const { sub: _, ...mainPageData } = newUser;
@@ -58,7 +59,25 @@ export const postMainPageData = async (
     res.status(200).json({ message: 'Update successful' });
     return;
   } catch (error) {
-    console.log(error);
+    console.error('[postMainPageData]', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+export const deleteUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  if (!req.user) { res.status(401).json({ message: '[userController][readMainPageData]Unauthorized' }); return; }
+  const sub = req.user.sub;
+  try {
+    await deleteFirebaseUser(sub);
+    await deleteUserData(sub);
+    res.status(200).json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error('[deleteUser]', error);
+    res.status(500).json({
+      message: 'Internal server error'
+    });
+  }
+}

@@ -9,7 +9,5 @@ if (!admin.apps.length) {
   });
 }
 
-const auth = admin.auth();
+export const auth = admin.auth();
 
-export { auth };
-export default admin;

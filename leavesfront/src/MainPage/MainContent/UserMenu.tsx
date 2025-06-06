@@ -2,6 +2,7 @@ import { Menu, MenuItem } from '@mui/material';
 import { auth } from '../../firebase';
 import { signOut } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../../axiosInstance';
 
 type Props = {
   onClose: () => void;
@@ -20,6 +21,16 @@ const UserMenu: React.FC<Props> = ({ onClose, userMenuAnchorEl }) => {
       console.error('Sign out error:', error);
     }
   };
+  const handleDeleteAccountClick = async () => {
+    onClose();
+    try {
+      await axiosInstance.delete('user/deleteUser');
+      await signOut(auth);
+      navigate('/');
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
+  };
 
   return (
     <Menu
@@ -30,6 +41,7 @@ const UserMenu: React.FC<Props> = ({ onClose, userMenuAnchorEl }) => {
       transformOrigin={{ vertical: 'top', horizontal: 'right' }}
     >
       <MenuItem onClick={handleLogoutClick}>Logout</MenuItem>
+      <MenuItem onClick={handleDeleteAccountClick}>Delete Account</MenuItem>
     </Menu>
   );
 };

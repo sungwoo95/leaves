@@ -15,8 +15,6 @@ const App = () => {
   const app: Application = express();
   const REST_API_PORT = 3000;
   const WS_PORT = 8081;
-  const wsGroups = new Map<string, Set<WebSocket>>();
-
   const setUpExpress = () => {
     app.use(express.json()); //req.body를 자동으로 객체로 변환
     app.use(cookieParser());
@@ -46,7 +44,7 @@ const App = () => {
     wsServer.on('connection', (ws: WebSocket) => {
       //ws매개변수의 인자값은 새로 연결된 클라이언트의 WebSocket 객체임.
       console.log('New WebSocket client connected');
-      registHandler(ws, wsGroups);
+      registHandler(ws);
     });
     console.log(`WebSocket server running on port ${WS_PORT}`);
   };
