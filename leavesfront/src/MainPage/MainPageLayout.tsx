@@ -5,13 +5,23 @@ import MainContent from './MainContent/MainContent';
 import FirstSidebar from './firstSidebar/FirstSidebar';
 import SecondSidebar from './SecondSidebar/SecondSidebar';
 import '../../src/styles.css';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useMediaQuery } from '@mui/material';
+const screenWidth = window.innerWidth;
+const desiredFirstSidebarWidth = Math.min(300, screenWidth * 0.15); // 20%, 최대 300px
+const desiredSecondSidebarWidth = Math.min(600, screenWidth * 0.35); // 30%, 최대 600px
 
 const MainPageLayout: React.FC = () => {
-  const prevFirstSidebarWidth = useRef<number>(240);
-  const prevSecondSidebarWidth = useRef<number>(500);
-  const [firstSidebarWidth, setFirstSidebarWidth] = useState<number>(240);
-  const [secondSidebarWidth, setSecondSidebarWidth] = useState<number>(500);
+  const prevFirstSidebarWidth = useRef<number>(desiredFirstSidebarWidth);
+  const prevSecondSidebarWidth = useRef<number>(desiredSecondSidebarWidth);
+  const [firstSidebarWidth, setFirstSidebarWidth] = useState<number>(
+    desiredFirstSidebarWidth
+  );
+  const [secondSidebarWidth, setSecondSidebarWidth] = useState<number>(
+    desiredSecondSidebarWidth
+  );
+  const isMSize = useMediaQuery('(max-width: 1024px)');
+  const isSSize = useMediaQuery('(max-width: 768px)');
 
   const toggleFirstSidebar = () => {
     if (firstSidebarWidth === 0) {
@@ -27,6 +37,20 @@ const MainPageLayout: React.FC = () => {
       setSecondSidebarWidth(0);
     }
   };
+
+  useEffect(() => {
+    if (isSSize) {
+      setFirstSidebarWidth(0);
+      setSecondSidebarWidth(0);
+    } else if (isMSize) {
+      setFirstSidebarWidth(0);
+      setSecondSidebarWidth(prevSecondSidebarWidth.current);
+    } else {
+      setFirstSidebarWidth(prevFirstSidebarWidth.current);
+      setSecondSidebarWidth(prevSecondSidebarWidth.current);
+    }
+  }, [isMSize, isSSize]);
+
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
       {/* 첫 번째 사이드바 */}
@@ -60,7 +84,7 @@ const MainPageLayout: React.FC = () => {
         height={Infinity}
         axis="x"
         resizeHandles={['e']}
-        minConstraints={[300, Infinity]}
+        minConstraints={[200, Infinity]}
         maxConstraints={[1000, Infinity]}
         handle={
           secondSidebarWidth === 0 ? <></> : <span className="custom-handle" />
@@ -84,7 +108,7 @@ const MainPageLayout: React.FC = () => {
         sx={{
           flex: 1, //flex-grow의 단축 형태로, 해당 요소가 남은 공간을 채우게 함.
           overflow: 'auto',
-          minWidth: 600,
+          minWidth: 200,
         }}
       >
         <MainContent
