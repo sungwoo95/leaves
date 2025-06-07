@@ -37,7 +37,9 @@ const MainPageLayout: React.FC = () => {
         resizeHandles={['e']} //핸들을 오른쪽에 위치(e: east)
         minConstraints={[100, Infinity]} //[너비,높이]
         maxConstraints={[400, Infinity]}
-        handle={<span className="custom-handle" />}
+        handle={
+          firstSidebarWidth === 0 ? <></> : <span className="custom-handle" />
+        }
         onResizeStop={(e: any, data: { size: { width: number } }) => {
           prevFirstSidebarWidth.current = data.size.width;
         }}
@@ -60,7 +62,9 @@ const MainPageLayout: React.FC = () => {
         resizeHandles={['e']}
         minConstraints={[300, Infinity]}
         maxConstraints={[1000, Infinity]}
-        handle={<span className="custom-handle" />}
+        handle={
+          secondSidebarWidth === 0 ? <></> : <span className="custom-handle" />
+        }
         onResizeStop={(e: any, data: { size: { width: number } }) => {
           prevSecondSidebarWidth.current = data.size.width;
         }}
