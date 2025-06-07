@@ -69,7 +69,14 @@ const MainPageLayout: React.FC = () => {
           prevSecondSidebarWidth.current = data.size.width;
         }}
       >
-        <SecondSidebar />
+        <Box
+          sx={{
+            display: secondSidebarWidth === 0 ? 'none' : 'block',
+            height: '100%',
+          }}
+        >
+          <SecondSidebar />
+        </Box>
       </ResizableBox>
 
       {/* 메인 콘텐츠 */}
@@ -77,6 +84,7 @@ const MainPageLayout: React.FC = () => {
         sx={{
           flex: 1, //flex-grow의 단축 형태로, 해당 요소가 남은 공간을 채우게 함.
           overflow: 'auto',
+          minWidth: 600,
         }}
       >
         <MainContent
