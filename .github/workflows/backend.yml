@@ -21,6 +21,8 @@ jobs:
         run: |
           echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> .env        # .env 파일 생성
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "SERVICE_ACCOUNT_KEY=${{ secrets.SERVICE_ACCOUNT_KEY }}" >> .env
+          echo "LIVEBLOCKS_SECRET=${{ secrets.LIVEBLOCKS_SECRET }}" >> .env
 
       - name: Build Node.js image
         run: |
