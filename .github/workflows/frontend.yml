@@ -12,6 +12,9 @@ jobs:
     runs-on: ubuntu-latest # GitHub이 제공하는 Ubuntu 가상머신에서 실행된다.
 
     steps:
+      - name: Checkout source
+        uses: actions/checkout@v3 # GitHub Actions에서 코드를 받아온다
+
       - name: Build nginx image
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/namunibs_nginx ./leavesfront

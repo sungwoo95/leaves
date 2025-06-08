@@ -8,7 +8,7 @@ const EntryPage: React.FC = () => {
     <div>
       <IntroduceApp />
       <SignInScreen />
-      <IntroduceDivideConquer videoSrc="../../public/introduceDivideConquer.mp4" />
+      <IntroduceDivideConquer videoSrc="/introduceDivideConquer.mp4" />
       <Footer />
     </div>
   );
