@@ -7,7 +7,7 @@ WORKDIR /app
 COPY . .
 
 # 의존성 설치 및 빌드
-RUN npm install
+RUN npm install --legacy-peer-deps
 RUN npm run build
 
 # 2단계: Nginx 이미지에 dist 결과만 복사

@@ -16,22 +16,11 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3 # 코드를 받아옴
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '22.13.0'
-
       - name: Create .env file
         working-directory: ./leavesback
         run: |
           echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> .env        # .env 파일 생성
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-
-      - name: Install dependencies & build TS
-        working-directory: ./leavesback
-        run: |
-          npm install     # 의존성 설치
-          npm run build   # TypeScript → JavaScript 변환
 
       - name: Build Node.js image
         run: |
