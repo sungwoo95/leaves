@@ -1,17 +1,15 @@
 import { Box, useTheme } from '@mui/material';
 import Leaf from './Leaf';
-import TobBar from './TopBar';
-import { useState } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 
-const MainContent = ({
-  toggleFirstSidebar,
-  toggleSecondSidebar,
-}: {
-  toggleFirstSidebar: () => void;
-  toggleSecondSidebar: () => void;
-}) => {
-  const [title, setTitle] = useState<string>('');
+type MainContentProps = {
+  title: string;
+  setTitle: Dispatch<SetStateAction<string>>;
+};
+
+const MainContent = ({ title, setTitle }: MainContentProps) => {
   const theme = useTheme();
+
   return (
     <Box
       sx={{
@@ -22,12 +20,6 @@ const MainContent = ({
         height: '100%',
       }}
     >
-      <TobBar
-        toggleFirstSidebar={toggleFirstSidebar}
-        toggleSecondSidebar={toggleSecondSidebar}
-        title={title}
-        setTitle={setTitle}
-      />
       <Box
         sx={{
           flex: 1,

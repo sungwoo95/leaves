@@ -54,7 +54,16 @@ const TobBar: React.FC<Props> = ({
 
   return (
     <div>
-      <AppBar position="sticky" elevation={0}>
+      <AppBar
+        position="sticky"
+        elevation={0}
+        sx={{
+          borderBottom:
+            theme.palette.mode === 'dark'
+              ? '1px solid #171817'
+              : '1px solid rgb(200, 208, 200)',
+        }}
+      >
         <Toolbar
           sx={{
             minHeight: 40,
