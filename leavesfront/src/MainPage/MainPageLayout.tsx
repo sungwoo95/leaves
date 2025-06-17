@@ -1,4 +1,4 @@
-import { Box } from '@mui/material';
+import { Box, useMediaQuery } from '@mui/material';
 import { ResizableBox } from 'react-resizable';
 import 'react-resizable/css/styles.css';
 import MainContent from './MainContent/MainContent';
@@ -6,14 +6,14 @@ import FirstSidebar from './firstSidebar/FirstSidebar';
 import SecondSidebar from './SecondSidebar/SecondSidebar';
 import '../../src/styles.css';
 import { useEffect, useRef, useState } from 'react';
-import { useMediaQuery } from '@mui/material';
 import TobBar from './MainContent/TopBar';
+
 const screenWidth = window.innerWidth;
 const desiredFirstSidebarWidth = Math.min(300, screenWidth * 0.15); // 20%, 최대 300px
 const desiredSecondSidebarWidth = Math.min(600, screenWidth * 0.35); // 30%, 최대 600px
 
 const MainPageLayout: React.FC = () => {
-  const prevFirstSidebarWidth = useRef<number>(250);
+  const prevFirstSidebarWidth = useRef<number>(desiredFirstSidebarWidth);
   const prevSecondSidebarWidth = useRef<number>(desiredSecondSidebarWidth);
   const [firstSidebarWidth, setFirstSidebarWidth] = useState<number>(
     desiredFirstSidebarWidth
@@ -25,33 +25,39 @@ const MainPageLayout: React.FC = () => {
   const isMSize = useMediaQuery('(max-width: 1024px)');
   const isSSize = useMediaQuery('(max-width: 768px)');
 
-  const toggleFirstSidebar = () => {
-    if (firstSidebarWidth === 0) {
-      setFirstSidebarWidth(prevFirstSidebarWidth.current);
-    } else {
-      setFirstSidebarWidth(0);
-    }
-  };
-  const toggleSecondSidebar = () => {
-    if (secondSidebarWidth === 0) {
-      setSecondSidebarWidth(prevSecondSidebarWidth.current);
-    } else {
-      setSecondSidebarWidth(0);
-    }
-  };
-
   useEffect(() => {
     if (isSSize) {
+      // 작은 화면: 둘 다 닫힌 상태로 시작
       setFirstSidebarWidth(0);
       setSecondSidebarWidth(0);
     } else if (isMSize) {
+      // 중간 화면: 첫 번째 사이드바만 닫힘
       setFirstSidebarWidth(0);
       setSecondSidebarWidth(prevSecondSidebarWidth.current);
     } else {
+      // 큰 화면: 둘 다 열림
       setFirstSidebarWidth(prevFirstSidebarWidth.current);
       setSecondSidebarWidth(prevSecondSidebarWidth.current);
     }
   }, [isMSize, isSSize]);
+
+  const toggleFirstSidebar = () => {
+    const newWidth = firstSidebarWidth === 0 ? prevFirstSidebarWidth.current : 0;
+    setFirstSidebarWidth(newWidth);
+    // 작은 화면에서 첫 번째 사이드바를 열면, 두 번째는 닫음
+    if (isSSize && newWidth > 0) {
+      setSecondSidebarWidth(0);
+    }
+  };
+
+  const toggleSecondSidebar = () => {
+    const newWidth = secondSidebarWidth === 0 ? prevSecondSidebarWidth.current : 0;
+    setSecondSidebarWidth(newWidth);
+    // 작은 화면에서 두 번째 사이드바를 열면, 첫 번째는 닫음
+    if (isSSize && newWidth > 0) {
+      setFirstSidebarWidth(0);
+    }
+  };
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', flexDirection: 'column' }}>
