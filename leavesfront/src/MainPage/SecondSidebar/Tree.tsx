@@ -141,16 +141,29 @@ const Tree: React.FC = () => {
     },
   };
 
+  const prevLeafId = useRef<string | null>(null);
+
   //leafId로 중앙 정렬.
   const focusCurrentNode = useCallback(() => {
-    if (cyRef.current && leafId) {
-      const cy = cyRef.current;
-      const leaf = cy.getElementById(leafId);
+    const cy = cyRef.current;
+    if (!cy) return;
 
-      if (leaf && leaf.isNode()) {
-        const leafPosition = leaf.position();
+    // 1. 이전에 강조된 노드가 있다면 스타일을 원래대로 되돌립니다.
+    if (prevLeafId.current && prevLeafId.current !== leafId) {
+      const prevNode = cy.getElementById(prevLeafId.current);
+      if (prevNode.length > 0) {
+        prevNode.style({ width: '5px', height: '5px' });
+      }
+    }
+
+    // 2. 현재 leafId에 해당하는 노드를 찾아 강조하고 중앙으로 이동합니다.
+    if (leafId) {
+      const leafNode = cy.getElementById(leafId);
+
+      if (leafNode.length > 0 && leafNode.isNode()) {
+        // 중앙 이동 애니메이션
+        const leafPosition = leafNode.position();
         const zoom = cy.zoom();
-
         cy.animate(
           {
             pan: {
@@ -164,16 +177,16 @@ const Tree: React.FC = () => {
           }
         );
 
-        // 강조 스타일 적용
-        cy.style()
-          .selector(`node[id = "${leafId}"]`)
-          .style({
-            width: '10px',
-            height: '10px',
-          })
-          .update();
+        // 개별 노드에 직접 스타일을 적용하여 리렌더링 후에도 유지되도록 합니다.
+        leafNode.style({
+          width: '10px',
+          height: '10px',
+        });
       }
     }
+
+    // 3. 현재 leafId를 "이전 ID"로 저장하여 다음 변경 시 사용합니다.
+    prevLeafId.current = leafId;
   }, [leafId]);
 
   const handleLeafClick = (event: cytoscape.EventObject) => {
