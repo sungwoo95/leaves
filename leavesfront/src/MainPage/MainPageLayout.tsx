@@ -8,9 +8,8 @@ import '../../src/styles.css';
 import { useEffect, useRef, useState } from 'react';
 import TobBar from './MainContent/TopBar';
 
-const screenWidth = window.innerWidth;
-const desiredFirstSidebarWidth = Math.min(300, screenWidth * 0.15); // 20%, 최대 300px
-const desiredSecondSidebarWidth = Math.min(600, screenWidth * 0.35); // 30%, 최대 600px
+const desiredFirstSidebarWidth = 250;
+const desiredSecondSidebarWidth = 450;
 
 const MainPageLayout: React.FC = () => {
   const prevFirstSidebarWidth = useRef<number>(desiredFirstSidebarWidth);
