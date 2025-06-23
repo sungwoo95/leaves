@@ -269,9 +269,11 @@ const Tree: React.FC = () => {
     nodes: NodeCollection,
     edges: EdgeCollection
   ) => {
-    if (isSimulationActivated) {
-      isSimulationActivated.stop();
-    }
+    const cy = cyRef.current;
+    if (!cy) return;
+
+    // d3-force는 반복적으로 실행되지만, tick마다 화면을 업데이트하는 대신
+    // 모든 계산이 끝난 후 최종 위치만 한 번에 적용하여 '즉시' 완료되는 것처럼 만듭니다.
     const d3Edges = edges.map((edge) => ({
       source: edge.source().id(),
       target: edge.target().id(),
@@ -281,38 +283,42 @@ const Tree: React.FC = () => {
       x: ele.position().x,
       y: ele.position().y,
     }));
-    const sim = forceSimulation(d3Nodes)
-      .force('charge', forceManyBody().strength(-30)) // 서로 밀어내는 힘
+
+    const simulation = forceSimulation(d3Nodes)
+      .force('charge', forceManyBody().strength(-30))
       .force(
         'link',
         forceLink(d3Edges)
           .id((n: any) => n.id)
           .distance(100)
           .strength(1)
-      ) // 서로 당기는 힘
-      .force('collision', forceCollide().radius(30)) // 충돌 방지
-      .alpha(0.1) // 초기 에너지 (애니메이션 강도)
-      .alphaDecay(0.05) // 서서히 멈추게 하는 감쇠율
-      .on('tick', () => {
-        d3Nodes.forEach((node) => {
-          const ele = cyRef.current!.getElementById(node.id);
-          if (ele) {
-            ele.position({
-              x: node.x ?? 0,
-              y: node.y ?? 0,
-            });
-          }
-        });
-      });
-    isSimulationActivated = sim;
+      )
+      .force('collision', forceCollide().radius(30))
+      .alpha(0.1)
+      .alphaDecay(0.05)
+      .stop(); // 자동 실행 중지
 
-    //시뮬레이션 정지
-    setTimeout(() => {
-      sim.stop();
-      if (isSimulationActivated === sim) {
-        isSimulationActivated = null;
-      }
-    }, 2000);
+    // 시뮬레이션을 수동으로 실행하여 최종 레이아웃을 계산합니다.
+    // alpha가 최소값에 도달할 때까지의 반복 횟수만큼 실행합니다.
+    const numIterations = Math.ceil(
+      Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay())
+    );
+    for (let i = 0; i < numIterations; ++i) {
+      simulation.tick();
+    }
+
+    // 계산된 최종 위치를 Cytoscape 노드에 한 번에 적용합니다.
+    cy.batch(() => {
+      d3Nodes.forEach((node) => {
+        const ele = cy.getElementById(node.id);
+        if (ele) {
+          ele.position({
+            x: node.x ?? 0,
+            y: node.y ?? 0,
+          });
+        }
+      });
+    });
   };
 
   const applyForceForDeleteNode = () => {
@@ -565,19 +571,25 @@ const Tree: React.FC = () => {
   useEffect(() => {
     const cy = cyRef.current;
     if (!cy) return;
+
+    // 1. 초기 위치를 breadthfirst로 빠르게 설정합니다.
     cy.layout({
       name: 'breadthfirst',
       directed: true,
       spacingFactor: 1,
       nodeDimensionsIncludeLabels: true,
     }).run();
-    if (treeId === owningTreeId) {
-      focusCurrentNode();
-    }
+
+    // 2. 동기화된 force-directed 레이아웃으로 위치를 미세 조정합니다.
     const nodes = cy.nodes();
     const edges = cy.edges();
     if (nodes.length > 0) {
       applyForceForFirstLayout(nodes, edges);
+    }
+    // 3. 레이아웃이 안정된 후, 포커스를 맞춥니다.
+    cy.fit();
+    if (treeId === owningTreeId) {
+      focusCurrentNode();
     }
   }, [treeDataFlag]);
 
