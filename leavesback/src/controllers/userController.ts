@@ -41,11 +41,11 @@ export const postMainPageData = async (
 ): Promise<void> => {
   if (!req.user) { res.status(401).json({ message: '[userController][readMainPageData]Unauthorized' }); return; }
   const sub = req.user.sub;
-  const { treeId, leafId } = req.body;
+  const { treeId, leafId, owningTreeId } = req.body;
   try {
     const document = await usersCollection.updateOne(
       { sub },
-      { $set: { treeId, leafId } }
+      { $set: { treeId, leafId, owningTreeId } }
     );
     if (document.matchedCount === 0) {
       res.status(404).json({ message: 'User not found' });

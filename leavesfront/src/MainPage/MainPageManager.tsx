@@ -121,6 +121,9 @@ export function MainPageManager({ children }: MainPageProps) {
         if (mainPageData.myForests) {
           setMyForests(mainPageData.myForests);
         }
+        if (mainPageData.owningTreeId) {
+          setOwningTreeId(mainPageData.owningTreeId);
+        }
         setIsReady(true);
       } catch (error) {
         console.log(
@@ -146,7 +149,7 @@ export function MainPageManager({ children }: MainPageProps) {
       return;
     }
     const postMainPageData = async () => {
-      const postData = { treeId, leafId };
+      const postData = { treeId, leafId, owningTreeId };
       try {
         await axiosInstance.post(`/user/mainPage`, postData);
       } catch (error) {
@@ -157,7 +160,7 @@ export function MainPageManager({ children }: MainPageProps) {
       }
     };
     postMainPageData();
-  }, [treeId, leafId]);
+  }, [treeId, leafId, owningTreeId]);
   return (
     <MainPageContext.Provider
       value={{

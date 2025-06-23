@@ -47,6 +47,7 @@ export type User = {
   myForests: MyForestInfo[];
   treeId: string | undefined;
   leafId: string | undefined;
+  owningTreeId?: string;
 };
 
 export type MyForestInfo = {
